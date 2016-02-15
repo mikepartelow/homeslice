@@ -1,0 +1,94 @@
+# -*- coding: utf-8 -*-
+
+from flask import Flask, g
+import os, sys, json, subprocess
+
+PATH_TO_WEMO_CACHE = '/tmp/homeslice.cache.json'
+
+class Wemo(object):
+    PATH_TO_WEMO = 'wemo'
+
+    def __init__(self, id, name, kind):
+        self.id, self.name, self.kind = id, name, kind
+
+    def on(self):
+        subprocess.check_output("""{} switch "{}" on""".format(self.PATH_TO_WEMO, self.name), shell=True)
+
+    def off(self):
+        subprocess.check_output("""{} switch "{}" off""".format(self.PATH_TO_WEMO, self.name), shell=True)
+
+    def to_dict(self):
+        return dict(id=self.id, name=self.name, kind=self.kind)
+
+    @classmethod
+    def find_configured(cls, config):
+        wemos = {}
+
+        # FIXME: it would be nice to use ouimeaux lib but it really doesn't want to coexist with flask.
+        #
+        out = subprocess.check_output("{} list".format(cls.PATH_TO_WEMO), shell=True)
+        wemos_found = [ line.split(':')[1].strip() for line in out.splitlines() ]
+
+        for wemo_name in wemos_found:
+            for entry in config:
+                if wemo_name == entry.get('wemo switch'):
+                    wemo_id=entry['id']
+                    wemos[wemo_id] = Wemo(wemo_id, wemo_name, 'switch')
+        return wemos
+
+app = Flask(__name__)
+
+def get_wemos():
+    if not hasattr(g, 'wemos'):
+        g.wemos = app.config['wemos']
+    return g.wemos
+
+@app.route('/')
+def root():
+    return "Homeslice!"
+
+@app.route('/api/v0/wemos/', methods=('GET',))
+def api_v0_wemos():
+    wemos = [ wemo.to_dict() for wemo in get_wemos().values() ]
+
+    return json.dumps(wemos)
+
+@app.route('/api/v0/wemos/switches/', methods=('GET',))
+def api_v0_wemos_switches():
+    wemos = [ wemo.to_dict() for wemo in get_wemos().values() if wemo.kind == 'switch' ]
+
+    return json.dumps(wemos)
+
+@app.route('/api/v0/wemos/switches/<switch_id>/on/', methods=('POST',))
+def api_v0_wemo_on(switch_id):
+    get_wemos()[switch_id].on()
+
+    return('OK')
+
+@app.route('/api/v0/wemos/switches/<switch_id>/off/', methods=('POST',))
+def api_v0_wemo_off(switch_id):
+    get_wemos()[switch_id].off()
+
+    return('OK')
+
+def configure(path_to_config):
+    with open(path_to_config) as config_file:
+       config = json.loads(config_file.read())
+       # FIXME: validate config
+       app.config['homeslice'] = config
+
+    if os.path.exists(PATH_TO_WEMO_CACHE):
+        with open(PATH_TO_WEMO_CACHE, 'r') as f:
+            wemo_dicts = json.loads(f.read())
+
+        app.config['wemos'] = dict([ ( d['id'], Wemo(d['id'], d['name'], d['kind']) ) for d in wemo_dicts ])
+    else:
+        app.config['wemos'] = Wemo.find_configured(app.config['homeslice'])
+        the_json = json.dumps([ wemo.to_dict() for wemo in app.config['wemos'].values() ])
+
+        with open(PATH_TO_WEMO_CACHE, 'w') as f:
+            f.write(the_json)
+
+if __name__ == '__main__':
+    configure(sys.argv[1])
+    app.run(host='0.0.0.0', debug=True)

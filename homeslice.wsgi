@@ -6,7 +6,7 @@ sys.stdout = sys.stderr
 sys.path.insert(0, '/opt/code/venv.homeslice/bin/')
 sys.path.insert(0, '/opt/code/homeslice/')
 
-from www import app as application
+from homeslice import app as application
 with open('/opt/code/homeslice/homeslice.json') as config_file:
     config = json.loads(config_file.read())
     # FIXME: validate config
