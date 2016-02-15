@@ -3,7 +3,7 @@
 from flask import Flask, g
 import os, sys, json, subprocess
 
-PATH_TO_WEMO = 'wemo'
+PATH_TO_WEMO = 'wemo '
 
 class Wemo(object):
     def __init__(self, name):
@@ -45,7 +45,8 @@ def wemo_dict(wemo_id, wemo_info):
 
 @app.route('/')
 def root():
-    return 'Homeslice!'
+    out = subprocess.check_output("ls /etc/", shell=True)
+    return out
 
 @app.route('/api/v0/wemos/', methods=('GET',))
 def api_v0_wemos():
@@ -71,10 +72,10 @@ def api_v0_wemo_off(switch_id):
 
     return('OK')
 
-if __name__ == '__main__':
-    with open(sys.argv[1]) as config_file:
-        config = json.loads(config_file.read())
-        # FIXME: validate config
-        app.config['homeslice'] = config
-
-    app.run(host='0.0.0.0', debug=True)
+#if __name__ == '__main__':
+#    with open(sys.argv[1]) as config_file:
+#        config = json.loads(config_file.read())
+#        # FIXME: validate config
+#        app.config['homeslice'] = config
+#
+#    app.run(host='0.0.0.0', debug=True)
