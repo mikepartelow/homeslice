@@ -3,15 +3,20 @@
 from flask import Flask, g
 import os, sys, json, subprocess
 
+PATH_TO_WEMO = 'wemo'
+
 class Wemo(object):
     def __init__(self, name):
         self.name = name
 
     def on(self):
-        subprocess.check_output("""wemo switch "{}" on""".format(self.name), shell=True)
+        subprocess.check_output("""{} switch "{}" on""".format(PATH_TO_WEMO, self.name), shell=True)
 
     def off(self):
-        subprocess.check_output("""wemo switch "{}" off""".format(self.name), shell=True)
+        subprocess.check_output("""{} switch "{}" off""".format(PATH_TO_WEMO, self.name), shell=True)
+
+# FIXME: why this? just an array of Wemo objs. merge them.
+#
 
 class Wemos(object):
     def __init__(self, config):
@@ -19,7 +24,7 @@ class Wemos(object):
 
         # FIXME: it would be nice to use ouimeaux lib but it really doesn't want to coexist with flask.
         #
-        out = subprocess.check_output("wemo list", shell=True)
+        out = subprocess.check_output("{} list".format(PATH_TO_WEMO), shell=True)
         wemos_found = [ line.split(':')[1].strip() for line in out.splitlines() ]
 
         for wemo_name in wemos_found:
