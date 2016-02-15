@@ -7,8 +7,5 @@ sys.path.insert(0, '/opt/code/venv.homeslice/bin/')
 sys.path.insert(0, '/opt/code/homeslice/')
 
 from homeslice import app as application
-with open('/opt/code/homeslice/homeslice.json') as config_file:
-    config = json.loads(config_file.read())
-    # FIXME: validate config
-    application.config['homeslice'] = config
-
+from homeslice import configure
+configure('/opt/code/homeslice/homeslice.json')
