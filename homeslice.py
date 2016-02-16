@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from flask import Flask, g
+from flask import Flask, g, jsonify, Response
 import os, sys, json, subprocess
-
+import soco
 PATH_TO_WEMO_CACHE = '/tmp/homeslice.cache.json'
 
 class Wemo(object):
@@ -43,6 +43,11 @@ def get_wemos():
         g.wemos = app.config['wemos']
     return g.wemos
 
+def get_sonos():
+    if not hasattr(g, 'sonos'):
+        g.sonos = soco.discover()
+    return g.sonos
+
 @app.route('/')
 def root():
     return "Homeslice!"
@@ -51,13 +56,13 @@ def root():
 def api_v0_wemos():
     wemos = [ wemo.to_dict() for wemo in get_wemos().values() ]
 
-    return json.dumps(wemos)
+    return Response(json.dumps(wemos),  mimetype='application/json')
 
 @app.route('/api/v0/wemos/switches/', methods=('GET',))
 def api_v0_wemos_switches():
     wemos = [ wemo.to_dict() for wemo in get_wemos().values() if wemo.kind == 'switch' ]
 
-    return json.dumps(wemos)
+    return Response(json.dumps(wemos),  mimetype='application/json')
 
 @app.route('/api/v0/wemos/switches/<switch_id>/on/', methods=('POST',))
 def api_v0_wemo_on(switch_id):
@@ -70,6 +75,27 @@ def api_v0_wemo_off(switch_id):
     get_wemos()[switch_id].off()
 
     return('OK')
+
+@app.route('/api/v0/sonos/', methods=('GET',))
+def api_v0_sonos_plural():
+    sonos = [ dict(name=z.player_name,
+                   group=z.group.uid,
+                   volume=z.volume,
+                   is_coordinator=z.is_coordinator,
+                   mute=z.mute,
+                   current_track=z.get_current_track_info()['title']) for z in get_sonos() ]
+    return Response(json.dumps(sonos),  mimetype='application/json')
+
+@app.route('/api/v0/sonos/<name>/', methods=('GET',))
+def api_v0_sonos_singular(name):
+    sonos = [ dict(name=z.player_name,
+                   group=z.group.uid,
+                   volume=z.volume,
+                   is_coordinator=z.is_coordinator,
+                   mute=z.mute,
+                   current_track=z.get_current_track_info()['title']) for z in get_sonos()
+                if z.player_name == name ][0]
+    return Response(json.dumps(sonos),  mimetype='application/json')
 
 def configure(path_to_config):
     with open(path_to_config) as config_file:
