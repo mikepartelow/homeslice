@@ -97,6 +97,22 @@ def api_v0_sonos_singular(name):
                 if z.player_name == name ][0]
     return Response(json.dumps(sonos),  mimetype='application/json')
 
+@app.route('/api/v0/sonos/play/', methods=('POST',))
+def api_v0_sonos_play():
+    sonos = next((z for z in get_sonos() if z.is_coordinator), None)
+    if sonos is not None:
+        sonos.play()
+
+    return('OK')
+
+@app.route('/api/v0/sonos/pause/', methods=('POST',))
+def api_v0_sonos_pause():
+    sonos = next((z for z in get_sonos() if z.is_coordinator), None)
+    if sonos is not None:
+        sonos.pause()
+
+    return('OK')
+
 def configure(path_to_config):
     with open(path_to_config) as config_file:
        config = json.loads(config_file.read())
