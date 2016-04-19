@@ -3,6 +3,7 @@
 from flask import Flask, g, jsonify, Response
 import os, sys, json, subprocess
 import soco
+import requests
 PATH_TO_WEMO_CACHE = '/tmp/homeslice.cache.json'
 
 class Wemo(object):
@@ -37,6 +38,9 @@ class Wemo(object):
         return wemos
 
 app = Flask(__name__)
+
+def reboot_sonos(z):
+    requests.get("http://{}:1400/reboot".format(z.ip_address))
 
 def get_wemos():
     if not hasattr(g, 'wemos'):
@@ -86,6 +90,12 @@ def api_v0_sonos_plural():
                    current_track=z.get_current_track_info()['title']) for z in get_sonos() ]
     return Response(json.dumps(sonos),  mimetype='application/json')
 
+@app.route('/api/v0/sonos/reboot/', methods=('POST',))
+def api_v0_sonos_reboot():
+    for z in get_sonos():
+        reboot_sonos(z)
+    return('OK')
+
 @app.route('/api/v0/sonos/<name>/', methods=('GET',))
 def api_v0_sonos_singular(name):
     sonos = [ dict(name=z.player_name,
@@ -110,6 +120,20 @@ def api_v0_sonos_pause():
     sonos = next((z for z in get_sonos() if z.is_coordinator), None)
     if sonos is not None:
         sonos.pause()
+
+    return('OK')
+
+@app.route('/api/v0/sonos/volume/up/', methods=('POST',))
+def api_v0_sonos_volume_up():
+    for sonos in get_sonos():
+        sonos.volume += 10
+
+    return('OK')
+
+@app.route('/api/v0/sonos/volume/down/', methods=('POST',))
+def api_v0_sonos_volume_down():
+    for sonos in get_sonos():
+        sonos.volume -= 10
 
     return('OK')
 

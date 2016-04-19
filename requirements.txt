@@ -1,3 +1,4 @@
 ouimeaux
 flask
 soco
+requests
