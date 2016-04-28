@@ -2,3 +2,4 @@ ouimeaux
 flask
 soco
 requests
+spotipy

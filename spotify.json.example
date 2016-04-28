@@ -1,0 +1,8 @@
+{
+  "auth" : {
+    "client-id"        : "",
+    "client-secret"    : "",
+    "redirect-uri"     : "",
+    "username"         : ""
+  }
+}
