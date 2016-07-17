@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*-
 
-from flask import Flask, g, jsonify, Response
+from flask import Flask, g, jsonify, Response, request, jsonify
 import os, sys, json, subprocess
 import soco
 import requests
-PATH_TO_WEMO_CACHE = '/tmp/homeslice.cache.json'
+from sqlite3 import dbapi2 as sqlite3
+import json
+
+PATH_TO_WEMO_CACHE = '/var/cache/homeslice/homeslice.cache.json'
+PATH_TO_DATABASE   = '/var/cache/homeslice/db/homeslice.sqlite3'
 
 class Wemo(object):
     PATH_TO_WEMO = 'wemo'
@@ -38,6 +42,32 @@ class Wemo(object):
         return wemos
 
 app = Flask(__name__)
+
+def connect_db():
+    rv = sqlite3.connect(os.path.join(PATH_TO_DATABASE))
+    rv.row_factory = sqlite3.Row
+    return rv
+
+def init_db():
+    db = get_db()
+    with app.open_resource('schema.sql', mode='r') as f:
+        db.cursor().executescript(f.read())
+    db.commit()
+
+@app.cli.command('initdb')
+def initdb_command():
+    init_db()
+    print('Initialized the database.')
+
+def get_db():
+    if not hasattr(g, 'sqlite_db'):
+        g.sqlite_db = connect_db()
+    return g.sqlite_db
+
+@app.teardown_appcontext
+def close_db(error):
+    if hasattr(g, 'sqlite_db'):
+        g.sqlite_db.close()
 
 def reboot_sonos(z):
     requests.get("http://{}:1400/reboot".format(z.ip_address))
@@ -134,6 +164,25 @@ def api_v0_sonos_volume_up():
 def api_v0_sonos_volume_down():
     for sonos in get_sonos():
         sonos.volume -= 10
+
+    return('OK')
+
+@app.route('/api/v0/logs/<log_name>/', methods=('GET', 'POST',))
+def api_v0_logs(log_name):
+    db = get_db()
+    if request.method == 'GET':
+        cur = db.execute('SELECT json, timestamp FROM log_entries WHERE log_name = ? ORDER BY id DESC', [log_name,])
+        entries = cur.fetchall()
+        return jsonify([ dict(entry=json.loads(e[0]), timestamp=e[1]) for e in entries ])
+
+    elif request.method == 'POST':
+        the_json = request.get_json()
+        sys.stderr.write("POST\n")
+        sys.stderr.write("POST: {}::{}\n".format(log_name, the_json))
+        db.execute('INSERT INTO log_entries (log_name, json) VALUES (?, ?)', [log_name, json.dumps(the_json),])
+        sys.stderr.write("POST2\n")
+        db.commit()
+        return jsonify(dict(result='OK'))
 
     return('OK')
 
