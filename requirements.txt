@@ -3,4 +3,3 @@ flask
 soco
 requests
 spotipy
-sqlite3

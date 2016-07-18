@@ -7,20 +7,21 @@ import requests
 from sqlite3 import dbapi2 as sqlite3
 import json
 
+PATH_TO_THE_WEMO_CACHE_WE_HATE = '/var/www/.wemo/cache'
 PATH_TO_WEMO_CACHE = '/var/cache/homeslice/homeslice.cache.json'
 PATH_TO_DATABASE   = '/var/cache/homeslice/db/homeslice.sqlite3'
 
 class Wemo(object):
-    PATH_TO_WEMO = 'wemo'
+    PATH_TO_WEMO = 'wemo -f'
 
     def __init__(self, id, name, kind):
         self.id, self.name, self.kind = id, name, kind
 
     def on(self):
-        subprocess.check_output("""{} switch "{}" on""".format(self.PATH_TO_WEMO, self.name), shell=True)
+        subprocess.check_output("""rm -f {} ; {} switch "{}" on 2>&1""".format(PATH_TO_THE_WEMO_CACHE_WE_HATE, self.PATH_TO_WEMO, self.name), shell=True)
 
     def off(self):
-        subprocess.check_output("""{} switch "{}" off""".format(self.PATH_TO_WEMO, self.name), shell=True)
+        subprocess.check_output("""rm -f {} ; {} switch "{}" off""".format(PATH_TO_THE_WEMO_CACHE_WE_HATE, self.PATH_TO_WEMO, self.name), shell=True)
 
     def to_dict(self):
         return dict(id=self.id, name=self.name, kind=self.kind)
