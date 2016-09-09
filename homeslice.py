@@ -6,6 +6,8 @@ import soco
 import requests
 from sqlite3 import dbapi2 as sqlite3
 import json
+from datetime import datetime
+from dateutil import tz
 
 PATH_TO_THE_WEMO_CACHE_WE_HATE = '/var/www/.wemo/cache'
 PATH_TO_WEMO_CACHE = '/var/cache/homeslice/homeslice.cache.json'
@@ -64,6 +66,14 @@ def get_db():
     if not hasattr(g, 'sqlite_db'):
         g.sqlite_db = connect_db()
     return g.sqlite_db
+
+def gmt_to_local(timestr):
+    utc = datetime.strptime(timestr, '%Y-%m-%d %H:%M:%S')
+    utc = utc.replace(tzinfo=gmt_to_local.from_zone)
+    return utc.astimezone(gmt_to_local.to_zone).isoformat()
+
+gmt_to_local.from_zone = tz.tzutc()
+gmt_to_local.to_zone = tz.tzlocal()
 
 @app.teardown_appcontext
 def close_db(error):
@@ -174,7 +184,7 @@ def api_v0_logs(log_name):
     if request.method == 'GET':
         cur = db.execute('SELECT json, timestamp FROM log_entries WHERE log_name = ? ORDER BY id DESC', [log_name,])
         entries = cur.fetchall()
-        return jsonify([ dict(entry=json.loads(e[0]), timestamp=e[1]) for e in entries ])
+        return jsonify([ dict(entry=json.loads(e[0]), timestamp=gmt_to_local(e[1])) for e in entries ])
 
     elif request.method == 'POST':
         the_json = request.get_json()
