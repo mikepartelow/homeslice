@@ -197,6 +197,18 @@ def api_v0_logs(log_name):
 
     return('OK')
 
+@app.route('/api/v0/logs/<log_name>/homebridge/', methods=('GET',))
+def api_v0_logs_last(log_name):
+    db = get_db()
+    if request.method == 'GET':
+        cur = db.execute('SELECT json, timestamp FROM log_entries WHERE log_name = ? ORDER BY id DESC LIMIT 1', [log_name,])
+        entry = json.loads(cur.fetchone()[0])
+        tempC = (float(entry['tempF']) - 32) / (9.0/5.0)
+        return jsonify(dict(temperature=tempC, humidity=float(entry['relhum'])))
+
+    return('OK')
+
+
 def configure(path_to_config):
     with open(path_to_config) as config_file:
        config = json.loads(config_file.read())
