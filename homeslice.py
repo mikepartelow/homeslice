@@ -121,6 +121,14 @@ def api_v0_wemo_off(switch_id):
 
     return('OK')
 
+@app.route('/api/v0/buttons/<button_name>/', methods=('GET',))
+def api_v0_button(button_name):
+    db = get_db()
+    if request.method == 'GET':
+        cur = db.execute('SELECT status FROM buttons WHERE name = ?', [button_name,])
+        entry = cur.fetchone()
+        return entry[0]
+
 @app.route('/api/v0/sonos/', methods=('GET',))
 def api_v0_sonos_plural():
     sonos = [ dict(name=z.player_name,
