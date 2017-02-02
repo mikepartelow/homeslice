@@ -129,6 +129,22 @@ def api_v0_button(button_name):
         entry = cur.fetchone()
         return entry[0]
 
+@app.route('/api/v0/buttons/<button_name>/on/', methods=('POST',))
+def api_v0_button_on(button_name):
+    db = get_db()
+    if request.method == 'POST':
+        db.execute("UPDATE buttons SET status='ON' WHERE name = ?", [button_name,])
+        db.commit()
+    return 'OK'
+
+@app.route('/api/v0/buttons/<button_name>/off/', methods=('POST',))
+def api_v0_button_off(button_name):
+    db = get_db()
+    if request.method == 'POST':
+        db.execute("UPDATE buttons SET status='OFF' WHERE name = ?", [button_name,])
+        db.commit()
+    return 'OK'
+
 @app.route('/api/v0/sonos/', methods=('GET',))
 def api_v0_sonos_plural():
     sonos = [ dict(name=z.player_name,
