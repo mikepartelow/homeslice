@@ -2,6 +2,12 @@
  {
   "wemo switch"  : "Living Room Torch",
   "id"           : "switch0"
+ },
+ {
+  "wemo light"  : "Bedroom",
+  "id"          : "light0"
  }
+
+
 
 ]

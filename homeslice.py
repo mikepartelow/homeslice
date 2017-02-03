@@ -14,16 +14,25 @@ PATH_TO_WEMO_CACHE = '/var/cache/homeslice/homeslice.cache.json'
 PATH_TO_DATABASE   = '/var/cache/homeslice/db/homeslice.sqlite3'
 
 class Wemo(object):
-    PATH_TO_WEMO = 'wemo -f'
+    PATH_TO_WEMO = 'wemo'
 
     def __init__(self, id, name, kind):
         self.id, self.name, self.kind = id, name, kind
 
     def on(self):
-        subprocess.check_output("""rm -f {} ; {} switch "{}" on 2>&1""".format(PATH_TO_THE_WEMO_CACHE_WE_HATE, self.PATH_TO_WEMO, self.name), shell=True)
+        subprocess.check_output("""rm -f {} ; {} {} "{}" on 2>&1""".format(PATH_TO_THE_WEMO_CACHE_WE_HATE, self.PATH_TO_WEMO, self.kind, self.name), shell=True)
 
     def off(self):
-        subprocess.check_output("""rm -f {} ; {} switch "{}" off""".format(PATH_TO_THE_WEMO_CACHE_WE_HATE, self.PATH_TO_WEMO, self.name), shell=True)
+        subprocess.check_output("""rm -f {} ; {} {} "{}" off""".format(PATH_TO_THE_WEMO_CACHE_WE_HATE, self.PATH_TO_WEMO, self.kind, self.name), shell=True)
+    
+    def toggle(self):
+        cmd = """rm -f {} ; {} {} "{}" status""".format(PATH_TO_THE_WEMO_CACHE_WE_HATE, self.PATH_TO_WEMO, self.kind, self.name)
+        o = subprocess.check_output(cmd, shell=True)
+        
+        if "'state': 'False'" in o or "'state': '0'" in o:
+            self.on()
+        else:
+            self.off()
 
     def to_dict(self):
         return dict(id=self.id, name=self.name, kind=self.kind)
@@ -35,13 +44,17 @@ class Wemo(object):
         # FIXME: it would be nice to use ouimeaux lib but it really doesn't want to coexist with flask.
         #
         out = subprocess.check_output("{} list".format(cls.PATH_TO_WEMO), shell=True)
-        wemos_found = [ line.split(':')[1].strip() for line in out.splitlines() ]
+        # ('Light:', 'Garage North')
+        wemos_found = [ line.split(',')[1].split("'")[1].strip() for line in out.splitlines() ]
 
         for wemo_name in wemos_found:
             for entry in config:
                 if wemo_name == entry.get('wemo switch'):
                     wemo_id=entry['id']
                     wemos[wemo_id] = Wemo(wemo_id, wemo_name, 'switch')
+                elif wemo_name == entry.get('wemo light'):
+                    wemo_id=entry['id']
+                    wemos[wemo_id] = Wemo(wemo_id, wemo_name, 'light')
         return wemos
 
 app = Flask(__name__)
@@ -120,6 +133,13 @@ def api_v0_wemo_off(switch_id):
     get_wemos()[switch_id].off()
 
     return('OK')
+
+@app.route('/api/v0/wemos/lights/<light_id>/toggle/', methods=('POST',))
+def api_v0_wemo_toggle(light_id):
+    get_wemos()[light_id].toggle()
+
+    return('OK')
+
 
 @app.route('/api/v0/buttons/<button_name>/', methods=('GET',))
 def api_v0_button(button_name):
