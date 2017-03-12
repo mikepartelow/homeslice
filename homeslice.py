@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from flask import Flask, g, jsonify, Response, request, jsonify
+from flask import Flask, g, jsonify, Response, request, jsonify, send_from_directory
 import os, sys, json, subprocess
 import soco
 import requests
@@ -12,6 +12,7 @@ from dateutil import tz
 PATH_TO_THE_WEMO_CACHE_WE_HATE = '/var/www/.wemo/cache'
 PATH_TO_WEMO_CACHE = '/var/cache/homeslice/homeslice.cache.json'
 PATH_TO_DATABASE   = '/var/cache/homeslice/db/homeslice.sqlite3'
+HOMESLICE_IP_ADDR  = '192.168.2.5'
 
 class Wemo(object):
     PATH_TO_WEMO = 'wemo'
@@ -109,6 +110,32 @@ def get_sonos():
 @app.route('/')
 def root():
     return "Homeslice!"
+
+@app.route('/api/v0/clocktime/', methods=('GET',))
+def api_v0_clocktime():
+    return datetime.today().strftime("%H%M")
+
+@app.route('/doorbell.mp3')
+def doorbell_mp3():
+    return send_from_directory('/var/www/html', 'doorbell.mp3', as_attachment=True)
+
+@app.route('/api/v0/doorbell/', methods=('POST',))
+def api_v0_doorbell():
+    for sonos in get_sonos():
+    	if sonos.is_coordinator:
+            info = sonos.get_current_track_info()
+            current_idx = info['playlist_position']
+            doorbell_idx = sonos.add_uri_to_queue("http://{}/doorbell.mp3".format(HOMESLICE_IP_ADDR))
+            sonos.pause()
+    	    sonos.play_from_queue(doorbell_idx-1)
+            import time
+            time.sleep(3)
+            sonos.pause()
+    	    sonos.play_from_queue(int(current_idx)-1)
+            sonos.seek(info['position'])
+    	    sonos.remove_from_queue(doorbell_idx-1)
+            break
+    return 'OK'
 
 @app.route('/api/v0/wemos/', methods=('GET',))
 def api_v0_wemos():
