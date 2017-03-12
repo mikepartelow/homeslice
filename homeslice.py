@@ -167,6 +167,12 @@ def api_v0_wemo_toggle(light_id):
 
     return('OK')
 
+@app.route('/api/v0/buttontimes/<button_name>/', methods=('GET',))
+def api_v0_button_time(button_name):
+    onoff = api_v0_button(button_name)
+    time  = api_v0_clocktime()
+    
+    return onoff + ":" + time
 
 @app.route('/api/v0/buttons/<button_name>/', methods=('GET',))
 def api_v0_button(button_name):
