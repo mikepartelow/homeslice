@@ -2,7 +2,9 @@
 
 from flask import Flask, g, jsonify, Response, request, jsonify, send_from_directory
 import os, sys, json, subprocess
+import time
 import soco
+import soco.snapshot
 import requests
 from sqlite3 import dbapi2 as sqlite3
 import json
@@ -113,7 +115,7 @@ def root():
 
 @app.route('/api/v0/clocktime/', methods=('GET',))
 def api_v0_clocktime():
-    return datetime.today().strftime("%H%M")
+    return datetime.today().strftime("%-I%M")
 
 @app.route('/doorbell.mp3')
 def doorbell_mp3():
@@ -123,17 +125,12 @@ def doorbell_mp3():
 def api_v0_doorbell():
     for sonos in get_sonos():
     	if sonos.is_coordinator:
-            info = sonos.get_current_track_info()
-            current_idx = info['playlist_position']
-            doorbell_idx = sonos.add_uri_to_queue("http://{}/doorbell.mp3".format(HOMESLICE_IP_ADDR))
-            sonos.pause()
-    	    sonos.play_from_queue(doorbell_idx-1)
-            import time
+            snap = soco.snapshot.Snapshot(sonos)
+            snap.snapshot()
+            sonos.play_uri("http://{}/doorbell.mp3".format(HOMESLICE_IP_ADDR), title="ding dong")
             time.sleep(3)
-            sonos.pause()
-    	    sonos.play_from_queue(int(current_idx)-1)
-            sonos.seek(info['position'])
-    	    sonos.remove_from_queue(doorbell_idx-1)
+            snap.restore(fade=False)
+            
             break
     return 'OK'
 
