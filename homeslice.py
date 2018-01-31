@@ -123,15 +123,23 @@ def doorbell_mp3():
 
 @app.route('/api/v0/doorbell/', methods=('POST',))
 def api_v0_doorbell():
+    snapshots = []
     for sonos in get_sonos():
-    	if sonos.is_coordinator:
-            snap = soco.snapshot.Snapshot(sonos)
-            snap.snapshot()
+    	if sonos.is_coordinator and len(sonos.group.members) > 1:
+            for member in sonos.group.members:
+                snap = soco.snapshot.Snapshot(member)
+                snap.snapshot()
+                snapshots.append(snap)
+                if member.is_coordinator and \
+                  member.get_current_transport_info()['current_transport_state'] == 'PLAYING':
+                    member.pause()
+            for member in sonos.group.members:
+                if not member.mute:
+                    member.volume = 40
             sonos.play_uri("http://{}/doorbell.mp3".format(HOMESLICE_IP_ADDR), title="ding dong")
-            time.sleep(3)
-            snap.restore(fade=False)
-            
-            break
+            time.sleep(6)
+            for snap in snapshots:
+                snap.restore(fade=False)
     return 'OK'
 
 @app.route('/api/v0/wemos/', methods=('GET',))
