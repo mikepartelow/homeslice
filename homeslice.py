@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from flask import Flask, g, jsonify, Response, request, jsonify, send_from_directory
+from flask import Flask, g, jsonify, Response, request, jsonify, send_from_directory, render_template
 import os, sys, json, subprocess
 import time
 import soco
@@ -27,11 +27,11 @@ class Wemo(object):
 
     def off(self):
         subprocess.check_output("""rm -f {} ; {} {} "{}" off""".format(PATH_TO_THE_WEMO_CACHE_WE_HATE, self.PATH_TO_WEMO, self.kind, self.name), shell=True)
-    
+
     def toggle(self):
         cmd = """rm -f {} ; {} {} "{}" status""".format(PATH_TO_THE_WEMO_CACHE_WE_HATE, self.PATH_TO_WEMO, self.kind, self.name)
         o = subprocess.check_output(cmd, shell=True)
-        
+
         if "'state': 'False'" in o or "'state': '0'" in o:
             self.on()
         else:
@@ -97,7 +97,9 @@ def close_db(error):
         g.sqlite_db.close()
 
 def reboot_sonos(z):
-    requests.get("http://{}:1400/reboot".format(z.ip_address))
+    r = requests.get("http://{}:1400/reboot".format(z.ip_address))
+    token = r.text.split('csrfToken')[1].split('"')[2]
+    requests.post("http://{}:1400/reboot".format(z.ip_address), data=dict(csrfToken=token))
 
 def get_wemos():
     if not hasattr(g, 'wemos'):
@@ -176,7 +178,7 @@ def api_v0_wemo_toggle(light_id):
 def api_v0_button_time(button_name):
     onoff = api_v0_button(button_name)
     time  = api_v0_clocktime()
-    
+
     return onoff + ":" + time
 
 @app.route('/api/v0/buttons/<button_name>/', methods=('GET',))
@@ -212,6 +214,16 @@ def api_v0_sonos_plural():
                    mute=z.mute,
                    current_track=z.get_current_track_info()['title']) for z in get_sonos() ]
     return Response(json.dumps(sonos),  mimetype='application/json')
+
+@app.route('/sonos/', methods=('GET',))
+def sonos_plural():
+    sonos = [ dict(name=z.player_name,
+                   group=z.group.uid,
+                   volume=z.volume,
+                   is_coordinator=z.is_coordinator,
+                   mute=z.mute,
+                   current_track=z.get_current_track_info()['title']) for z in get_sonos() ]
+    return render_template('sonos.html', sonos=sonos)
 
 @app.route('/api/v0/sonos/reboot/', methods=('POST',))
 def api_v0_sonos_reboot():
@@ -310,5 +322,6 @@ def configure(path_to_config):
             f.write(the_json)
 
 if __name__ == '__main__':
+    port = int(os.environ.get('HOMESLICE_PORT', 80))
     configure(sys.argv[1])
-    app.run(host='0.0.0.0', debug=True)
+    app.run(host='0.0.0.0', port=port, debug=True)
