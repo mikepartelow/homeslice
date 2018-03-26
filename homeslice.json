@@ -7,8 +7,17 @@
   "wemo light"  : "Color Light 02",
   "aka"         : "Bedroom",
   "id"          : "light0"
+ },
+ {
+  "kasa"        : "Mess Hall",
+  "kind"        : "plug",
+  "id"          : "kplug0",        
+  "ip"          : "192.168.2.215"
+ },
+ {
+  "kasa"        : "Captain's Quarters",
+  "kind"        : "bulb",
+  "id"          : "kbulb0",        
+  "ip"          : "192.168.2.212"
  }
-
-
-
 ]

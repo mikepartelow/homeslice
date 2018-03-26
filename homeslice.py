@@ -16,6 +16,31 @@ PATH_TO_WEMO_CACHE = '/var/cache/homeslice/homeslice.cache.json'
 PATH_TO_DATABASE   = '/var/cache/homeslice/db/homeslice.sqlite3'
 HOMESLICE_IP_ADDR  = '192.168.2.5'
 
+class Kasa(object):
+    PATH_TO_KASA = '/usr/local/bin/pyhs100'
+    
+    def __init__(self, id, ip, name, kind):
+        self.id, self.ip, self.name, self.kind = id, ip, name, kind
+    
+    def to_dict(self):
+        return(dict(id=self.id, ip=self.ip, name=self.name, kind=self.kind))
+
+    def on(self):
+        cmd = "LANG=C.UTF-8 {} --{} --ip {} on".format(self.PATH_TO_KASA, self.kind, self.ip)
+        subprocess.check_output(cmd, shell=True)
+
+    def off(self):
+        cmd = "LANG=C.UTF-8 {} --{} --ip {} off".format(self.PATH_TO_KASA, self.kind, self.ip)
+        subprocess.check_output(cmd, shell=True)
+
+    def toggle(self):
+        cmd = "LANG=C.UTF-8 {} --{} --ip {} state".format(self.PATH_TO_KASA, self.kind, self.ip)
+        out = subprocess.check_output(cmd, shell=True)
+        if u"Device state: ON" in out.decode('UTF-8'):
+            self.off()
+        else:
+            self.on()
+
 class Wemo(object):
     PATH_TO_WEMO = 'wemo'
 
@@ -106,6 +131,16 @@ def get_wemos():
         g.wemos = app.config['wemos']
     return g.wemos
 
+def get_kasas():
+    if not hasattr(g, 'kasas'):
+        g.kasas = app.config['kasas']
+    return g.kasas
+
+def get_switches():
+    switches = get_wemos().copy()
+    switches.update(get_kasas())
+    return switches
+
 def get_sonos():
     if not hasattr(g, 'sonos'):
         g.sonos = soco.discover()
@@ -149,6 +184,29 @@ def api_v0_wemos():
     wemos = [ wemo.to_dict() for wemo in get_wemos().values() ]
 
     return Response(json.dumps(wemos),  mimetype='application/json')
+
+@app.route('/api/v0/switches/', methods=('GET',))
+def api_v0_switches():
+    switches = map(lambda v: v.to_dict(), get_switches().values())
+    return Response(json.dumps(switches),  mimetype='application/json')
+
+@app.route('/api/v0/switches/<switch_id>/on/', methods=('POST',))
+def api_v0_switch_on(switch_id):
+    get_switches()[switch_id].on()
+
+    return('OK')
+
+@app.route('/api/v0/switches/<switch_id>/off/', methods=('POST',))
+def api_v0_switch_off(switch_id):
+    get_switches()[switch_id].off()
+
+    return('OK')
+
+@app.route('/api/v0/switches/<switch_id>/toggle/', methods=('POST',))
+def api_v0_switch_toggle(switch_id):
+    get_switches()[switch_id].toggle()
+
+    return('OK')
 
 @app.route('/api/v0/wemos/switches/', methods=('GET',))
 def api_v0_wemos_switches():
@@ -308,6 +366,8 @@ def configure(path_to_config):
        config = json.loads(config_file.read())
        # FIXME: validate config
        app.config['homeslice'] = config
+    
+    app.config['kasas'] = dict([ ( d['id'], Kasa(d['id'], d['ip'], d['kasa'], d['kind']) ) for d in app.config['homeslice'] if 'kasa' in d.keys() ])
 
     if os.path.exists(PATH_TO_WEMO_CACHE):
         with open(PATH_TO_WEMO_CACHE, 'r') as f:
