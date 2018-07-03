@@ -1,6 +1,6 @@
+gevent==1.2.2
 ouimeaux
 flask
 soco
 requests
 spotipy
-python-dateutil

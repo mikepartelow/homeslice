@@ -1,0 +1,4 @@
+docker build -t homeslice .
+docker run -ti -v`pwd`:/mnt/homeslice -p80:3000 homeslice bash
+
+python ./homeslice.py ./homeslice.json
