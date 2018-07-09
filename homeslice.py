@@ -143,7 +143,7 @@ def api_v0_doorbell():
             for member in sonos.group.members:
                 if not member.mute:
                     member.volume = 40
-            sonos.play_uri("http://{}/doorbell.mp3".format(HOMESLICE_IP_ADDR), title="ding dong")
+            sonos.play_uri(app.config['doorbell_url'], title="ding dong")
             time.sleep(6)
             for snap in snapshots:
                 snap.restore(fade=False)
@@ -259,9 +259,10 @@ def api_v0_sonos_volume_down():
 
 def configure(path_to_config):
     with open(path_to_config) as config_file:
-       switch_dicts = json.loads(config_file.read())['switches']
+       cfg = json.loads(config_file.read())
 
-    app.config['switches'] = dict( (d['id'], SmartSwitch.from_dict(d)) for d in switch_dicts )
+    app.config['switches'] = dict( (d['id'], SmartSwitch.from_dict(d)) for d in cfg['switches'] )
+    app.config['doorbell_url'] = cfg['doorbell_url']
     
 if __name__ == '__main__':
     port = int(os.environ.get('HOMESLICE_PORT', 80))
