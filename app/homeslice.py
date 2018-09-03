@@ -10,7 +10,7 @@ from sqlite3 import dbapi2 as sqlite3
 import json
 from datetime import datetime
 
-PATH_TO_DATABASE   = '/var/tmp/homeslice.sqlite3'
+PATH_TO_DATABASE   = '/homeslice/homeslice.sqlite3'
 
 class SmartSwitch(object):
     def __init__(self, id, name, kind):
@@ -40,7 +40,7 @@ class SmartSwitch(object):
 
 class Kasa(SmartSwitch):
     PATH_TO_KASA = 'pyhs100'
-    
+
     def __init__(self, id, ip, name, kind):
         super(Kasa, self).__init__(id, name, kind)
         self.ip = ip
@@ -103,16 +103,16 @@ def get_switches():
 
 def get_sonos():
     if not hasattr(g, 'sonos'):
-        g.sonos = soco.discover()
+        g.sonos = soco.discover() or []
     return g.sonos
 
 @app.route('/')
 def root():
     return "Homeslice!"
 
-@app.route('/doorbell.mp3')
-def doorbell_mp3():
-    return send_from_directory('/var/www/html', 'doorbell.mp3', as_attachment=True)
+# @app.route('/doorbell.mp3')
+# def doorbell_mp3():
+#     return send_from_directory('/var/www/html', 'doorbell.mp3', as_attachment=True)
 
 @app.route('/sonos/', methods=('GET',))
 def sonos_plural():
@@ -123,7 +123,7 @@ def sonos_plural():
                    mute=z.mute,
                    current_track=z.get_current_track_info()['title']) for z in get_sonos() ]
     return render_template('sonos.html', sonos=sonos)
-    
+
 @app.route('/api/v0/clocktime/', methods=('GET',))
 def api_v0_clocktime():
     return datetime.today().strftime("%-I%M")
@@ -176,8 +176,15 @@ def api_v0_button_time(button_name):
 
     return onoff + ":" + time
 
+@app.route('/api/v0/buttons/', methods=('GET',))
+def api_v0_buttons():
+    if request.method == 'GET':
+        db = get_db()
+        cur = db.execute('SELECT * FROM buttons')
+        return json.dumps(cur.fetchall())
+
 @app.route('/api/v0/buttons/<button_name>/', methods=('GET',))
-def api_v0_button(button_name):    
+def api_v0_button(button_name):
     if request.method == 'GET':
         db = get_db()
         cur = db.execute('SELECT status FROM buttons WHERE name = ?', [button_name,])
@@ -185,7 +192,7 @@ def api_v0_button(button_name):
         return entry[0]
 
 @app.route('/api/v0/buttons/<button_name>/on/', methods=('POST',))
-def api_v0_button_on(button_name):    
+def api_v0_button_on(button_name):
     if request.method == 'POST':
         db = get_db()
         db.execute("UPDATE buttons SET status='ON' WHERE name = ?", [button_name,])
@@ -193,7 +200,7 @@ def api_v0_button_on(button_name):
     return 'OK'
 
 @app.route('/api/v0/buttons/<button_name>/off/', methods=('POST',))
-def api_v0_button_off(button_name):    
+def api_v0_button_off(button_name):
     if request.method == 'POST':
         db = get_db()
         db.execute("UPDATE buttons SET status='OFF' WHERE name = ?", [button_name,])
@@ -263,8 +270,7 @@ def configure(path_to_config):
 
     app.config['switches'] = dict( (d['id'], SmartSwitch.from_dict(d)) for d in cfg['switches'] )
     app.config['doorbell_url'] = cfg['doorbell_url']
-    
+
 if __name__ == '__main__':
-    port = int(os.environ.get('HOMESLICE_PORT', 80))
     configure(sys.argv[1])
-    app.run(host='0.0.0.0', port=port, debug=True)
+    app.run(host='0.0.0.0', debug=True)

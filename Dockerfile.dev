@@ -1,0 +1,12 @@
+FROM kelvinmo/gevent
+
+RUN pip install --upgrade pip
+
+ADD app/requirements.txt /tmp/requirements.txt
+RUN cd /tmp && pip install -r requirements.txt
+
+ADD app /homeslice
+WORKDIR /homeslice
+
+ENV FLASK_ENV=development
+CMD python ./homeslice.py ./homeslice.json

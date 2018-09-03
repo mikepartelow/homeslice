@@ -1,4 +1,12 @@
-docker build -t homeslice .
-docker run -ti -v`pwd`:/mnt/homeslice -p80:3000 homeslice bash
+# DEV #
+#
+docker build -f Dockerfile.dev -t homeslice-dev .
+
+docker run --rm --name homeslice-dev -ti -v`pwd`/app:/homeslice -e "HOMESLICE_PORT=3333" --network=host homeslice-dev
 
 python ./homeslice.py ./homeslice.json
+
+# PROD #
+#
+docker build -f Dockerfile.prod -t homeslice .
+docker run --rm --name homeslice -ti --network=host homeslice
