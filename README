@@ -9,4 +9,6 @@ python ./homeslice.py ./homeslice.json
 # PROD #
 #
 docker build -f Dockerfile.prod -t homeslice .
-docker run --rm --name homeslice -ti --network=host homeslice
+# docker run --rm --name homeslice -ti --network=host homeslice
+
+docker run --name homeslice -d --restart=always --network=host homeslice

@@ -4,3 +4,5 @@ create table buttons (
   status text not null,
   timestamp timestamp not null default current_timestamp
 );
+
+insert into buttons ('name', 'status') values ('brclock', 'OFF');
