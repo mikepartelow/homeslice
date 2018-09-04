@@ -2,13 +2,13 @@
 #
 docker build -f Dockerfile.dev -t homeslice-dev .
 
-docker run --rm --name homeslice-dev -ti -v`pwd`/app:/homeslice -e "HOMESLICE_PORT=3333" --network=host homeslice-dev
-
-python ./homeslice.py ./homeslice.json
+docker run --rm --name homeslice-dev -ti -v`pwd`/app:/homeslice --network=host homeslice-dev
 
 # PROD #
 #
 docker build -f Dockerfile.prod -t homeslice .
-# docker run --rm --name homeslice -ti --network=host homeslice
+docker rm -f homeslice; docker run --name homeslice -d --restart=always --network=host homeslice
 
-docker run --name homeslice -d --restart=always --network=host homeslice
+
+# TODO:
+# - /homeslice/index.html with links to /homeslice/sonos/

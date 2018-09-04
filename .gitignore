@@ -63,3 +63,4 @@ target/
 venv.*
 spotify.json
 venv
+app/homeslice.json

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from flask import Flask, g, jsonify, Response, request, jsonify, send_from_directory, render_template
+from flask import Flask, g, jsonify, Response, request, jsonify, render_template
 import os, sys, json, subprocess
 import time
 import soco
@@ -106,15 +106,11 @@ def get_sonos():
         g.sonos = soco.discover() or []
     return g.sonos
 
-@app.route('/')
+@app.route('/homeslice/')
 def root():
     return "Homeslice!"
 
-# @app.route('/doorbell.mp3')
-# def doorbell_mp3():
-#     return send_from_directory('/var/www/html', 'doorbell.mp3', as_attachment=True)
-
-@app.route('/sonos/', methods=('GET',))
+@app.route('/homeslice/sonos/', methods=('GET',))
 def sonos_plural():
     sonos = [ dict(name=z.player_name,
                    group=z.group.uid,

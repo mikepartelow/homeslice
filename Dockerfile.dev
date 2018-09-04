@@ -1,12 +1,25 @@
-FROM kelvinmo/gevent
+FROM alpine
 
-RUN pip install --upgrade pip
+RUN apk update \
+    && apk add --no-cache libev tzdata build-base linux-headers \
+                          sqlite python3 py3-pip python3-dev \
+    && cp /usr/share/zoneinfo/America/Los_Angeles /etc/localtime \
+    && echo 'America/Los_Angeles' > /etc/timezone \
+    && pip3 install --upgrade pip \
+    && pip3 install gevent pyhs100 \
+    && apk del tzdata python3-dev build-base linux-headers
 
 ADD app/requirements.txt /tmp/requirements.txt
-RUN cd /tmp && pip install -r requirements.txt
+RUN cd /tmp && pip3 install -r requirements.txt
+
+RUN sed -i 's/gevent.wsgi/gevent.pywsgi/g' /usr/lib/python3.6/site-packages/ouimeaux/subscribe.py
 
 ADD app /homeslice
+ADD config/homeslice.json /homeslice/homeslice.json
+
 WORKDIR /homeslice
 
+RUN cat ./schema.sql | sqlite3 ./homeslice.sqlite3
+
 ENV FLASK_ENV=development
-CMD python ./homeslice.py ./homeslice.json
+CMD python3 ./homeslice.py ./homeslice.json
