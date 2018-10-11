@@ -129,20 +129,32 @@ def api_v0_doorbell():
     snapshots = []
     for sonos in get_sonos():
     	if sonos.is_coordinator and len(sonos.group.members) > 1:
+            print(f"coordinator: {sonos.player_name}")
             for member in sonos.group.members:
+                print(f" member: {member.player_name}")
+
                 snap = soco.snapshot.Snapshot(member)
-                snap.snapshot()
+                try:
+                    snap.snapshot()
+                except: 
+                    print(f"  exception: snap {member.player_name}")                    
                 snapshots.append(snap)
                 if member.is_coordinator and \
                   member.get_current_transport_info()['current_transport_state'] == 'PLAYING':
-                    member.pause()
+                    try:
+                        member.pause()
+                    except:
+                        print(f"  exception: pause {member.player_name}")
             for member in sonos.group.members:
                 if not member.mute:
                     member.volume = 40
             sonos.play_uri(app.config['doorbell_url'], title="ding dong")
-            time.sleep(6)
-            for snap in snapshots:
-                snap.restore(fade=False)
+    time.sleep(6)
+    for snap in snapshots:
+        try:
+            snap.restore(fade=False)
+        except:
+            print(f"  exception: restore {member.player_name}")
     return 'OK'
 
 @app.route('/api/v0/switches/', methods=('GET',))
