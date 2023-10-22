@@ -32,7 +32,10 @@ dev:
 shell: dev
 	docker run --rm --entrypoint '' -ti ${--shell-args} $(PROJECT)-dev /bin/bash
 
-build:
+test:
+	go test -cover ./...
+
+build: test
 	docker build ${--build-args} -t $(IMAGE):$(VERSION) --target prod .
 
 run: build
