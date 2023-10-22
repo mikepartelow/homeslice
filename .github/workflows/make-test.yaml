@@ -7,5 +7,4 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Setup Go ${{ matrix.go-version }}
-        uses: actions/setup-go@v4
         run: cd apps & make test
