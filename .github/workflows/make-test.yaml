@@ -13,9 +13,12 @@ jobs:
           cache-dependency-path: |
             app/buttons/go.sum
             app/clocktime/go.sum
-            app/switches.go.sum
-      - name: make lint
+            app/switches/go.sum
+      - name: lint
         uses: golangci/golangci-lint-action@v3
-        run: cd apps && make lint
-      - name: make test
+        working-directory: |
+          app/buttons
+          app/clocktime
+          app/switches
+      - name: test
         run: cd apps && make test
