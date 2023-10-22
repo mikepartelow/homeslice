@@ -1,0 +1,31 @@
+encryptionsalt: v1:VKuGdX6V+cI=:v1:NjPNhDyrBhgOUzh7:ZORqZH2ALQT0/D+qYIhNJOAoCraRjw==
+config:
+  homeslice:namespace: homeslice
+  homeslice:buttons:
+    image: registry.localdomain:32000/buttons:20231018_212620
+    container_port: 8000
+    clocktime_url: http://clocktime.homeslice.svc.cluster.local/api/v0/clocktime/
+    ingress_enabled: true
+    ingress_prefixes:
+    - /api/v0/buttons/
+    - /api/v0/buttontimes/
+  homeslice:clocktime:
+    image: registry.localdomain:32000/clocktime:20231016_133307
+    container_port: 8000
+    location: America/Los_Angeles
+    ingress_enabled: true
+    ingress_prefix: /api/v0/clocktime/
+  homeslice:switches:
+    image: registry.localdomain:32000/switches:20231019_222323
+    container_port: 8000
+    switches_json: |
+      [
+        {
+          "id": "switch0",
+          "kind": "wemo/v1",
+          "name": "Living Room Torch",
+          "address": "a.b.c.d"
+        }
+      ]
+    ingress_enabled: true
+    ingress_prefix: /api/v0/switches/
