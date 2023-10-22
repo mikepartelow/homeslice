@@ -1,8 +1,8 @@
-name: 'make test'
+name: 'pipes'
 
 on: [push]
 jobs:
-  make-test:
+  pipes:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -13,6 +13,11 @@ jobs:
           cache-dependency-path: |
             app/buttons/go.sum
             app/clocktime/go.sum
-            app/switches.go.sum
-      - name: make test
+            app/switches/go.sum
+      - name: Setup linters
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.55.0
+      - name: lint
+        run: cd apps && make lint
+      - name: test
         run: cd apps && make test

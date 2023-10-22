@@ -16,7 +16,7 @@ IMAGE = $(REGISTRY)/$(PROJECT)
 --local-args :=
 --shell-args := ${--docker-run-ports} ${--docker-run-mounts} ${--docker-run-env}
 
-.PHONY: all info dev shell build run push local
+.PHONY: fmt lint info dev shell build run push local
 all: build
 
 info:
@@ -25,6 +25,12 @@ info:
 	echo "Version: ${VERSION}"
 	echo "Image: ${IMAGE}"
 	echo "MAKEFILE_LIST: ${MAKEFILE_LIST}"
+
+fmt:
+	go fmt ./...
+
+lint:
+	golangci-lint run
 
 dev:
 	docker build ${--dev-args} -t $(PROJECT)-dev --target dev .
