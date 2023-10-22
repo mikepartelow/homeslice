@@ -3,7 +3,7 @@
 APPS := buttons clocktime switches
 
 test:
-	for APP in ${APPS}; do cd $${APP} && make test $@ && cd ..; done
+	for APP in ${APPS}; do cd $${APP} && pwd && ls && make test $@ && cd ..; done
 
 build:
 	for APP in ${APPS}; do cd $${APP} && make build $@ && cd ..; done
