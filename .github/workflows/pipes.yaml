@@ -17,6 +17,6 @@ jobs:
       - name: lint buttons
         uses: golangci/golangci-lint-action@v3
         with:
-          working-directory: apps/buttons
+          working-directory: apps/
       - name: test
         run: cd apps && make test
