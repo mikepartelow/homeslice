@@ -2,7 +2,7 @@ name: 'pipes'
 
 on: [push]
 jobs:
-  make-test:
+  pipes:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -17,6 +17,6 @@ jobs:
       - name: lint buttons
         uses: golangci/golangci-lint-action@v3
         with:
-          working-directory: apps/
+          working-directory: apps/...
       - name: test
         run: cd apps && make test
