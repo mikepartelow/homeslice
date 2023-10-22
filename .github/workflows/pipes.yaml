@@ -1,4 +1,4 @@
-name: 'make test'
+name: 'pipes'
 
 on: [push]
 jobs:
@@ -14,12 +14,9 @@ jobs:
             app/buttons/go.sum
             app/clocktime/go.sum
             app/switches/go.sum
-      - name: lint
+      - name: lint buttons
         uses: golangci/golangci-lint-action@v3
         with:
-          working-directory: |
-            app/buttons
-            app/clocktime
-            app/switches
+          working-directory: apps/buttons
       - name: test
         run: cd apps && make test
