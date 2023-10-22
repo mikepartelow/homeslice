@@ -1,0 +1,6 @@
+name: homeslice
+runtime:
+  name: python
+  options:
+    virtualenv: venv
+description: homeslice home automation
