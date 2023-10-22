@@ -16,9 +16,10 @@ jobs:
             app/switches/go.sum
       - name: lint
         uses: golangci/golangci-lint-action@v3
-        working-directory: |
-          app/buttons
-          app/clocktime
-          app/switches
+        with:
+          working-directory: |
+            app/buttons
+            app/clocktime
+            app/switches
       - name: test
         run: cd apps && make test
