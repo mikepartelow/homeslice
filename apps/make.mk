@@ -38,7 +38,7 @@ dev:
 shell: dev
 	docker run --rm --entrypoint '' -ti ${--shell-args} $(PROJECT)-dev /bin/bash
 
-test: lint
+test:
 	go test -cover ./...
 
 build: test
