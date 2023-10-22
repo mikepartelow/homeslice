@@ -1,0 +1,22 @@
+name: 'make test'
+
+on: [push]
+jobs:
+  make-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: 1.21
+          cache-dependency-path: |
+            app/buttons/go.sum
+            app/clocktime/go.sum
+            app/switches/go.sum
+      - name: lint buttons
+        uses: golangci/golangci-lint-action@v3
+        with:
+          working-directory: apps/buttons
+      - name: test
+        run: cd apps && make test
