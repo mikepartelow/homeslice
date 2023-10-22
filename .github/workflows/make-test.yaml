@@ -10,6 +10,9 @@ jobs:
         uses: actions/setup-go@v4
         with:
           go-version: 1.21
-        cache-dependency-path: app/buttons/go.sum app/clocktime/go.sum app/switches.go.sum
+        cache-dependency-path: |
+          app/buttons/go.sum
+          app/clocktime/go.sum
+          app/switches.go.sum
       - name: make test
         run: cd apps && make test
