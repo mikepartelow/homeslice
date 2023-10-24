@@ -74,3 +74,5 @@ def subst_address(s: str) -> str:
 
     for k, v in switches.SECRETS.items():
         s = s.replace(k, v)
+
+    return s
