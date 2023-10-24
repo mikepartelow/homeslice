@@ -70,14 +70,7 @@ def app(namespace: str, config: pulumi.Config) -> None:
 
 # I don't want to publish IP addresses to GitHub
 def subst_address(s: str) -> str:
-    filename = "./subst_address.json"
-    try:
-        with open(filename) as f:
-            # this file is a map of fake IPs to real ones
-            # { "a.b.c.d": "1.2.3.4" }
-            d = json.load(f)
-            for k, v in d.items():
-                s = s.replace(k, v)
-    except FileNotFoundError:
-        print(f"🚨🚨 missing required file {filename} 🚨🚨")
-        sys.exit(1)
+    from secrets import switches
+
+    for k, v in switches.SECRETS.items():
+        s = s.replace(k, v)

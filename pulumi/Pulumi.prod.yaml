@@ -1,6 +1,11 @@
 encryptionsalt: v1:VKuGdX6V+cI=:v1:NjPNhDyrBhgOUzh7:ZORqZH2ALQT0/D+qYIhNJOAoCraRjw==
 config:
   homeslice:namespace: homeslice
+  homeslice:backup_todoist:
+    image: registry.localdomain:32000/backup-todoist:20231023_224744
+    private_key_path: /nonroot/.ssh/id_rsa
+    author_name: Mike Partelow
+    author_email: github@mikepartelow.com
   homeslice:buttons:
     image: registry.localdomain:32000/buttons:20231018_212620
     container_port: 8000
