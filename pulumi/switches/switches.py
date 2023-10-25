@@ -37,7 +37,6 @@ def app(namespace: str, config: pulumi.Config) -> None:
             name="switches-json",
             config_map=kubernetes.core.v1.ConfigMapVolumeSourceArgs(
                 name=NAME,
-
             )
         ),
     ]
@@ -62,22 +61,11 @@ def app(namespace: str, config: pulumi.Config) -> None:
     if ingress_enabled:
         ingress = homeslice.ingress(NAME, metadata, [ingress_prefix])
 
-    # these are here just so we don't get unused variable warnings
-    pulumi.export("switchesDeploymentName", deployment.metadata.name)
-    pulumi.export("switchesServiceName", service.metadata.name)
-    if ingress_enabled:
-        pulumi.export("switchesIngressName", ingress.metadata.name)
-
 # I don't want to publish IP addresses to GitHub
 def subst_address(s: str) -> str:
-    filename = "./subst_address.json"
-    try:
-        with open(filename) as f:
-            # this file is a map of fake IPs to real ones
-            # { "a.b.c.d": "1.2.3.4" }
-            d = json.load(f)
-            for k, v in d.items():
-                s = s.replace(k, v)
-    except FileNotFoundError:
-        print(f"🚨🚨 missing required file {filename} 🚨🚨")
-        sys.exit(1)
+    from secrets import switches
+
+    for k, v in switches.SECRETS.items():
+        s = s.replace(k, v)
+
+    return s

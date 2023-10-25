@@ -1,4 +1,4 @@
 *.pyc
 venv/
 .vscode
-subst_address.json
+/secrets/*.py

@@ -1,6 +1,14 @@
 encryptionsalt: v1:VKuGdX6V+cI=:v1:NjPNhDyrBhgOUzh7:ZORqZH2ALQT0/D+qYIhNJOAoCraRjw==
 config:
   homeslice:namespace: homeslice
+  homeslice:backup_todoist:
+    image: registry.localdomain:32000/backup-todoist:20231024_211437
+    author_name: Mike Partelow
+    author_email: github@mikepartelow.com
+    private_key_path: /var/run/ssh-privatekey/ssh-privatekey
+    known_hosts_path: /var/run/known_hosts/known_hosts
+    known_hosts: |
+      github.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl
   homeslice:buttons:
     image: registry.localdomain:32000/buttons:20231018_212620
     container_port: 8000

@@ -24,7 +24,7 @@ def app(namespace: str, config: pulumi.Config) -> None:
     env_from = [
         kubernetes.core.v1.EnvFromSourceArgs(
             config_map_ref=kubernetes.core.v1.ConfigMapEnvSourceArgs(
-                name=configmap.metadata.name,
+                name=NAME,
             )
         )
     ]
@@ -42,9 +42,3 @@ def app(namespace: str, config: pulumi.Config) -> None:
 
     if ingress_enabled:
         ingress = homeslice.ingress(NAME, metadata, ingress_prefixes)
-
-    # these are here just so we don't get unused variable warnings
-    pulumi.export("buttonDeploymentName", deployment.metadata.name)
-    pulumi.export("buttonServiceName", service.metadata.name)
-    if ingress_enabled:
-        pulumi.export("buttonIngressName", ingress.metadata.name)
