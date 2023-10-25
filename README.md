@@ -29,4 +29,4 @@ Deploy with [pulumi](https://www.pulumi.com).
 % pulumi up
 ```
 
-Now, enjoy the benefits of relatively low latency IoT light switches and the excitement of LRU cached REST API accessible remote smart button state!
+Now, enjoy the benefits of relatively low latency IoT light switches, the excitement of LRU cached REST API accessible remote smart button state, and periodic Todoist backups!
