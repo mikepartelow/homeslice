@@ -37,7 +37,6 @@ def app(namespace: str, config: pulumi.Config) -> None:
             name="switches-json",
             config_map=kubernetes.core.v1.ConfigMapVolumeSourceArgs(
                 name=NAME,
-
             )
         ),
     ]
@@ -61,12 +60,6 @@ def app(namespace: str, config: pulumi.Config) -> None:
 
     if ingress_enabled:
         ingress = homeslice.ingress(NAME, metadata, [ingress_prefix])
-
-    # these are here just so we don't get unused variable warnings
-    pulumi.export("switchesDeploymentName", deployment.metadata.name)
-    pulumi.export("switchesServiceName", service.metadata.name)
-    if ingress_enabled:
-        pulumi.export("switchesIngressName", ingress.metadata.name)
 
 # I don't want to publish IP addresses to GitHub
 def subst_address(s: str) -> str:

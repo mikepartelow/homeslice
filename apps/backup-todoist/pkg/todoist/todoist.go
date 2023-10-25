@@ -37,23 +37,20 @@ type Task struct {
 }
 
 func (c *Client) Dump() (*Dump, error) {
+	projects, err := c.Projects()
+	if err != nil {
+		return nil, fmt.Errorf("error fetching projects: %w", err)
+	}
 
-	return &Dump{}, nil
+	tasks, err := c.ActiveTasks()
+	if err != nil {
+		return nil, fmt.Errorf("error fetching tasks: %w", err)
+	}
 
-	// projects, err := c.Projects()
-	// if err != nil {
-	// 	return nil, fmt.Errorf("error fetching projects: %w", err)
-	// }
-
-	// tasks, err := c.ActiveTasks()
-	// if err != nil {
-	// 	return nil, fmt.Errorf("error fetching tasks: %w", err)
-	// }
-
-	// return &Dump{
-	// 	Projects:    projects,
-	// 	ActiveTasks: tasks,
-	// }, nil
+	return &Dump{
+		Projects:    projects,
+		ActiveTasks: tasks,
+	}, nil
 }
 
 func (c *Client) Projects() ([]Project, error) {
