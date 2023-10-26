@@ -105,7 +105,7 @@ def app(namespace: str, config: pulumi.Config) -> None:
         NAME,
         metadata=metadata,
         spec=kubernetes.batch.v1.CronJobSpecArgs(
-            schedule="1 */1 * * *",  # Schedule the job to run every hour
+            schedule="0 0 * * *",  # Schedule the job to run every hour
             job_template=kubernetes.batch.v1.JobTemplateSpecArgs(
                 spec=kubernetes.batch.v1.JobSpecArgs(
                     template=kubernetes.core.v1.PodTemplateSpecArgs(

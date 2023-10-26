@@ -2,6 +2,7 @@ import pulumi
 import homeslice
 from backup_todoist import backup_todoist
 from buttons import buttons
+from chime import chime
 from clocktime import clocktime
 from switches import switches
 
@@ -16,6 +17,9 @@ if cfg := config.get_object("backup_todoist"):
 
 if cfg := config.get_object("buttons"):
     buttons.app(name, cfg)
+
+if cfg := config.get_object("chime"):
+    chime.app(name, cfg)
 
 if cfg := config.get_object("clocktime"):
     clocktime.app(name, cfg)

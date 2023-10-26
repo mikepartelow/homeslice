@@ -24,20 +24,20 @@ def app(namespace: str, config: pulumi.Config) -> None:
         }
     )
 
-    volume_mounts = [
-        kubernetes.core.v1.VolumeMountArgs(
-            name="switches-json",
-            mount_path=SWITCHES_JSON_ROOT,
-            read_only=True,
-        ),
-    ]
-
     volumes = [
         kubernetes.core.v1.VolumeArgs(
             name="switches-json",
             config_map=kubernetes.core.v1.ConfigMapVolumeSourceArgs(
                 name=NAME,
             )
+        ),
+    ]
+
+    volume_mounts = [
+        kubernetes.core.v1.VolumeMountArgs(
+            name="switches-json",
+            mount_path=SWITCHES_JSON_ROOT,
+            read_only=True,
         ),
     ]
 
@@ -53,8 +53,9 @@ def app(namespace: str, config: pulumi.Config) -> None:
                                       metadata,
                                       args=[SWITCHES_JSON_ROOT+"switches.json"],
                                       ports=ports,
-                                      volume_mounts=volume_mounts,
-                                      volumes=volumes)
+                                      volumes=volumes,
+                                      volume_mounts=volume_mounts)
+
 
     service = homeslice.service(NAME, metadata)
 
