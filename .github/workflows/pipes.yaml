@@ -26,9 +26,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v3
+      - name: setup python
+        uses: actions/setup-python@v3
       - name: install linters
-        - run: pip install pylint black
+        run: pip install pylint black
       - name: lint pulumi
         run: cd pulumi && black --check . && pylint "**/*.py"
       - name: lint apps
