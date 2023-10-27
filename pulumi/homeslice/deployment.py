@@ -15,16 +15,9 @@ def deployment(
 ) -> kubernetes.apps.v1.Deployment:
     """THE kubernetes Deployment factory"""
 
-    if args is None:
-        args = []
-    if env_from is None:
-        env_from = []
-    if ports is None:
-        ports = []
-    if volume_mounts is None:
-        volume_mounts = []
-    if volumes is None:
-        volumes = []
+    for a in ("args", "env_from", "ports", "volume_mounts", "volumes"):
+        if locals()[a] is None:
+            locals()[a] = []
 
     return kubernetes.apps.v1.Deployment(
         name,

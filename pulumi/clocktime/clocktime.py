@@ -1,3 +1,5 @@
+"""Resources for the homeslice/clocktime app."""
+
 import pulumi
 import pulumi_kubernetes as kubernetes
 import homeslice
@@ -6,15 +8,17 @@ NAME = "clocktime"
 
 
 def app(namespace: str, config: pulumi.Config) -> None:
+    """define resources for the homeslice/clocktime app"""
+
     image = config["image"]
     container_port = int(config["container_port"])
     location = config["location"]
-    ingress_enabled = config.get("ingress_enabled", "false") == True
+    ingress_enabled = config.get("ingress_enabled", "false") is True
     ingress_prefix = config.get("ingress_prefix")
 
     metadata = homeslice.metadata(NAME, namespace)
 
-    configmap = kubernetes.core.v1.ConfigMap(
+    kubernetes.core.v1.ConfigMap(
         NAME,
         metadata=metadata,
         data={
@@ -37,11 +41,11 @@ def app(namespace: str, config: pulumi.Config) -> None:
         )
     ]
 
-    deployment = homeslice.deployment(
+    homeslice.deployment(
         NAME, image, metadata, env_from=env_from, ports=ports
     )
 
-    service = homeslice.service(NAME, metadata)
+    homeslice.service(NAME, metadata)
 
     if ingress_enabled:
-        ingress = homeslice.ingress(NAME, metadata, [ingress_prefix])
+        homeslice.ingress(NAME, metadata, [ingress_prefix])
