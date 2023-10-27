@@ -1,6 +1,6 @@
 .PHONY: fmt lint test build push
 
-APPS := buttons clocktime switches
+APPS := buttons clocktime switches backup-todoist chime
 
 fmt:
 	for APP in ${APPS}; do cd $${APP} && make fmt $@ && cd ..; done

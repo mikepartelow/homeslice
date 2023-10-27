@@ -4,6 +4,7 @@ import time
 
 from soco import snapshot, SoCo
 
+
 def parse_args():
     """Parse the command line arguments"""
     import argparse
@@ -17,6 +18,7 @@ def parse_args():
     parser.add_argument("--player-volume", type=int, required=False, default=40)
 
     return parser.parse_args()
+
 
 def main():
     args = parse_args()
@@ -39,8 +41,11 @@ def main():
         except:
             print(f"  exception: snap {member.player_name}")
         snapshots.append(snap)
-        if member.is_coordinator and \
-                member.get_current_transport_info()['current_transport_state'] == 'PLAYING':
+        if (
+            member.is_coordinator
+            and member.get_current_transport_info()["current_transport_state"]
+            == "PLAYING"
+        ):
             try:
                 member.pause()
             except:
@@ -58,5 +63,6 @@ def main():
             snap.restore(fade=False)
         except:
             print(f"  exception: restore {member.player_name}")
+
 
 main()

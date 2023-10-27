@@ -1,0 +1,6 @@
+FROM python
+
+COPY requirements-linter.txt /tmp
+RUN pip install --no-deps -r /tmp/requirements-linter.txt
+
+WORKDIR /app
