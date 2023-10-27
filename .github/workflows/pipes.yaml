@@ -2,7 +2,7 @@ name: 'pipes'
 
 on: [push]
 jobs:
-  go:
+  go-apps:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -22,7 +22,7 @@ jobs:
         run: cd apps && make lint
       - name: test
         run: cd apps && make test
-  python:
+  python-apps:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -30,7 +30,15 @@ jobs:
         uses: actions/setup-python@v3
       - name: install linters
         run: pip install pylint black
-      - name: lint pulumi
+      - name: lint
+        run: cd python && black --check . && pylint "**/*.py"
+  pulumi:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: setup python
+        uses: actions/setup-python@v3
+      - name: install linters
+        run: pip install pylint black
+      - name: lint
         run: cd pulumi && black --check . && pylint "**/*.py"
-      - name: lint apps
-        run: cd apps && black --check . && pylint "**/*.py"
