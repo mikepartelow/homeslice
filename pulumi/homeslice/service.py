@@ -1,9 +1,11 @@
+"""kubernetes Service factory"""
 import pulumi_kubernetes as kubernetes
 
 
 def service(
     name: str, metadata: kubernetes.meta.v1.ObjectMetaArgs
 ) -> kubernetes.core.v1.Service:
+    """THE kubernetes Service factory"""
     return kubernetes.core.v1.Service(
         name,
         metadata=metadata,

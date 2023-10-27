@@ -1,3 +1,4 @@
+"""kubernetes Ingress factory"""
 import pulumi_kubernetes as kubernetes
 
 
@@ -7,6 +8,8 @@ def ingress(
     ingress_prefixes: [str],
     path_type: str = "Prefix",
 ) -> kubernetes.core.v1.Service:
+    """THE kubernetes Ingress factory"""
+
     return kubernetes.networking.v1.Ingress(
         name,
         metadata=metadata,

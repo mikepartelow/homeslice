@@ -1,16 +1,19 @@
+"""Resources for the homeslice/switches app."""
+from pathlib import Path
 import pulumi
 import pulumi_kubernetes as kubernetes
 import homeslice
 from homeslice_secrets import switches as SWITCHES_SECRETS
-from pathlib import Path
 
 NAME = "switches"
 
 
 def app(namespace: str, config: pulumi.Config) -> None:
+    """define resources for the homeslice/switches app"""
+
     image = config["image"]
     container_port = int(config["container_port"])
-    ingress_enabled = config.get("ingress_enabled", "false") == True
+    ingress_enabled = config.get("ingress_enabled", "false") is True
     ingress_prefix = config.get("ingress_prefix")
     switches_json = subst_address(config["switches_json"])
     switches_json_path = config["switches_json_path"]
@@ -19,7 +22,7 @@ def app(namespace: str, config: pulumi.Config) -> None:
 
     metadata = homeslice.metadata(NAME, namespace)
 
-    configmap = kubernetes.core.v1.ConfigMap(
+    kubernetes.core.v1.ConfigMap(
         NAME,
         metadata=metadata,
         data={
@@ -51,7 +54,7 @@ def app(namespace: str, config: pulumi.Config) -> None:
         )
     ]
 
-    deployment = homeslice.deployment(
+    homeslice.deployment(
         NAME,
         image,
         metadata,
@@ -61,14 +64,15 @@ def app(namespace: str, config: pulumi.Config) -> None:
         volume_mounts=volume_mounts,
     )
 
-    service = homeslice.service(NAME, metadata)
+    homeslice.service(NAME, metadata)
 
     if ingress_enabled:
-        ingress = homeslice.ingress(NAME, metadata, [ingress_prefix])
+        homeslice.ingress(NAME, metadata, [ingress_prefix])
 
 
 # I don't want to publish IP addresses to GitHub
 def subst_address(s: str) -> str:
+    """Returns the given string with secrets substituted in."""
     for k, v in SWITCHES_SECRETS.IP_ADDRESSES.items():
         s = s.replace(k, v)
 

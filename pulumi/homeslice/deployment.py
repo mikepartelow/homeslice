@@ -1,3 +1,4 @@
+"""kubernetes Deployment factory"""
 import pulumi_kubernetes as kubernetes
 
 
@@ -5,13 +6,26 @@ def deployment(
     name: str,
     image: str,
     metadata: kubernetes.meta.v1.ObjectMetaArgs,
-    args: list[str] = [],
+    args: list[str] = None,
     replicas: int = 1,
-    env_from: list[kubernetes.core.v1.EnvFromSourceArgs] = [],
-    ports: list[kubernetes.core.v1.ContainerPortArgs] = [],
-    volume_mounts: list[kubernetes.core.v1.VolumeMountArgs] = [],
-    volumes: list[kubernetes.core.v1.VolumeArgs] = [],
+    env_from: list[kubernetes.core.v1.EnvFromSourceArgs] = None,
+    ports: list[kubernetes.core.v1.ContainerPortArgs] = None,
+    volume_mounts: list[kubernetes.core.v1.VolumeMountArgs] = None,
+    volumes: list[kubernetes.core.v1.VolumeArgs] = None,
 ) -> kubernetes.apps.v1.Deployment:
+    """THE kubernetes Deployment factory"""
+
+    if args is None:
+        args = []
+    if env_from is None:
+        env_from = []
+    if ports is None:
+        ports = []
+    if volume_mounts is None:
+        volume_mounts = []
+    if volumes is None:
+        volumes = []
+
     return kubernetes.apps.v1.Deployment(
         name,
         metadata=metadata,

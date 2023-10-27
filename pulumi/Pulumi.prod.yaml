@@ -5,6 +5,7 @@ config:
     image: registry.localdomain:32000/backup-todoist:20231024_211437
     author_name: Mike Partelow
     author_email: github@mikepartelow.com
+    schedule: 0 0 * * *
     private_key_path: /var/run/ssh-privatekey/ssh-privatekey
     known_hosts_path: /var/run/known_hosts/known_hosts
     known_hosts: |

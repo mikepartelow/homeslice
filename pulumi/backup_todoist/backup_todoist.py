@@ -1,17 +1,22 @@
+"""Resources for the homeslice/backup-todoist app."""
+
+from pathlib import Path
 import pulumi
 import pulumi_kubernetes as kubernetes
 import homeslice
 from homeslice_secrets import backup_todoist as BACKUP_TODOIST_SECRETS
-from pathlib import Path
 
 NAME = "backup-todoist"
 
 
 def app(namespace: str, config: pulumi.Config) -> None:
+    """define resources for the homeslice/backup-todoist app"""
+
     image = config["image"]
     private_key_path = config["private_key_path"]
     author_name = config["author_name"]
     author_email = config["author_email"]
+    schedule = config["schedule"]
 
     ssh_name = NAME + "-ssh"
 
@@ -21,7 +26,7 @@ def app(namespace: str, config: pulumi.Config) -> None:
 
     metadata = homeslice.metadata(NAME, namespace)
 
-    env_configmap = kubernetes.core.v1.ConfigMap(
+    kubernetes.core.v1.ConfigMap(
         NAME,
         metadata=metadata,
         data=dict(
@@ -32,7 +37,7 @@ def app(namespace: str, config: pulumi.Config) -> None:
         ),
     )
 
-    known_hosts_configmap = kubernetes.core.v1.ConfigMap(
+    kubernetes.core.v1.ConfigMap(
         known_hosts_name,
         metadata=homeslice.metadata(known_hosts_name, namespace),
         data={
@@ -40,7 +45,7 @@ def app(namespace: str, config: pulumi.Config) -> None:
         },
     )
 
-    env_secret = kubernetes.core.v1.Secret(
+    kubernetes.core.v1.Secret(
         NAME,
         metadata=metadata,
         type="Opaque",
@@ -50,7 +55,7 @@ def app(namespace: str, config: pulumi.Config) -> None:
         ),
     )
 
-    ssh_secret = kubernetes.core.v1.Secret(
+    kubernetes.core.v1.Secret(
         ssh_name,
         metadata=homeslice.metadata(ssh_name, namespace),
         type="kubernetes.io/ssh-auth",
@@ -102,11 +107,11 @@ def app(namespace: str, config: pulumi.Config) -> None:
         ),
     ]
 
-    cronjob = kubernetes.batch.v1.CronJob(
+    kubernetes.batch.v1.CronJob(
         NAME,
         metadata=metadata,
         spec=kubernetes.batch.v1.CronJobSpecArgs(
-            schedule="0 0 * * *",  # Schedule the job to run every hour
+            schedule=schedule,
             job_template=kubernetes.batch.v1.JobTemplateSpecArgs(
                 spec=kubernetes.batch.v1.JobSpecArgs(
                     template=kubernetes.core.v1.PodTemplateSpecArgs(

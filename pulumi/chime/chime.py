@@ -1,26 +1,27 @@
+"""Resources for the homeslice/chime app."""
 import pulumi
 import pulumi_kubernetes as kubernetes
 import homeslice
 from homeslice_secrets import chime as CHIME_SECRET
-from pathlib import Path
 
 NAME = "chime"
 
 
 def app(namespace: str, config: pulumi.Config) -> None:
+    """define resources for the homeslice/chime app"""
     image = config["image"]
     chimes = config["chimes"]
     nginx = config["nginx"]
     pvc_mount_path = config["pvc_mount_path"]
     container_port = int(config["container_port"])
-    ingress_enabled = config.get("ingress_enabled", "false") == True
+    ingress_enabled = config.get("ingress_enabled", "false") is True
     ingress_prefix = config.get("ingress_prefix")
 
     metadata = homeslice.metadata(NAME, namespace)
 
     # an nginx deployment serves up media from a persistent volume
     #
-    pvc = kubernetes.core.v1.PersistentVolumeClaim(
+    kubernetes.core.v1.PersistentVolumeClaim(
         NAME,
         metadata=metadata,
         spec=kubernetes.core.v1.PersistentVolumeClaimSpecArgs(
@@ -60,14 +61,14 @@ def app(namespace: str, config: pulumi.Config) -> None:
         )
     ]
 
-    deployment = homeslice.deployment(
+    homeslice.deployment(
         NAME, nginx, metadata, ports=ports, volumes=volumes, volume_mounts=volume_mounts
     )
 
-    service = homeslice.service(NAME, metadata)
+    homeslice.service(NAME, metadata)
 
     if ingress_enabled:
-        ingress = homeslice.ingress(
+        homeslice.ingress(
             NAME,
             homeslice.metadata(
                 NAME,
@@ -86,7 +87,7 @@ def app(namespace: str, config: pulumi.Config) -> None:
         for zone in CHIME_SECRET.ZONES:
             name = make_name(NAME, chime, zone)
 
-            zone_cronjob = kubernetes.batch.v1.CronJob(
+            kubernetes.batch.v1.CronJob(
                 name,
                 metadata=homeslice.metadata(name, namespace),
                 spec=kubernetes.batch.v1.CronJobSpecArgs(
@@ -118,6 +119,7 @@ def app(namespace: str, config: pulumi.Config) -> None:
 
 
 def make_name(name: str, chime: dict, zone: dict) -> str:
+    """Combine the inputs and return a name suitable for a Pulumi URN"""
     boring_title = chime["media_title"].replace(" ", "-")
     boring_zone_name = zone["name"].replace(" ", "-")
     fancy_zone_ip_address = zone["ip_address"].replace(".", "-")
