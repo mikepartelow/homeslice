@@ -1,7 +1,7 @@
 import pulumi
 import pulumi_kubernetes as kubernetes
 import homeslice
-from secrets import chime as chime_secret
+from homeslice_secrets import chime as chime_secret
 from pathlib import Path
 
 NAME = "chime"

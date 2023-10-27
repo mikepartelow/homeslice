@@ -1,7 +1,7 @@
 import pulumi
 import pulumi_kubernetes as kubernetes
 import homeslice
-from secrets import backup_todoist
+from homeslice_secrets import backup_todoist
 from pathlib import Path
 
 NAME = "backup-todoist"

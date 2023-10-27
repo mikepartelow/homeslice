@@ -64,7 +64,7 @@ def app(namespace: str, config: pulumi.Config) -> None:
 
 # I don't want to publish IP addresses to GitHub
 def subst_address(s: str) -> str:
-    from secrets import switches
+    from homeslice_secrets import switches
 
     for k, v in switches.SECRETS.items():
         s = s.replace(k, v)

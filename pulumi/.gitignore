@@ -1,4 +1,4 @@
 *.pyc
 venv/
 .vscode
-/secrets/*.py
+/homeslice_secrets/*.py
