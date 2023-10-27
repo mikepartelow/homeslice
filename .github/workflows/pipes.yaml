@@ -2,7 +2,7 @@ name: 'pipes'
 
 on: [push]
 jobs:
-  pipes:
+  go:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -11,13 +11,25 @@ jobs:
         with:
           go-version: 1.21
           cache-dependency-path: |
+            app/backup_todoist/go.sum
             app/buttons/go.sum
             app/clocktime/go.sum
             app/switches/go.sum
-      - name: Setup linters
+      - name: Setup Go linters
         run: |
           curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.55.0
       - name: lint
         run: cd apps && make lint
       - name: test
         run: cd apps && make test
+  python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v3
+      - name: install linters
+        - run: pip install pylint black
+      - name: lint pulumi
+        run: cd pulumi && black --check . && pylint "**/*.py"
+      - name: lint apps
+        run: cd apps && black --check . && pylint "**/*.py"
