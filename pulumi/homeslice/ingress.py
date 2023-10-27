@@ -2,7 +2,8 @@ import pulumi_kubernetes as kubernetes
 
 def ingress(name: str,
             metadata: kubernetes.meta.v1.ObjectMetaArgs,
-            ingress_prefixes: [str]
+            ingress_prefixes: [str],
+            path_type: str = "Prefix",
             ) -> kubernetes.core.v1.Service:
 
     return kubernetes.networking.v1.Ingress(
@@ -23,7 +24,7 @@ def ingress(name: str,
                                     ),
                                 ),
                                 path=ingress_prefix,
-                                path_type="Prefix",
+                                path_type=path_type,
                             )
                         for ingress_prefix in ingress_prefixes]
                     )

@@ -70,7 +70,9 @@ def app(namespace: str, config: pulumi.Config) -> None:
     if ingress_enabled:
         ingress = homeslice.ingress(NAME,
                                     homeslice.metadata(NAME, namespace, annotations={
-                                        "nginx.ingress.kubernetes.io/rewrite-target": "/",
+                                        "nginx.ingress.kubernetes.io/use-regex": "true",
+                                        "nginx.ingress.kubernetes.io/rewrite-target": "/$2",
                                     }),
-                                    [ingress_prefix]
+                                    [ingress_prefix],
+                                    path_type="ImplementationSpecific",
         )
