@@ -6,7 +6,6 @@ from chime import chime
 from clocktime import clocktime
 from switches import switches
 
-# Get some values from the Pulumi stack configuration, or use defaults
 config = pulumi.Config("homeslice")
 name = config.require("namespace")
 

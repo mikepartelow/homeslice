@@ -2,9 +2,9 @@ import pulumi
 import pulumi_kubernetes as kubernetes
 import homeslice
 from homeslice_secrets import switches as SWITCHES_SECRETS
+from pathlib import Path
 
 NAME = "switches"
-SWITCHES_JSON_ROOT = "/var/run/"
 
 def app(namespace: str, config: pulumi.Config) -> None:
     image = config["image"]
@@ -12,6 +12,9 @@ def app(namespace: str, config: pulumi.Config) -> None:
     ingress_enabled = config.get("ingress_enabled", "false") == True
     ingress_prefix = config.get("ingress_prefix")
     switches_json = subst_address(config["switches_json"])
+    switches_json_path = config["switches_json_path"]
+    switches_json_name = str(Path(switches_json_path).name)
+    volume_name = switches_json_name.replace(".", "-")
 
     metadata=homeslice.metadata(NAME, namespace)
 
@@ -19,13 +22,13 @@ def app(namespace: str, config: pulumi.Config) -> None:
         NAME,
         metadata=metadata,
         data={
-            "switches.json" : switches_json,
+           switches_json_name : switches_json,
         }
     )
 
     volumes = [
         kubernetes.core.v1.VolumeArgs(
-            name="switches-json",
+            name=volume_name,
             config_map=kubernetes.core.v1.ConfigMapVolumeSourceArgs(
                 name=NAME,
             )
@@ -34,8 +37,8 @@ def app(namespace: str, config: pulumi.Config) -> None:
 
     volume_mounts = [
         kubernetes.core.v1.VolumeMountArgs(
-            name="switches-json",
-            mount_path=SWITCHES_JSON_ROOT,
+            name=volume_name,
+            mount_path=str(Path(switches_json_path).parent),
             read_only=True,
         ),
     ]
@@ -50,7 +53,7 @@ def app(namespace: str, config: pulumi.Config) -> None:
     deployment = homeslice.deployment(NAME,
                                       image,
                                       metadata,
-                                      args=[SWITCHES_JSON_ROOT+"switches.json"],
+                                      args=[switches_json_path],
                                       ports=ports,
                                       volumes=volumes,
                                       volume_mounts=volume_mounts)

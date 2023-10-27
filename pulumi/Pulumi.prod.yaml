@@ -37,6 +37,7 @@ config:
   homeslice:switches:
     image: registry.localdomain:32000/switches:20231019_222323
     container_port: 8000
+    switches_json_path: /var/run/switches.json
     switches_json: |
       [
         {
