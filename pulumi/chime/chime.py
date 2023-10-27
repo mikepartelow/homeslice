@@ -1,7 +1,7 @@
 import pulumi
 import pulumi_kubernetes as kubernetes
 import homeslice
-from homeslice_secrets import chime as chime_secret
+from homeslice_secrets import chime as CHIME_SECRET
 from pathlib import Path
 
 NAME = "chime"
@@ -80,7 +80,7 @@ def app(namespace: str, config: pulumi.Config) -> None:
 
     # cronjobs schedule the chimes.
     for chime in chimes:
-        for zone in chime_secret.ZONES:
+        for zone in CHIME_SECRET.ZONES:
             name = make_name(NAME, chime, zone)
 
             zone_cronjob = kubernetes.batch.v1.CronJob(
@@ -100,7 +100,7 @@ def app(namespace: str, config: pulumi.Config) -> None:
                                             args=[
                                                 zone["ip_address"],
                                                 chime["media_title"],
-                                                chime["media_uri"].replace("{{ingress}}", chime_secret.INGRESS),
+                                                chime["media_uri"].replace("{{ingress}}", CHIME_SECRET.INGRESS),
                                             ]
                                         )
                                     ]

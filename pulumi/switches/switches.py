@@ -1,8 +1,7 @@
 import pulumi
 import pulumi_kubernetes as kubernetes
 import homeslice
-import json
-import sys
+from homeslice_secrets import switches as SWITCHES_SECRETS
 
 NAME = "switches"
 SWITCHES_JSON_ROOT = "/var/run/"
@@ -64,9 +63,7 @@ def app(namespace: str, config: pulumi.Config) -> None:
 
 # I don't want to publish IP addresses to GitHub
 def subst_address(s: str) -> str:
-    from homeslice_secrets import switches
-
-    for k, v in switches.SECRETS.items():
+    for k, v in SWITCHES_SECRETS.IP_ADDRESSES.items():
         s = s.replace(k, v)
 
     return s

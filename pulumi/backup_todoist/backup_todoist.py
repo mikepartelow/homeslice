@@ -1,7 +1,7 @@
 import pulumi
 import pulumi_kubernetes as kubernetes
 import homeslice
-from homeslice_secrets import backup_todoist
+from homeslice_secrets import backup_todoist as BACKUP_TODOIST_SECRETS
 from pathlib import Path
 
 NAME = "backup-todoist"
@@ -44,8 +44,8 @@ def app(namespace: str, config: pulumi.Config) -> None:
         metadata=metadata,
         type="Opaque",
         string_data=dict(
-            TODOIST_BACKUP_GIT_CLONE_URL=backup_todoist.SECRETS["TODOIST_BACKUP_GIT_CLONE_URL"],
-            TODOIST_BACKUP_TODOIST_TOKEN=backup_todoist.SECRETS["TODOIST_BACKUP_TODOIST_TOKEN"],
+            TODOIST_BACKUP_GIT_CLONE_URL=BACKUP_TODOIST_SECRETS.TODOIST_BACKUP_GIT_CLONE_URL,
+            TODOIST_BACKUP_TODOIST_TOKEN=BACKUP_TODOIST_SECRETS.TODOIST_BACKUP_TODOIST_TOKEN,
         )
     )
 
@@ -54,7 +54,7 @@ def app(namespace: str, config: pulumi.Config) -> None:
         metadata=homeslice.metadata(ssh_name, namespace),
         type="kubernetes.io/ssh-auth",
         string_data={
-            "ssh-privatekey": backup_todoist.SECRETS["SSH_PRIVATE_KEY"],
+            "ssh-privatekey": BACKUP_TODOIST_SECRETS.SSH_PRIVATE_KEY,
         }
     )
 
