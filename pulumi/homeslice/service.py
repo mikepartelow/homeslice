@@ -1,8 +1,9 @@
 import pulumi_kubernetes as kubernetes
 
-def service(name: str,
-            metadata: kubernetes.meta.v1.ObjectMetaArgs
-            ) -> kubernetes.core.v1.Service:
+
+def service(
+    name: str, metadata: kubernetes.meta.v1.ObjectMetaArgs
+) -> kubernetes.core.v1.Service:
     return kubernetes.core.v1.Service(
         name,
         metadata=metadata,
@@ -17,5 +18,5 @@ def service(name: str,
                     target_port="http",
                 )
             ],
-        )
+        ),
     )

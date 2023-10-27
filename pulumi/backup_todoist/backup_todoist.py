@@ -6,19 +6,20 @@ from pathlib import Path
 
 NAME = "backup-todoist"
 
+
 def app(namespace: str, config: pulumi.Config) -> None:
     image = config["image"]
     private_key_path = config["private_key_path"]
     author_name = config["author_name"]
     author_email = config["author_email"]
 
-    ssh_name = NAME+"-ssh"
+    ssh_name = NAME + "-ssh"
 
-    known_hosts_name = NAME+"-known-hosts"
+    known_hosts_name = NAME + "-known-hosts"
     known_hosts_path = config["known_hosts_path"]
     known_hosts = config["known_hosts"]
 
-    metadata=homeslice.metadata(NAME, namespace)
+    metadata = homeslice.metadata(NAME, namespace)
 
     env_configmap = kubernetes.core.v1.ConfigMap(
         NAME,
@@ -28,7 +29,7 @@ def app(namespace: str, config: pulumi.Config) -> None:
             TODOIST_BACKUP_AUTHOR_NAME=author_name,
             TODOIST_BACKUP_AUTHOR_EMAIL=author_email,
             SSH_KNOWN_HOSTS=str(known_hosts_path),
-        )
+        ),
     )
 
     known_hosts_configmap = kubernetes.core.v1.ConfigMap(
@@ -36,7 +37,7 @@ def app(namespace: str, config: pulumi.Config) -> None:
         metadata=homeslice.metadata(known_hosts_name, namespace),
         data={
             str(Path(known_hosts_path).name): known_hosts,
-        }
+        },
     )
 
     env_secret = kubernetes.core.v1.Secret(
@@ -46,7 +47,7 @@ def app(namespace: str, config: pulumi.Config) -> None:
         string_data=dict(
             TODOIST_BACKUP_GIT_CLONE_URL=BACKUP_TODOIST_SECRETS.TODOIST_BACKUP_GIT_CLONE_URL,
             TODOIST_BACKUP_TODOIST_TOKEN=BACKUP_TODOIST_SECRETS.TODOIST_BACKUP_TODOIST_TOKEN,
-        )
+        ),
     )
 
     ssh_secret = kubernetes.core.v1.Secret(
@@ -55,7 +56,7 @@ def app(namespace: str, config: pulumi.Config) -> None:
         type="kubernetes.io/ssh-auth",
         string_data={
             "ssh-privatekey": BACKUP_TODOIST_SECRETS.SSH_PRIVATE_KEY,
-        }
+        },
     )
 
     volume_mounts = [
@@ -77,15 +78,15 @@ def app(namespace: str, config: pulumi.Config) -> None:
             secret=kubernetes.core.v1.SecretVolumeSourceArgs(
                 secret_name=ssh_name,
                 default_mode=0o444,
-            )
+            ),
         ),
         kubernetes.core.v1.VolumeArgs(
             name=known_hosts_name,
             config_map=kubernetes.core.v1.ConfigMapVolumeSourceArgs(
                 name=known_hosts_name,
                 default_mode=0o444,
-            )
-        )
+            ),
+        ),
     ]
 
     env_from = [
@@ -98,7 +99,7 @@ def app(namespace: str, config: pulumi.Config) -> None:
             secret_ref=kubernetes.core.v1.SecretEnvSourceArgs(
                 name=NAME,
             )
-        )
+        ),
     ]
 
     cronjob = kubernetes.batch.v1.CronJob(
@@ -123,6 +124,6 @@ def app(namespace: str, config: pulumi.Config) -> None:
                         ),
                     ),
                 ),
-            )
-        )
+            ),
+        ),
     )

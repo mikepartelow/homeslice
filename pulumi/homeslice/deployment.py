@@ -1,16 +1,17 @@
 import pulumi_kubernetes as kubernetes
 
-def deployment(name: str,
-               image: str,
-               metadata: kubernetes.meta.v1.ObjectMetaArgs,
-               args: list[str] = [],
-               replicas: int = 1,
-               env_from: list[kubernetes.core.v1.EnvFromSourceArgs] = [],
-               ports: list[kubernetes.core.v1.ContainerPortArgs] = [],
-               volume_mounts: list[kubernetes.core.v1.VolumeMountArgs] = [],
-               volumes: list[kubernetes.core.v1.VolumeArgs] = [],
-               ) -> kubernetes.apps.v1.Deployment:
 
+def deployment(
+    name: str,
+    image: str,
+    metadata: kubernetes.meta.v1.ObjectMetaArgs,
+    args: list[str] = [],
+    replicas: int = 1,
+    env_from: list[kubernetes.core.v1.EnvFromSourceArgs] = [],
+    ports: list[kubernetes.core.v1.ContainerPortArgs] = [],
+    volume_mounts: list[kubernetes.core.v1.VolumeMountArgs] = [],
+    volumes: list[kubernetes.core.v1.VolumeArgs] = [],
+) -> kubernetes.apps.v1.Deployment:
     return kubernetes.apps.v1.Deployment(
         name,
         metadata=metadata,
@@ -35,7 +36,7 @@ def deployment(name: str,
                         )
                     ],
                     volumes=volumes,
-                )
-            )
-        )
+                ),
+            ),
+        ),
     )

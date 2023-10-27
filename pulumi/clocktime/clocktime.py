@@ -4,6 +4,7 @@ import homeslice
 
 NAME = "clocktime"
 
+
 def app(namespace: str, config: pulumi.Config) -> None:
     image = config["image"]
     container_port = int(config["container_port"])
@@ -11,14 +12,14 @@ def app(namespace: str, config: pulumi.Config) -> None:
     ingress_enabled = config.get("ingress_enabled", "false") == True
     ingress_prefix = config.get("ingress_prefix")
 
-    metadata=homeslice.metadata(NAME, namespace)
+    metadata = homeslice.metadata(NAME, namespace)
 
     configmap = kubernetes.core.v1.ConfigMap(
         NAME,
         metadata=metadata,
         data={
             "LOCATION": location,
-        }
+        },
     )
 
     env_from = [
@@ -36,7 +37,9 @@ def app(namespace: str, config: pulumi.Config) -> None:
         )
     ]
 
-    deployment = homeslice.deployment(NAME, image, metadata, env_from=env_from, ports=ports)
+    deployment = homeslice.deployment(
+        NAME, image, metadata, env_from=env_from, ports=ports
+    )
 
     service = homeslice.service(NAME, metadata)
 

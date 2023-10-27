@@ -6,6 +6,7 @@ from pathlib import Path
 
 NAME = "chime"
 
+
 def app(namespace: str, config: pulumi.Config) -> None:
     image = config["image"]
     chimes = config["chimes"]
@@ -15,7 +16,7 @@ def app(namespace: str, config: pulumi.Config) -> None:
     ingress_enabled = config.get("ingress_enabled", "false") == True
     ingress_prefix = config.get("ingress_prefix")
 
-    metadata=homeslice.metadata(NAME, namespace)
+    metadata = homeslice.metadata(NAME, namespace)
 
     # an nginx deployment serves up media from a persistent volume
     #
@@ -30,9 +31,9 @@ def app(namespace: str, config: pulumi.Config) -> None:
                 },
                 limits={
                     "storage": "256Mi",
-                }
-            )
-        )
+                },
+            ),
+        ),
     )
 
     volumes = [
@@ -40,7 +41,7 @@ def app(namespace: str, config: pulumi.Config) -> None:
             name=NAME,
             persistent_volume_claim=kubernetes.core.v1.PersistentVolumeClaimVolumeSourceArgs(
                 claim_name=NAME,
-            )
+            ),
         ),
     ]
 
@@ -59,23 +60,25 @@ def app(namespace: str, config: pulumi.Config) -> None:
         )
     ]
 
-    deployment = homeslice.deployment(NAME,
-                                      nginx,
-                                      metadata,
-                                      ports=ports,
-                                      volumes=volumes,
-                                      volume_mounts=volume_mounts)
+    deployment = homeslice.deployment(
+        NAME, nginx, metadata, ports=ports, volumes=volumes, volume_mounts=volume_mounts
+    )
 
     service = homeslice.service(NAME, metadata)
 
     if ingress_enabled:
-        ingress = homeslice.ingress(NAME,
-                                    homeslice.metadata(NAME, namespace, annotations={
-                                        "nginx.ingress.kubernetes.io/use-regex": "true",
-                                        "nginx.ingress.kubernetes.io/rewrite-target": "/$2",
-                                    }),
-                                    [ingress_prefix],
-                                    path_type="ImplementationSpecific",
+        ingress = homeslice.ingress(
+            NAME,
+            homeslice.metadata(
+                NAME,
+                namespace,
+                annotations={
+                    "nginx.ingress.kubernetes.io/use-regex": "true",
+                    "nginx.ingress.kubernetes.io/rewrite-target": "/$2",
+                },
+            ),
+            [ingress_prefix],
+            path_type="ImplementationSpecific",
         )
 
     # cronjobs schedule the chimes.
@@ -100,19 +103,24 @@ def app(namespace: str, config: pulumi.Config) -> None:
                                             args=[
                                                 zone["ip_address"],
                                                 chime["media_title"],
-                                                chime["media_uri"].replace("{{ingress}}", CHIME_SECRET.INGRESS),
-                                            ]
+                                                chime["media_uri"].replace(
+                                                    "{{ingress}}", CHIME_SECRET.INGRESS
+                                                ),
+                                            ],
                                         )
-                                    ]
+                                    ],
                                 )
                             )
                         )
-                    )
-                )
+                    ),
+                ),
             )
+
 
 def make_name(name: str, chime: dict, zone: dict) -> str:
     boring_title = chime["media_title"].replace(" ", "-")
     boring_zone_name = zone["name"].replace(" ", "-")
-    fancy_zone_ip_address = zone["ip_address"].replace('.', '-')
-    return (name+"-"+boring_title+"-"+fancy_zone_ip_address+"-"+boring_zone_name).lower()
+    fancy_zone_ip_address = zone["ip_address"].replace(".", "-")
+    return (
+        name + "-" + boring_title + "-" + fancy_zone_ip_address + "-" + boring_zone_name
+    ).lower()

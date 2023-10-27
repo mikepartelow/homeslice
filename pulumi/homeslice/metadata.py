@@ -1,11 +1,12 @@
 import pulumi_kubernetes as kubernetes
 
-def metadata(name: str,
-             namespace: str,
-             labels: dict[str, str] = None,
-             annotations: dict[str, str] = None,
-            ) -> kubernetes.meta.v1.ObjectMetaArgs :
 
+def metadata(
+    name: str,
+    namespace: str,
+    labels: dict[str, str] = None,
+    annotations: dict[str, str] = None,
+) -> kubernetes.meta.v1.ObjectMetaArgs:
     if labels is None:
         labels = {"app.kubernetes.io/name": name}
 
