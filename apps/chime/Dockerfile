@@ -19,6 +19,6 @@ FROM dev AS prod
 
 WORKDIR /app
 
-USER nonroot
+USER nobody
 
 ENTRYPOINT ["/app/chime.py"]

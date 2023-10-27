@@ -18,11 +18,16 @@ config:
     - /api/v0/buttons/
     - /api/v0/buttontimes/
   homeslice:chime:
+    image: registry.localdomain:32000/chime:20231026_221550
     nginx: nginx:1.25
     pvc_mount_path: /usr/share/nginx/html
     container_port: 80
     ingress_enabled: true
     ingress_prefix: /(api/v0/chime/)(.*)$
+    chimes:
+    - schedule: 20 16 * * *
+      media_title: every day
+      media_uri: http://{{ingress}}/api/v0/chime/swed.mp3
   homeslice:clocktime:
     image: registry.localdomain:32000/clocktime:20231016_133307
     container_port: 8000
