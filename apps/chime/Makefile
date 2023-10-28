@@ -14,7 +14,10 @@ linter:
 
 ifeq ($(CI),TRUE)
 lint:
-	black --check . && pylint  --ignore-paths=venv "**/*.py"
+	python -m venv venv
+	./venv/pip install --no-deps -r /tmp/requirements-lint.txt -r /tmp/requirements.txt
+	./vin/pip/black --check .
+	./vin/pip/pylint  --ignore-paths=venv "**/*.py"
 else
 lint: linter
 	docker run --rm -v`pwd`:/app -ti $(LINTER_IMAGE) bash -c 'black --check . && pylint  --ignore-paths=venv "**/*.py"'

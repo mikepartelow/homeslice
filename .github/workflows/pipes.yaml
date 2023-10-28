@@ -22,10 +22,8 @@ jobs:
       - name: Setup Go linters
         run: |
           curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.55.0
-      - name: setup python
+      - name: setup Python
         uses: actions/setup-python@v3
-      - name: Setup Python linters
-        run: pip install pylint black
       - name: lint
         run: cd apps && make lint
       - name: test
