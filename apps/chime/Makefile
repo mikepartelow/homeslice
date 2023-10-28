@@ -19,7 +19,7 @@ lint:
 	python -m venv $(VENV)
 	$(VENV)/bin/pip install --no-deps -r requirements-lint.txt -r requirements.txt
 	$(VENV)/bin/black --check .
-	$(VENV)/bin/pylint  --ignore-paths=venv "**/*.py"
+	$(VENV)/bin/pylint --ignore-paths=venv "**/*.py"
 else
 lint: linter
 	docker run --rm -v`pwd`:/app -ti $(LINTER_IMAGE) bash -c 'black --check . && pylint  --ignore-paths=venv "**/*.py"'
