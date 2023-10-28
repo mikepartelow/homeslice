@@ -1,3 +1,5 @@
+"""kubernetes metadata factory"""
+
 import pulumi_kubernetes as kubernetes
 
 
@@ -7,6 +9,8 @@ def metadata(
     labels: dict[str, str] = None,
     annotations: dict[str, str] = None,
 ) -> kubernetes.meta.v1.ObjectMetaArgs:
+    """THE kubernetes metadata factory"""
+
     if labels is None:
         labels = {"app.kubernetes.io/name": name}
 

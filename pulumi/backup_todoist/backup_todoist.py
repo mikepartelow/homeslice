@@ -29,12 +29,12 @@ def app(namespace: str, config: pulumi.Config) -> None:
     kubernetes.core.v1.ConfigMap(
         NAME,
         metadata=metadata,
-        data=dict(
-            TODOIST_BACKUP_PRIVATE_KEY_PATH=private_key_path,
-            TODOIST_BACKUP_AUTHOR_NAME=author_name,
-            TODOIST_BACKUP_AUTHOR_EMAIL=author_email,
-            SSH_KNOWN_HOSTS=str(known_hosts_path),
-        ),
+        data={
+            "TODOIST_BACKUP_PRIVATE_KEY_PATH": private_key_path,
+            "TODOIST_BACKUP_AUTHOR_NAME": author_name,
+            "TODOIST_BACKUP_AUTHOR_EMAIL": author_email,
+            "SSH_KNOWN_HOSTS": str(known_hosts_path),
+        },
     )
 
     kubernetes.core.v1.ConfigMap(
@@ -49,10 +49,10 @@ def app(namespace: str, config: pulumi.Config) -> None:
         NAME,
         metadata=metadata,
         type="Opaque",
-        string_data=dict(
-            TODOIST_BACKUP_GIT_CLONE_URL=BACKUP_TODOIST_SECRETS.TODOIST_BACKUP_GIT_CLONE_URL,
-            TODOIST_BACKUP_TODOIST_TOKEN=BACKUP_TODOIST_SECRETS.TODOIST_BACKUP_TODOIST_TOKEN,
-        ),
+        string_data={
+            "TODOIST_BACKUP_GIT_CLONE_URL": BACKUP_TODOIST_SECRETS.TODOIST_BACKUP_GIT_CLONE_URL,
+            "TODOIST_BACKUP_TODOIST_TOKEN": BACKUP_TODOIST_SECRETS.TODOIST_BACKUP_TODOIST_TOKEN,
+        },
     )
 
     kubernetes.core.v1.Secret(

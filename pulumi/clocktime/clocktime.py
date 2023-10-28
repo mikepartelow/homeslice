@@ -41,9 +41,7 @@ def app(namespace: str, config: pulumi.Config) -> None:
         )
     ]
 
-    homeslice.deployment(
-        NAME, image, metadata, env_from=env_from, ports=ports
-    )
+    homeslice.deployment(NAME, image, metadata, env_from=env_from, ports=ports)
 
     homeslice.service(NAME, metadata)
 
