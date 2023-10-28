@@ -3,7 +3,9 @@ from pathlib import Path
 import pulumi
 import pulumi_kubernetes as kubernetes
 import homeslice
-from homeslice_secrets import switches as SWITCHES_SECRETS # pylint: disable=no-name-in-module
+from homeslice_secrets import (
+    switches as SWITCHES_SECRETS,
+)  # pylint: disable=no-name-in-module
 
 NAME = "switches"
 

@@ -4,7 +4,9 @@ from pathlib import Path
 import pulumi
 import pulumi_kubernetes as kubernetes
 import homeslice
-from homeslice_secrets import backup_todoist as BACKUP_TODOIST_SECRETS # pylint: disable=no-name-in-module
+from homeslice_secrets import (
+    backup_todoist as BACKUP_TODOIST_SECRETS,
+)  # pylint: disable=no-name-in-module
 
 NAME = "backup-todoist"
 
