@@ -13,11 +13,12 @@ linter:
 	docker build -t $(LINTER_IMAGE) -f Dockerfile-lint .
 
 ifeq ($(CI),TRUE)
+VENV := /tmp/venv.$(PROJECT)
 lint:
-	python -m venv venv
-	./venv/pip install --no-deps -r /tmp/requirements-lint.txt -r /tmp/requirements.txt
-	./vin/pip/black --check .
-	./vin/pip/pylint  --ignore-paths=venv "**/*.py"
+	python -m venv $(VENV)
+	$(VENV)/bin/pip install --no-deps -r /tmp/requirements-lint.txt -r /tmp/requirements.txt
+	$(VENV)/bin/black --check .
+	$(VENV)/bin/pylint  --ignore-paths=venv "**/*.py"
 else
 lint: linter
 	docker run --rm -v`pwd`:/app -ti $(LINTER_IMAGE) bash -c 'black --check . && pylint  --ignore-paths=venv "**/*.py"'
