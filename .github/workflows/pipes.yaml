@@ -45,6 +45,6 @@ jobs:
       - name: lint
         run: |
           cd pulumi &&
-          /tmp/venv/bin/pip freeze &&
+          /tmp/venv/bin/python -m pip freeze &&
           /tmp/venv/bin/black --check . &&
           /tmp/venv/bin/pylint "**/*.py"
