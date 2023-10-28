@@ -31,7 +31,7 @@ def app(config: pulumi.Config) -> None:
             "TODOIST_BACKUP_AUTHOR_NAME": author_name,
             "TODOIST_BACKUP_AUTHOR_EMAIL": author_email,
             "SSH_KNOWN_HOSTS": str(known_hosts_path),
-        }
+        },
     )
 
     homeslice.configmap(

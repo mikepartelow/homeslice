@@ -3,6 +3,7 @@
 import pulumi_kubernetes as kubernetes
 import homeslice
 
+
 def metadata(
     name: str,
     labels: dict[str, str] = None,

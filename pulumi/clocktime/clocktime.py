@@ -1,7 +1,6 @@
 """Resources for the homeslice/clocktime app."""
 
 import pulumi
-import pulumi_kubernetes as kubernetes
 import homeslice
 
 NAME = "clocktime"
@@ -14,9 +13,12 @@ def app(config: pulumi.Config) -> None:
     location = config["location"]
     ingress_prefix = config.get("ingress_prefix")
 
-    homeslice.configmap(NAME, {
-        "LOCATION": location,
-    })
+    homeslice.configmap(
+        NAME,
+        {
+            "LOCATION": location,
+        },
+    )
 
     env_from = [homeslice.env_from_configmap(NAME)]
 

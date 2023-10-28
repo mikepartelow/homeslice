@@ -2,6 +2,7 @@
 import pulumi_kubernetes as kubernetes
 import homeslice
 
+
 def deployment(
     name: str,
     image: str,
@@ -12,6 +13,7 @@ def deployment(
     volume_mounts: list[kubernetes.core.v1.VolumeMountArgs] = None,
     volumes: list[kubernetes.core.v1.VolumeArgs] = None,
 ) -> kubernetes.apps.v1.Deployment:
+    # pylint: disable=too-many-arguments
     """THE kubernetes Deployment factory"""
 
     metadata = homeslice.metadata(name)

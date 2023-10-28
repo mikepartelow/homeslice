@@ -1,7 +1,7 @@
 """kubernetes env_from factory"""
 
 import pulumi_kubernetes as kubernetes
-import homeslice
+
 
 def env_from_configmap(name: str) -> kubernetes.core.v1.EnvFromSourceArgs:
     """THE kubernetes env_from (configmap) factory"""

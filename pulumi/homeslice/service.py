@@ -2,6 +2,7 @@
 import pulumi_kubernetes as kubernetes
 import homeslice
 
+
 def service(
     name: str,
 ) -> kubernetes.core.v1.Service:

@@ -19,7 +19,9 @@ def app(config: pulumi.Config) -> None:
     switches_json_name = str(Path(switches_json_path).name)
     volume_name = switches_json_name.replace(".", "-")
 
-    homeslice.configmap(NAME, {
+    homeslice.configmap(
+        NAME,
+        {
             switches_json_name: switches_json,
         },
     )
