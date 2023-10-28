@@ -1,6 +1,6 @@
 """Resources for the homeslice/chime app."""
-import pulumi
 import pulumi_kubernetes as kubernetes
+import pulumi
 import homeslice
 from homeslice_secrets import chime as CHIME_SECRET  # pylint: disable=no-name-in-module
 
