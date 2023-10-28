@@ -81,35 +81,18 @@ def app(config: pulumi.Config) -> None:
     for chime in chimes:
         for zone in CHIME_SECRET.ZONES:
             name = make_name(NAME, chime, zone)
+            args = [
+                zone["ip_address"],
+                chime["media_title"],
+                chime["media_uri"].replace("{{ingress}}", CHIME_SECRET.INGRESS),
+            ]
 
-            kubernetes.batch.v1.CronJob(
+            homeslice.cronjob(
                 name,
+                image,
+                chime["schedule"],
+                args=args,
                 metadata=homeslice.metadata(name),
-                spec=kubernetes.batch.v1.CronJobSpecArgs(
-                    schedule=chime["schedule"],
-                    job_template=kubernetes.batch.v1.JobTemplateSpecArgs(
-                        spec=kubernetes.batch.v1.JobSpecArgs(
-                            template=kubernetes.core.v1.PodTemplateSpecArgs(
-                                spec=kubernetes.core.v1.PodSpecArgs(
-                                    restart_policy="Never",
-                                    containers=[
-                                        kubernetes.core.v1.ContainerArgs(
-                                            name=name,
-                                            image=image,
-                                            args=[
-                                                zone["ip_address"],
-                                                chime["media_title"],
-                                                chime["media_uri"].replace(
-                                                    "{{ingress}}", CHIME_SECRET.INGRESS
-                                                ),
-                                            ],
-                                        )
-                                    ],
-                                )
-                            )
-                        )
-                    ),
-                ),
             )
 
 

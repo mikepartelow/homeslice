@@ -1,7 +1,8 @@
 """kubernetes helpers"""
-
+# pylint: disable=cyclic-import
 
 from .configmap import *
+from .cronjob import *
 from .deployment import *
 from .env_from import *
 from .ingress import *

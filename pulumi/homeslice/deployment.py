@@ -10,8 +10,8 @@ def deployment(
     replicas: int = 1,
     env_from: list[kubernetes.core.v1.EnvFromSourceArgs] = None,
     ports: list[kubernetes.core.v1.ContainerPortArgs] = None,
-    volume_mounts: list[kubernetes.core.v1.VolumeMountArgs] = None,
     volumes: list[kubernetes.core.v1.VolumeArgs] = None,
+    volume_mounts: list[kubernetes.core.v1.VolumeMountArgs] = None,
 ) -> kubernetes.apps.v1.Deployment:
     # pylint: disable=too-many-arguments
     """THE kubernetes Deployment factory"""

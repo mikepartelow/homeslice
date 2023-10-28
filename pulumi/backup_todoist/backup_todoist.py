@@ -95,28 +95,11 @@ def app(config: pulumi.Config) -> None:
         homeslice.env_from_secret(NAME),
     ]
 
-    kubernetes.batch.v1.CronJob(
+    homeslice.cronjob(
         NAME,
-        metadata=homeslice.metadata(NAME),
-        spec=kubernetes.batch.v1.CronJobSpecArgs(
-            schedule=schedule,
-            job_template=kubernetes.batch.v1.JobTemplateSpecArgs(
-                spec=kubernetes.batch.v1.JobSpecArgs(
-                    template=kubernetes.core.v1.PodTemplateSpecArgs(
-                        spec=kubernetes.core.v1.PodSpecArgs(
-                            restart_policy="Never",
-                            containers=[
-                                kubernetes.core.v1.ContainerArgs(
-                                    name=NAME,
-                                    image=image,
-                                    env_from=env_from,
-                                    volume_mounts=volume_mounts,
-                                )
-                            ],
-                            volumes=volumes,
-                        ),
-                    ),
-                ),
-            ),
-        ),
+        image,
+        schedule,
+        env_from=env_from,
+        volumes=volumes,
+        volume_mounts=volume_mounts,
     )
