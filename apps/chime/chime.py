@@ -1,13 +1,13 @@
 #!/venv/bin/python
+"""chime.py plays an mp3 on a given Sonos Zone"""
 
 import time
-
+import argparse
 from soco import snapshot, SoCo
 
 
 def parse_args():
     """Parse the command line arguments"""
-    import argparse
 
     description = "Interrupt a Zone, play a media file, then attempt to resume the Zone"
     parser = argparse.ArgumentParser(description=description)
@@ -21,6 +21,7 @@ def parse_args():
 
 
 def main():
+    """ye olde main()"""
     args = parse_args()
     print(
         " zone_ip_address: {args.zone_ip_address}\n"
@@ -38,8 +39,9 @@ def main():
         snap = snapshot.Snapshot(member)
         try:
             snap.snapshot()
-        except:
+        except:  # pylint: disable=bare-except
             print(f"  exception: snap {member.player_name}")
+            continue
         snapshots.append(snap)
         if (
             member.is_coordinator
@@ -48,8 +50,9 @@ def main():
         ):
             try:
                 member.pause()
-            except:
+            except:  # pylint: disable=bare-except
                 print(f"  exception: pause {member.player_name}")
+                continue
     for member in zone.group.members:
         if not member.mute:
             member.volume = args.player_volume
@@ -61,8 +64,9 @@ def main():
     for snap in snapshots:
         try:
             snap.restore(fade=False)
-        except:
+        except:  # pylint: disable=bare-except
             print(f"  exception: restore {member.player_name}")
+            continue
 
 
 main()
