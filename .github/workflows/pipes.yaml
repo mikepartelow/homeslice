@@ -2,9 +2,6 @@ name: 'pipes'
 
 on: [push]
 
-env:
-  CI: "TRUE"
-
 jobs:
   apps:
     runs-on: ubuntu-latest

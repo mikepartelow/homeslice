@@ -7,23 +7,15 @@ include ./.make.mk
 test:
 	echo FIXME
 
-LINTER_IMAGE := homeslice-chime-linter
+# FIXME: share with pulumi
+VENV_LINT := ./venv.lint
+venv-lint:
+	python3 -m venv $(VENV_LINT)
+	$(VENV_LINT)/bin/pip install --no-deps -r requirements-lint.txt -r requirements.txt
 
-linter:
-	docker build -t $(LINTER_IMAGE) -f Dockerfile-lint .
+lint: venv-lint
+	$(VENV_LINT)/bin/black --exclude 'venv.*' --check .
+	$(VENV_LINT)/bin/pylint --ignore-paths=venv,venv.lint "**/*.py"
 
-ifeq ($(CI),TRUE)
-# FIXME: abstract to make.mk
-VENV := /tmp/venv.$(PROJECT)
-lint:
-	python -m venv $(VENV)
-	$(VENV)/bin/pip install --no-deps -r requirements-lint.txt -r requirements.txt
-	$(VENV)/bin/black --check .
-	$(VENV)/bin/pylint --ignore-paths=venv "**/*.py"
-else
-lint: linter
-	docker run --rm -v`pwd`:/app -ti $(LINTER_IMAGE) bash -c 'black --check . && pylint  --ignore-paths=venv "**/*.py"'
-
-fmt: linter
-	docker run --rm -v`pwd`:/app -ti $(LINTER_IMAGE) bash -c 'black .'
-endif
+fmt: venv-lint
+	$(VENV_LINT)/bin/black --exclude 'venv.*' .

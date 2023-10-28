@@ -1,6 +1,0 @@
-FROM python
-
-COPY requirements-lint.txt /tmp
-RUN pip install --no-deps -r /tmp/requirements-lint.txt
-
-WORKDIR /app

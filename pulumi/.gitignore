@@ -1,4 +1,5 @@
 *.pyc
-venv/
+/venv
+/venv.lint
 .vscode
 /homeslice_secrets/*.py
