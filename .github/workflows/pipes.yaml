@@ -39,6 +39,6 @@ jobs:
       - name: setup python
         uses: actions/setup-python@v3
       - name: install linters
-        run: pip install pylint black
+        run: pip install -r pulumi/requirements-lint.txt
       - name: lint
         run: cd pulumi && black --check . && pylint "**/*.py"
