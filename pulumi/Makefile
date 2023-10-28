@@ -11,7 +11,7 @@ PROJECT := pulumi
 VENV := /tmp/venv.$(PROJECT)
 lint:
 	python -m venv $(VENV)
-	$(VENV)/bin/pip install --no-deps -r /tmp/requirements-lint.txt -r /tmp/requirements.txt
+	$(VENV)/bin/pip install --no-deps -r requirements-lint.txt -r requirements.txt
 	$(VENV)/bin/black --check .
 	$(VENV)/bin/pylint  --ignore-paths=venv "**/*.py"
 else
