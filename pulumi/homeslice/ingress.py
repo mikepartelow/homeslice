@@ -1,9 +1,18 @@
+"""kubernetes Ingress factory"""
 import pulumi_kubernetes as kubernetes
+import homeslice
 
-def ingress(name: str,
-            metadata: kubernetes.meta.v1.ObjectMetaArgs,
-            ingress_prefixes: [str]
-            ) -> kubernetes.core.v1.Service:
+
+def ingress(
+    name: str,
+    ingress_prefixes: [str],
+    path_type: str = "Prefix",
+    metadata: kubernetes.meta.v1.ObjectMetaArgs = None,
+) -> kubernetes.core.v1.Service:
+    """THE kubernetes Ingress factory"""
+
+    if metadata is None:
+        metadata = homeslice.metadata(name)
 
     return kubernetes.networking.v1.Ingress(
         name,
@@ -23,11 +32,12 @@ def ingress(name: str,
                                     ),
                                 ),
                                 path=ingress_prefix,
-                                path_type="Prefix",
+                                path_type=path_type,
                             )
-                        for ingress_prefix in ingress_prefixes]
+                            for ingress_prefix in ingress_prefixes
+                        ]
                     )
                 )
             ]
-        )
+        ),
     )

@@ -1,10 +1,22 @@
-import pulumi_kubernetes as kubernetes
+"""kubernetes metadata factory"""
 
-def metadata(name: str, namespace: str) -> kubernetes.meta.v1.ObjectMetaArgs :
+import pulumi_kubernetes as kubernetes
+import homeslice
+
+
+def metadata(
+    name: str,
+    labels: dict[str, str] = None,
+    annotations: dict[str, str] = None,
+) -> kubernetes.meta.v1.ObjectMetaArgs:
+    """THE kubernetes metadata factory"""
+
+    if labels is None:
+        labels = {"app.kubernetes.io/name": name}
+
     return kubernetes.meta.v1.ObjectMetaArgs(
-        labels={
-            "app.kubernetes.io/name": name,
-        },
+        annotations=annotations,
+        labels=labels,
         name=name,
-        namespace=namespace,
+        namespace=homeslice.HOMESLICE,
     )

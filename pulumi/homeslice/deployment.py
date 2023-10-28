@@ -1,15 +1,26 @@
+"""kubernetes Deployment factory"""
 import pulumi_kubernetes as kubernetes
+import homeslice
 
-def deployment(name: str,
-               image: str,
-               metadata: kubernetes.meta.v1.ObjectMetaArgs,
-               args: list[str] = [],
-               replicas: int = 1,
-               env_from: list[kubernetes.core.v1.EnvFromSourceArgs] = [],
-               ports: list[kubernetes.core.v1.ContainerPortArgs] = [],
-               volume_mounts: list[kubernetes.core.v1.VolumeMountArgs] = [],
-               volumes: list[kubernetes.core.v1.VolumeArgs] = [],
-               ) -> kubernetes.apps.v1.Deployment:
+
+def deployment(
+    name: str,
+    image: str,
+    args: list[str] = None,
+    replicas: int = 1,
+    env_from: list[kubernetes.core.v1.EnvFromSourceArgs] = None,
+    ports: list[kubernetes.core.v1.ContainerPortArgs] = None,
+    volumes: list[kubernetes.core.v1.VolumeArgs] = None,
+    volume_mounts: list[kubernetes.core.v1.VolumeMountArgs] = None,
+) -> kubernetes.apps.v1.Deployment:
+    # pylint: disable=too-many-arguments
+    """THE kubernetes Deployment factory"""
+
+    metadata = homeslice.metadata(name)
+
+    for a in ("args", "env_from", "ports", "volume_mounts", "volumes"):
+        if locals()[a] is None:
+            locals()[a] = []
 
     return kubernetes.apps.v1.Deployment(
         name,
@@ -35,7 +46,7 @@ def deployment(name: str,
                         )
                     ],
                     volumes=volumes,
-                )
-            )
-        )
+                ),
+            ),
+        ),
     )

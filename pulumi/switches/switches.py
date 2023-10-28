@@ -1,71 +1,70 @@
-import pulumi
+"""Resources for the homeslice/switches app."""
+from pathlib import Path
 import pulumi_kubernetes as kubernetes
+import pulumi
 import homeslice
-import json
-import sys
+from homeslice_secrets import (  # pylint: disable=no-name-in-module
+    switches as SWITCHES_SECRETS,
+)
 
 NAME = "switches"
-SWITCHES_JSON_ROOT = "/var/run/"
 
-def app(namespace: str, config: pulumi.Config) -> None:
+
+def app(config: pulumi.Config) -> None:
+    """define resources for the homeslice/switches app"""
+
     image = config["image"]
     container_port = int(config["container_port"])
-    ingress_enabled = config.get("ingress_enabled", "false") == True
     ingress_prefix = config.get("ingress_prefix")
     switches_json = subst_address(config["switches_json"])
+    switches_json_path = config["switches_json_path"]
+    switches_json_name = str(Path(switches_json_path).name)
+    volume_name = switches_json_name.replace(".", "-")
 
-    metadata=homeslice.metadata(NAME, namespace)
-
-    configmap = kubernetes.core.v1.ConfigMap(
+    homeslice.configmap(
         NAME,
-        metadata=metadata,
-        data={
-            "switches.json" : switches_json,
-        }
+        {
+            switches_json_name: switches_json,
+        },
     )
+
+    volumes = [
+        kubernetes.core.v1.VolumeArgs(
+            name=volume_name,
+            config_map=kubernetes.core.v1.ConfigMapVolumeSourceArgs(
+                name=NAME,
+            ),
+        ),
+    ]
 
     volume_mounts = [
         kubernetes.core.v1.VolumeMountArgs(
-            name="switches-json",
-            mount_path=SWITCHES_JSON_ROOT,
+            name=volume_name,
+            mount_path=str(Path(switches_json_path).parent),
             read_only=True,
         ),
     ]
 
-    volumes = [
-        kubernetes.core.v1.VolumeArgs(
-            name="switches-json",
-            config_map=kubernetes.core.v1.ConfigMapVolumeSourceArgs(
-                name=NAME,
-            )
-        ),
-    ]
+    ports = [homeslice.port(container_port)]
 
-    ports=[
-        kubernetes.core.v1.ContainerPortArgs(
-            name="http",
-            container_port=container_port,
-        )
-    ]
+    homeslice.deployment(
+        NAME,
+        image,
+        args=[switches_json_path],
+        ports=ports,
+        volumes=volumes,
+        volume_mounts=volume_mounts,
+    )
 
-    deployment = homeslice.deployment(NAME,
-                                      image,
-                                      metadata,
-                                      args=[SWITCHES_JSON_ROOT+"switches.json"],
-                                      ports=ports,
-                                      volume_mounts=volume_mounts,
-                                      volumes=volumes)
+    homeslice.service(NAME)
 
-    service = homeslice.service(NAME, metadata)
+    homeslice.ingress(NAME, [ingress_prefix])
 
-    if ingress_enabled:
-        ingress = homeslice.ingress(NAME, metadata, [ingress_prefix])
 
 # I don't want to publish IP addresses to GitHub
 def subst_address(s: str) -> str:
-    from secrets import switches
-
-    for k, v in switches.SECRETS.items():
+    """Returns the given string with secrets substituted in."""
+    for k, v in SWITCHES_SECRETS.IP_ADDRESSES.items():
         s = s.replace(k, v)
 
     return s
