@@ -1,4 +1,3 @@
 # chime
 
-- [ ] python linters/formatters
-- [ ] make test
+chime.py plays an mp3 on Sonos Zone.
