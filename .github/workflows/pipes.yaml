@@ -42,4 +42,4 @@ jobs:
         run: |
           pip install -r pulumi/requirements-lint.txt -r pulumi/requirements.txt
       - name: lint
-        run: cd pulumi && black --check . && pylint "**/*.py"
+        run: cd pulumi && pip freeze && black --check . && pylint "**/*.py"
