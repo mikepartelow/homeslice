@@ -14,7 +14,6 @@ def app(namespace: str, config: pulumi.Config) -> None:
     nginx = config["nginx"]
     pvc_mount_path = config["pvc_mount_path"]
     container_port = int(config["container_port"])
-    ingress_enabled = config.get("ingress_enabled", "false") is True
     ingress_prefix = config.get("ingress_prefix")
 
     metadata = homeslice.metadata(NAME, namespace)
@@ -67,20 +66,19 @@ def app(namespace: str, config: pulumi.Config) -> None:
 
     homeslice.service(NAME, metadata)
 
-    if ingress_enabled:
-        homeslice.ingress(
+    homeslice.ingress(
+        NAME,
+        homeslice.metadata(
             NAME,
-            homeslice.metadata(
-                NAME,
-                namespace,
-                annotations={
-                    "nginx.ingress.kubernetes.io/use-regex": "true",
-                    "nginx.ingress.kubernetes.io/rewrite-target": "/$2",
-                },
-            ),
-            [ingress_prefix],
-            path_type="ImplementationSpecific",
-        )
+            namespace,
+            annotations={
+                "nginx.ingress.kubernetes.io/use-regex": "true",
+                "nginx.ingress.kubernetes.io/rewrite-target": "/$2",
+            },
+        ),
+        [ingress_prefix],
+        path_type="ImplementationSpecific",
+    )
 
     # cronjobs schedule the chimes.
     for chime in chimes:

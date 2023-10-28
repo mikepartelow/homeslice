@@ -13,7 +13,6 @@ def app(namespace: str, config: pulumi.Config) -> None:
 
     image = config["image"]
     container_port = int(config["container_port"])
-    ingress_enabled = config.get("ingress_enabled", "false") is True
     ingress_prefix = config.get("ingress_prefix")
     switches_json = subst_address(config["switches_json"])
     switches_json_path = config["switches_json_path"]
@@ -66,8 +65,7 @@ def app(namespace: str, config: pulumi.Config) -> None:
 
     homeslice.service(NAME, metadata)
 
-    if ingress_enabled:
-        homeslice.ingress(NAME, metadata, [ingress_prefix])
+    homeslice.ingress(NAME, metadata, [ingress_prefix])
 
 
 # I don't want to publish IP addresses to GitHub

@@ -13,7 +13,6 @@ def app(namespace: str, config: pulumi.Config) -> None:
     image = config["image"]
     container_port = int(config["container_port"])
     location = config["location"]
-    ingress_enabled = config.get("ingress_enabled", "false") is True
     ingress_prefix = config.get("ingress_prefix")
 
     metadata = homeslice.metadata(NAME, namespace)
@@ -45,5 +44,4 @@ def app(namespace: str, config: pulumi.Config) -> None:
 
     homeslice.service(NAME, metadata)
 
-    if ingress_enabled:
-        homeslice.ingress(NAME, metadata, [ingress_prefix])
+    homeslice.ingress(NAME, metadata, [ingress_prefix])

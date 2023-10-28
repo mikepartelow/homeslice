@@ -14,7 +14,6 @@ config:
     image: registry.localdomain:32000/buttons:20231018_212620
     container_port: 8000
     clocktime_url: http://clocktime.homeslice.svc.cluster.local/api/v0/clocktime/
-    ingress_enabled: true
     ingress_prefixes:
     - /api/v0/buttons/
     - /api/v0/buttontimes/
@@ -23,7 +22,6 @@ config:
     nginx: nginx:1.25
     pvc_mount_path: /usr/share/nginx/html
     container_port: 80
-    ingress_enabled: true
     ingress_prefix: /(api/v0/chime/)(.*)$
     chimes:
     - schedule: 20 16 * * *
@@ -33,7 +31,6 @@ config:
     image: registry.localdomain:32000/clocktime:20231016_133307
     container_port: 8000
     location: America/Los_Angeles
-    ingress_enabled: true
     ingress_prefix: /api/v0/clocktime/
   homeslice:switches:
     image: registry.localdomain:32000/switches:20231019_222323
@@ -48,5 +45,4 @@ config:
           "address": "a.b.c.d"
         }
       ]
-    ingress_enabled: true
     ingress_prefix: /api/v0/switches/
