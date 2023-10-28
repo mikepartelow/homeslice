@@ -3,7 +3,7 @@ name: 'pipes'
 on: [push]
 
 env:
-  CI: TRUE
+  CI: "TRUE"
 
 jobs:
   apps:
@@ -27,7 +27,7 @@ jobs:
       - name: Setup Python linters
         run: pip install pylint black
       - name: lint
-        run: env && cd apps && make lint
+        run: cd apps && make lint
       - name: test
         run: cd apps && make test
   pulumi:
