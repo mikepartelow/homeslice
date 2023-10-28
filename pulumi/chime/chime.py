@@ -2,7 +2,7 @@
 import pulumi
 import pulumi_kubernetes as kubernetes
 import homeslice
-from homeslice_secrets import chime as CHIME_SECRET
+from homeslice_secrets import chime as CHIME_SECRET # pylint: disable=no-name-in-module
 
 NAME = "chime"
 
