@@ -13,6 +13,7 @@ linter:
 	docker build -t $(LINTER_IMAGE) -f Dockerfile-lint .
 
 ifeq ($(CI),TRUE)
+# FIXME: abstract to make.mk
 VENV := /tmp/venv.$(PROJECT)
 lint:
 	python -m venv $(VENV)
