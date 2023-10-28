@@ -13,16 +13,16 @@ name = config.require("namespace")
 namespace = homeslice.namespace(name)
 
 if cfg := config.get_object("backup_todoist"):
-    backup_todoist.app(name, cfg)
+    backup_todoist.app(cfg)
 
 if cfg := config.get_object("buttons"):
-    buttons.app(name, cfg)
+    buttons.app(cfg)
 
 if cfg := config.get_object("chime"):
-    chime.app(name, cfg)
+    chime.app(cfg)
 
 if cfg := config.get_object("clocktime"):
-    clocktime.app(name, cfg)
+    clocktime.app(cfg)
 
 if cfg := config.get_object("switches"):
-    switches.app(name, cfg)
+    switches.app(cfg)

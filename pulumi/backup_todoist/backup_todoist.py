@@ -9,7 +9,7 @@ from homeslice_secrets import backup_todoist as BACKUP_TODOIST_SECRETS
 NAME = "backup-todoist"
 
 
-def app(namespace: str, config: pulumi.Config) -> None:
+def app(config: pulumi.Config) -> None:
     """define resources for the homeslice/backup-todoist app"""
 
     image = config["image"]
@@ -24,30 +24,26 @@ def app(namespace: str, config: pulumi.Config) -> None:
     known_hosts_path = config["known_hosts_path"]
     known_hosts = config["known_hosts"]
 
-    metadata = homeslice.metadata(NAME, namespace)
-
-    kubernetes.core.v1.ConfigMap(
+    homeslice.configmap(
         NAME,
-        metadata=metadata,
-        data={
+        {
             "TODOIST_BACKUP_PRIVATE_KEY_PATH": private_key_path,
             "TODOIST_BACKUP_AUTHOR_NAME": author_name,
             "TODOIST_BACKUP_AUTHOR_EMAIL": author_email,
             "SSH_KNOWN_HOSTS": str(known_hosts_path),
-        },
+        }
     )
 
-    kubernetes.core.v1.ConfigMap(
+    homeslice.configmap(
         known_hosts_name,
-        metadata=homeslice.metadata(known_hosts_name, namespace),
-        data={
+        {
             str(Path(known_hosts_path).name): known_hosts,
         },
     )
 
     kubernetes.core.v1.Secret(
         NAME,
-        metadata=metadata,
+        metadata=homeslice.metadata(NAME),
         type="Opaque",
         string_data={
             "TODOIST_BACKUP_GIT_CLONE_URL": BACKUP_TODOIST_SECRETS.TODOIST_BACKUP_GIT_CLONE_URL,
@@ -57,7 +53,7 @@ def app(namespace: str, config: pulumi.Config) -> None:
 
     kubernetes.core.v1.Secret(
         ssh_name,
-        metadata=homeslice.metadata(ssh_name, namespace),
+        metadata=homeslice.metadata(ssh_name),
         type="kubernetes.io/ssh-auth",
         string_data={
             "ssh-privatekey": BACKUP_TODOIST_SECRETS.SSH_PRIVATE_KEY,
@@ -95,21 +91,13 @@ def app(namespace: str, config: pulumi.Config) -> None:
     ]
 
     env_from = [
-        kubernetes.core.v1.EnvFromSourceArgs(
-            config_map_ref=kubernetes.core.v1.ConfigMapEnvSourceArgs(
-                name=NAME,
-            )
-        ),
-        kubernetes.core.v1.EnvFromSourceArgs(
-            secret_ref=kubernetes.core.v1.SecretEnvSourceArgs(
-                name=NAME,
-            )
-        ),
+        homeslice.env_from_configmap(NAME),
+        homeslice.env_from_secret(NAME),
     ]
 
     kubernetes.batch.v1.CronJob(
         NAME,
-        metadata=metadata,
+        metadata=homeslice.metadata(NAME),
         spec=kubernetes.batch.v1.CronJobSpecArgs(
             schedule=schedule,
             job_template=kubernetes.batch.v1.JobTemplateSpecArgs(

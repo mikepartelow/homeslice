@@ -1,11 +1,10 @@
 """kubernetes Deployment factory"""
 import pulumi_kubernetes as kubernetes
-
+import homeslice
 
 def deployment(
     name: str,
     image: str,
-    metadata: kubernetes.meta.v1.ObjectMetaArgs,
     args: list[str] = None,
     replicas: int = 1,
     env_from: list[kubernetes.core.v1.EnvFromSourceArgs] = None,
@@ -14,6 +13,8 @@ def deployment(
     volumes: list[kubernetes.core.v1.VolumeArgs] = None,
 ) -> kubernetes.apps.v1.Deployment:
     """THE kubernetes Deployment factory"""
+
+    metadata = homeslice.metadata(name)
 
     for a in ("args", "env_from", "ports", "volume_mounts", "volumes"):
         if locals()[a] is None:

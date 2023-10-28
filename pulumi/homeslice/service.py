@@ -1,11 +1,14 @@
 """kubernetes Service factory"""
 import pulumi_kubernetes as kubernetes
-
+import homeslice
 
 def service(
-    name: str, metadata: kubernetes.meta.v1.ObjectMetaArgs
+    name: str,
 ) -> kubernetes.core.v1.Service:
     """THE kubernetes Service factory"""
+
+    metadata = homeslice.metadata(name)
+
     return kubernetes.core.v1.Service(
         name,
         metadata=metadata,

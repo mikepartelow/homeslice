@@ -1,11 +1,10 @@
 """kubernetes metadata factory"""
 
 import pulumi_kubernetes as kubernetes
-
+import homeslice
 
 def metadata(
     name: str,
-    namespace: str,
     labels: dict[str, str] = None,
     annotations: dict[str, str] = None,
 ) -> kubernetes.meta.v1.ObjectMetaArgs:
@@ -18,5 +17,5 @@ def metadata(
         annotations=annotations,
         labels=labels,
         name=name,
-        namespace=namespace,
+        namespace=homeslice.HOMESLICE,
     )

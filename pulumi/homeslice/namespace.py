@@ -6,4 +6,4 @@ import homeslice
 
 def namespace(name: str) -> kubernetes.core.v1.Namespace:
     """THE kubernetes Namespace factory"""
-    return kubernetes.core.v1.Namespace(name, metadata=homeslice.metadata(name, name))
+    return kubernetes.core.v1.Namespace(name, metadata=homeslice.metadata(name))

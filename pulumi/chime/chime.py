@@ -7,7 +7,7 @@ from homeslice_secrets import chime as CHIME_SECRET
 NAME = "chime"
 
 
-def app(namespace: str, config: pulumi.Config) -> None:
+def app(config: pulumi.Config) -> None:
     """define resources for the homeslice/chime app"""
     image = config["image"]
     chimes = config["chimes"]
@@ -16,13 +16,11 @@ def app(namespace: str, config: pulumi.Config) -> None:
     container_port = int(config["container_port"])
     ingress_prefix = config.get("ingress_prefix")
 
-    metadata = homeslice.metadata(NAME, namespace)
-
     # an nginx deployment serves up media from a persistent volume
     #
     kubernetes.core.v1.PersistentVolumeClaim(
         NAME,
-        metadata=metadata,
+        metadata=homeslice.metadata(NAME),
         spec=kubernetes.core.v1.PersistentVolumeClaimSpecArgs(
             access_modes=["ReadWriteOnce", "ReadOnlyMany"],
             resources=kubernetes.core.v1.ResourceRequirementsArgs(
@@ -61,23 +59,22 @@ def app(namespace: str, config: pulumi.Config) -> None:
     ]
 
     homeslice.deployment(
-        NAME, nginx, metadata, ports=ports, volumes=volumes, volume_mounts=volume_mounts
+        NAME, nginx, ports=ports, volumes=volumes, volume_mounts=volume_mounts
     )
 
-    homeslice.service(NAME, metadata)
+    homeslice.service(NAME)
 
     homeslice.ingress(
         NAME,
-        homeslice.metadata(
+        [ingress_prefix],
+        path_type="ImplementationSpecific",
+        metadata=homeslice.metadata(
             NAME,
-            namespace,
             annotations={
                 "nginx.ingress.kubernetes.io/use-regex": "true",
                 "nginx.ingress.kubernetes.io/rewrite-target": "/$2",
             },
         ),
-        [ingress_prefix],
-        path_type="ImplementationSpecific",
     )
 
     # cronjobs schedule the chimes.
@@ -87,7 +84,7 @@ def app(namespace: str, config: pulumi.Config) -> None:
 
             kubernetes.batch.v1.CronJob(
                 name,
-                metadata=homeslice.metadata(name, namespace),
+                metadata=homeslice.metadata(name),
                 spec=kubernetes.batch.v1.CronJobSpecArgs(
                     schedule=chime["schedule"],
                     job_template=kubernetes.batch.v1.JobTemplateSpecArgs(

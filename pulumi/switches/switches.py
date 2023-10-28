@@ -8,7 +8,7 @@ from homeslice_secrets import switches as SWITCHES_SECRETS
 NAME = "switches"
 
 
-def app(namespace: str, config: pulumi.Config) -> None:
+def app(config: pulumi.Config) -> None:
     """define resources for the homeslice/switches app"""
 
     image = config["image"]
@@ -19,12 +19,7 @@ def app(namespace: str, config: pulumi.Config) -> None:
     switches_json_name = str(Path(switches_json_path).name)
     volume_name = switches_json_name.replace(".", "-")
 
-    metadata = homeslice.metadata(NAME, namespace)
-
-    kubernetes.core.v1.ConfigMap(
-        NAME,
-        metadata=metadata,
-        data={
+    homeslice.configmap(NAME, {
             switches_json_name: switches_json,
         },
     )
@@ -46,26 +41,20 @@ def app(namespace: str, config: pulumi.Config) -> None:
         ),
     ]
 
-    ports = [
-        kubernetes.core.v1.ContainerPortArgs(
-            name="http",
-            container_port=container_port,
-        )
-    ]
+    ports = [homeslice.port(container_port)]
 
     homeslice.deployment(
         NAME,
         image,
-        metadata,
         args=[switches_json_path],
         ports=ports,
         volumes=volumes,
         volume_mounts=volume_mounts,
     )
 
-    homeslice.service(NAME, metadata)
+    homeslice.service(NAME)
 
-    homeslice.ingress(NAME, metadata, [ingress_prefix])
+    homeslice.ingress(NAME, [ingress_prefix])
 
 
 # I don't want to publish IP addresses to GitHub

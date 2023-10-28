@@ -7,40 +7,23 @@ import homeslice
 NAME = "buttons"
 
 
-def app(namespace: str, config: pulumi.Config) -> None:
+def app(config: pulumi.Config) -> None:
     """define resources for the homeslice/buttons app"""
     image = config["image"]
     container_port = int(config["container_port"])
     clocktime_url = config["clocktime_url"]
     ingress_prefixes = config.get("ingress_prefixes")
 
-    metadata = homeslice.metadata(NAME, namespace)
+    homeslice.configmap(NAME, {
+        "CLOCKTIME_URL": clocktime_url,
+    })
 
-    kubernetes.core.v1.ConfigMap(
-        NAME,
-        metadata=metadata,
-        data={
-            "CLOCKTIME_URL": clocktime_url,
-        },
-    )
+    env_from = [homeslice.env_from_configmap(NAME)]
 
-    env_from = [
-        kubernetes.core.v1.EnvFromSourceArgs(
-            config_map_ref=kubernetes.core.v1.ConfigMapEnvSourceArgs(
-                name=NAME,
-            )
-        )
-    ]
+    ports = [homeslice.port(container_port, name="http")]
 
-    ports = [
-        kubernetes.core.v1.ContainerPortArgs(
-            name="http",
-            container_port=container_port,
-        )
-    ]
+    homeslice.deployment(NAME, image, env_from=env_from, ports=ports)
 
-    homeslice.deployment(NAME, image, metadata, env_from=env_from, ports=ports)
+    homeslice.service(NAME)
 
-    homeslice.service(NAME, metadata)
-
-    homeslice.ingress(NAME, metadata, ingress_prefixes)
+    homeslice.ingress(NAME, ingress_prefixes)
