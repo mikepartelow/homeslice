@@ -39,6 +39,7 @@ jobs:
       - name: setup python
         uses: actions/setup-python@v3
       - name: install linters
-        run: pip install -r pulumi/requirements-lint.txt
+        run: |
+          pip install -r pulumi/requirements-lint.txt -r pulumi/requirements.txt
       - name: lint
         run: cd pulumi && black --check . && pylint "**/*.py"
