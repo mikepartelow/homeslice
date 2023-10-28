@@ -40,11 +40,9 @@ jobs:
         uses: actions/setup-python@v3
       - name: install linters
         run: |
-          python -m venv /tmp/venv &&
-          /tmp/venv/bin/pip install -r pulumi/requirements-lint.txt -r pulumi/requirements.txt
+          pip install -r pulumi/requirements-lint.txt -r pulumi/requirements.txt
       - name: lint
         run: |
           cd pulumi &&
-          /tmp/venv/bin/pip freeze &&
-          /tmp/venv/bin/black --check . &&
-          /tmp/venv/bin/pylint "**/*.py"
+          black --check . &&
+          pylint "**/*.py"
