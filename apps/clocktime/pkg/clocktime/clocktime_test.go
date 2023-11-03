@@ -27,7 +27,11 @@ func TestClocktime(t *testing.T) {
 		},
 		{
 			time: time.Date(2023, 10, 16, 9, 1, 0, 0, time.Local),
-			want: "901",
+			want: "0901",
+		},
+		{
+			time: time.Date(2023, 10, 16, 0, 1, 0, 0, time.Local),
+			want: "0001",
 		},
 	}
 
