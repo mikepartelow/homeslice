@@ -20,5 +20,5 @@ func (s Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		now = time.Now().In(s.Location)
 	}
 
-	fmt.Fprintf(w, "%d%02d", now.Hour(), now.Minute())
+	fmt.Fprintf(w, "%02d%02d", now.Hour(), now.Minute())
 }
