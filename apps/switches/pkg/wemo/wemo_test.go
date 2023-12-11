@@ -2,6 +2,7 @@ package wemo_test
 
 import (
 	"io"
+	"mp/switches/pkg/switches"
 	"mp/switches/pkg/wemo"
 	"net"
 	"net/http"
@@ -14,6 +15,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 )
+
+var _ switches.Switch = &wemo.Wemo{}
 
 func TestOn(t *testing.T) {
 	setResponse := "<BinaryState>1</BinaryState>"

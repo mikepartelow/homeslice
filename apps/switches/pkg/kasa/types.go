@@ -4,17 +4,17 @@ type OnOff int
 
 const (
 	Off OnOff = 0
-	on  OnOff = 1
+	On  OnOff = 1
 )
 
 type LightState struct {
-	OnOff OnOff  `json:"on_off,omitempty"`
+	OnOff OnOff  `json:"on_off"`
 	Mode  string `json:"mode,omitempty"`
 }
 
 type SysInfoResponse struct {
 	ErrCode    int        `json:"err_code,omitempty"`
-	LightState LightState `json:"light_state,omitempty"`
+	LightState LightState `json:"light_state"`
 	SwVer      string     `json:"sw_ver,omitempty"`
 	HwVer      string     `json:"hw_ver,omitempty"`
 	Type       string     `json:"type,omitempty"`
@@ -54,6 +54,15 @@ type SystemRequests struct {
 	GetSysinfo *GetSysinfoRequest `json:"get_sysinfo,omitempty"`
 }
 
+type TransitionLightState struct {
+	OnOff OnOff `json:"on_off"`
+}
+
+type LightingService struct {
+	TransitionLightState *TransitionLightState `json:"transition_light_state"`
+}
+
 type GenericRequest struct {
-	System *SystemRequests `json:"system,omitempty"`
+	System          *SystemRequests  `json:"system,omitempty"`
+	LightingService *LightingService `json:"smartlife.iot.smartbulb.lightingservice,omitempty"`
 }

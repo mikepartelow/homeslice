@@ -1,9 +1,8 @@
 package kasa_test
 
 import (
-	"testing"
+	"mp/switches/pkg/kasa"
+	"mp/switches/pkg/switches"
 )
 
-func TestInfo(t *testing.T) {
-
-}
+var _ switches.Switch = &kasa.Kasa{}

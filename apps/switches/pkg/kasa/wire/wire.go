@@ -4,18 +4,19 @@ import (
 	"encoding/binary"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io"
+	"log/slog"
 	"net"
 	"time"
 )
 
 type Connection struct {
-	conn net.Conn
+	conn   net.Conn
+	logger *slog.Logger
 }
 
 // NewConnection establishes a connection to a TP-Link Smart Home Protocol device.
-func NewConnection(address string) (*Connection, error) {
+func NewConnection(address string, logger *slog.Logger) (*Connection, error) {
 	d := net.Dialer{
 		Timeout: time.Second * 60,
 	}
@@ -24,7 +25,8 @@ func NewConnection(address string) (*Connection, error) {
 		return nil, err
 	}
 	return &Connection{
-		conn: conn,
+		conn:   conn,
+		logger: logger,
 	}, nil
 }
 
@@ -34,6 +36,8 @@ func (c *Connection) Write(data interface{}) error {
 	if err != nil {
 		return err
 	}
+
+	c.logger.Info("write", "json", string(jsonData))
 
 	encryptedData := Encrypt(jsonData)
 	framedData := Frame(encryptedData)
@@ -49,7 +53,9 @@ func (c *Connection) Read(data interface{}) error {
 		return err
 	}
 	jsonData := Decrypt(payload)
-	fmt.Println(string(jsonData))
+
+	c.logger.Info("read", "json", string(jsonData))
+
 	return json.Unmarshal(jsonData, data)
 }
 

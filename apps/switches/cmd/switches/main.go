@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log/slog"
+	"mp/switches/pkg/kasa"
 	"mp/switches/pkg/switches"
 	"mp/switches/pkg/wemo"
 	"net"
@@ -33,16 +34,24 @@ func main() {
 
 	var devices []switches.Switch
 	for _, cfg := range mustParseConfigs(configPath, logger) {
-		if cfg.Kind != "wemo/v1" {
+		logger.Debug("got switch cfg", "cfg", cfg)
+
+		if cfg.Kind == "wemo/v1" {
+			devices = append(devices, &wemo.Wemo{
+				Id:      cfg.Id,
+				Name:    cfg.Name,
+				Address: net.ParseIP(cfg.Address),
+				Logger:  logger,
+			})
+		} else if cfg.Kind == "kasa/v1" {
+			devices = append(devices, kasa.New(
+				cfg.Id,
+				net.ParseIP(cfg.Address),
+				logger,
+			))
+		} else {
 			panic(fmt.Sprintf("unknown kind: %s", cfg.Kind))
 		}
-		logger.Debug("got switch cfg", "cfg", cfg)
-		devices = append(devices, &wemo.Wemo{
-			Id:      cfg.Id,
-			Name:    cfg.Name,
-			Address: net.ParseIP(cfg.Address),
-			Logger:  logger,
-		})
 	}
 
 	server := switches.NewServer(logger, devices)

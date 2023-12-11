@@ -33,7 +33,7 @@ config:
     location: America/Los_Angeles
     ingress_prefix: /api/v0/clocktime/
   homeslice:switches:
-    image: registry.localdomain:32000/switches:20231019_222323
+    image: registry.localdomain:32000/switches:20231211_100924
     container_port: 8000
     switches_json_path: /var/run/switches.json
     switches_json: |
@@ -43,6 +43,12 @@ config:
           "kind": "wemo/v1",
           "name": "Living Room Torch",
           "address": "a.b.c.d"
+        },
+        {
+          "id": "kbulb0",
+          "kind": "kasa/v1",
+          "name": "Captain's Quarters",
+          "address": "w.x.y.z"
         }
       ]
     ingress_prefix: /api/v0/switches/
