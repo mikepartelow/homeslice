@@ -39,7 +39,7 @@ shell: dev
 	docker run --rm --entrypoint '' -ti ${--shell-args} $(PROJECT)-dev /bin/bash
 
 test:
-	go test -cover ./...
+	go test -race -cover ./...
 
 build: test
 	docker build ${--build-args} -t $(IMAGE):$(VERSION) --target prod .
