@@ -2,7 +2,7 @@ encryptionsalt: v1:VKuGdX6V+cI=:v1:NjPNhDyrBhgOUzh7:ZORqZH2ALQT0/D+qYIhNJOAoCraR
 config:
   homeslice:namespace: homeslice
   homeslice:backup_todoist:
-    image: registry.localdomain:32000/backup-todoist:20231024_211437
+    image: registry.localdomain:32000/backup-todoist:20240206_202813
     author_name: Mike Partelow
     author_email: github@mikepartelow.com
     schedule: 0 0 * * *
@@ -11,14 +11,14 @@ config:
     known_hosts: |
       github.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl
   homeslice:buttons:
-    image: registry.localdomain:32000/buttons:20231018_212620
+    image: registry.localdomain:32000/buttons:20240206_204022
     container_port: 8000
     clocktime_url: http://clocktime.homeslice.svc.cluster.local/api/v0/clocktime/
     ingress_prefixes:
     - /api/v0/buttons/
     - /api/v0/buttontimes/
   homeslice:chime:
-    image: registry.localdomain:32000/chime:20231026_221550
+    image: registry.localdomain:32000/chime:20240206_203449
     nginx: nginx:1.25
     pvc_mount_path: /usr/share/nginx/html
     container_port: 80
@@ -28,12 +28,12 @@ config:
       media_title: every day
       media_uri: http://{{ingress}}/api/v0/chime/swed.mp3
   homeslice:clocktime:
-    image: registry.localdomain:32000/clocktime:20231103_084856
+    image: registry.localdomain:32000/clocktime:20240206_203405
     container_port: 8000
     location: America/Los_Angeles
     ingress_prefix: /api/v0/clocktime/
   homeslice:switches:
-    image: registry.localdomain:32000/switches:20231212_084141
+    image: registry.localdomain:32000/switches:20240206_203426
     container_port: 8000
     switches_json_path: /var/run/switches.json
     switches_json: |
