@@ -1,8 +1,8 @@
 DEFAULT_REGISTRY := registry.localdomain:32000
 
 PROJECT := $(notdir $(patsubst %/,%,$(dir $(abspath $(firstword $(MAKEFILE_LIST))))))
-REGISTRY := $(if ${REGISTRY},${REGISTRY},$(DEFAULT_REGISTRY))
-VERSION := $(if ${VERSION},${VERSION},$(shell date +'%Y%m%d_%H%M%S'))
+REGISTRY ?= $(DEFAULT_REGISTRY)
+VERSION ?= $(shell date +'%Y%m%d_%H%M%S')
 IMAGE = $(REGISTRY)/$(PROJECT)
 
 --docker-run-env :=
@@ -20,11 +20,11 @@ IMAGE = $(REGISTRY)/$(PROJECT)
 all: build
 
 info:
-	echo "Project: ${PROJECT}"
-	echo "Registry: ${REGISTRY}"
-	echo "Version: ${VERSION}"
-	echo "Image: ${IMAGE}"
-	echo "MAKEFILE_LIST: ${MAKEFILE_LIST}"
+	@echo "Project: ${PROJECT}"
+	@echo "Registry: ${REGISTRY}"
+	@echo "Version: ${VERSION}"
+	@echo "Image: ${IMAGE}"
+	@echo "MAKEFILE_LIST: ${MAKEFILE_LIST}"
 
 fmt:
 	go fmt ./...
