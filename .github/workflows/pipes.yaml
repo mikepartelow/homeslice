@@ -42,7 +42,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
         with:
-          images: ${{ env.REGISTRY }}/${{ env.REPO_NAME }}-clocktime
+          images: ${{ env.REGISTRY }}/${{ env.REPO_NAME }}/clocktime
           tags: |
             type=sha,enable=true,priority=2000,prefix=gitsha-,suffix=,format=short
       - name: Build and push Docker images
