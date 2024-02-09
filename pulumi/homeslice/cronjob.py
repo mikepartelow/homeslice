@@ -31,7 +31,7 @@ def cronjob(
             schedule=schedule,
             job_template=kubernetes.batch.v1.JobTemplateSpecArgs(
                 spec=kubernetes.batch.v1.JobSpecArgs(
-                    ttl_seconds_after_finished=60*60*24,
+                    ttl_seconds_after_finished=60 * 60 * 24,
                     template=kubernetes.core.v1.PodTemplateSpecArgs(
                         spec=kubernetes.core.v1.PodSpecArgs(
                             restart_policy=restart_policy,
