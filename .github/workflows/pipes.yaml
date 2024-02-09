@@ -43,10 +43,17 @@ jobs:
         uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+        tags: |
+          type=sha,enable=true,priority=100,prefix=spam-,suffix=,format=short
       - name: Build and push Docker images
         uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+
+        # https://github.com/mikepartelow/homeslice/actions/runs/7840197203/job/21394404873?pr=14#step:10:283
+        # https://docs.github.com/en/actions/using-jobs/using-a-matrix-for-your-jobs#example-using-a-single-dimension-matrix
+        # https://github.com/docker/metadata-action?tab=readme-ov-file#outputs
+
         with:
-          context: apps/chime
+          context: apps/clocktime
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
