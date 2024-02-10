@@ -3,7 +3,7 @@ name: 'pipes'
 on: [push]
 
 env:
-  APPS: '[\"backup-todoist\", \"buttons\", \"chime\", \"clocktime\", \"switches\"]'
+  APPS: '["backup-todoist", "buttons", "chime", "clocktime", "switches"]'
   IMAGE_NAME: ${{ github.repository }}
   REGISTRY: ghcr.io
 
