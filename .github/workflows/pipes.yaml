@@ -24,7 +24,7 @@ jobs:
       packages: write
     strategy:
       matrix:
-        app: ${{ fromJSON(needs.improve-readability.outputs.APPS) }}
+        app: [ "${{ fromJSON(needs.improve-readability.outputs.APPS) }}" ]
     steps:
       - uses: actions/checkout@v4
       - name: Setup Go
