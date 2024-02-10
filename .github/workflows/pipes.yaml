@@ -8,10 +8,15 @@ env:
   REGISTRY: ghcr.io
 
 jobs:
-  env:
+  improve-readability:
+    name: Convert env.APPS into something usable by "matrix:"
+    runs-on: ubuntu-latest
     outputs:
-      APPS: ${{ fromJSON(env.APPS) }}
-  apps:
+      all_versions: ${{ steps.step1.outputs.matrix }}
+    steps:
+      - name: Create Matrix Variable
+        id: step1
+        run: echo "matrix=${{env.VERSIONS}}" >> $GITHUB_OUTPUT  apps:
     runs-on: ubuntu-latest
     permissions:
       contents: read
