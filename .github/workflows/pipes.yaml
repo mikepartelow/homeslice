@@ -17,8 +17,8 @@ jobs:
       contents: read
       packages: write
     strategy:
-      matrix: ${{ needs.env.outputs.APPS }}
-        app:
+      matrix:
+        app: ${{ needs.env.outputs.APPS }}
     steps:
       - uses: actions/checkout@v4
       - name: Setup Go
