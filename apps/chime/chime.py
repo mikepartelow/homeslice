@@ -57,8 +57,6 @@ def main():
         if not member.mute:
             member.volume = args.player_volume
 
-invalid
-
     zone.play_uri(args.media_uri, title=args.media_title)
 
     time.sleep(6)
