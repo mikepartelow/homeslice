@@ -8,14 +8,17 @@ env:
   REGISTRY: ghcr.io
 
 jobs:
+  env:
+    outputs:
+      APPS: ${{ fromJSON(env.APPS) }}
   apps:
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
     strategy:
-      matrix:
-        app: ${{ fromJSON(env.APPS) }}
+      matrix: ${{ needs.env.outputs.APPS }}
+        app:
     steps:
       - uses: actions/checkout@v4
       - name: Setup Go
