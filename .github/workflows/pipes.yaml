@@ -3,8 +3,9 @@ name: 'pipes'
 on: [push]
 
 env:
+  APPS: [backup-todoist, buttons, chime, clocktime, switches]
+  IMAGE_NAME: ${{ github.repository }}
   REGISTRY: ghcr.io
-  REPO_NAME: ${{ github.repository }}
 
 jobs:
   apps:
@@ -14,7 +15,7 @@ jobs:
       packages: write
     strategy:
       matrix:
-        app: [backup-todoist, buttons, chime, clocktime, switches]
+        app: ${{ env.APPS }}
     steps:
       - uses: actions/checkout@v4
       - name: Setup Go
@@ -40,9 +41,9 @@ jobs:
         id: meta
         uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
         with:
-          images: ${{ env.REGISTRY }}/${{ env.REPO_NAME }}/${{ matrix.app }}
-          tags: |
-            type=sha,enable=true,priority=2000,prefix=gitsha-,suffix=,format=short
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/${{ matrix.app }}
+          # tags: |
+          #   type=sha,enable=true,priority=2000,prefix=gitsha-,suffix=,format=short
       - name: Build and push Docker images
         uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
         with:
