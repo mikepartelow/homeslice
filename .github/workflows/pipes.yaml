@@ -12,11 +12,12 @@ jobs:
     name: Convert env.APPS into something usable by "matrix:"
     runs-on: ubuntu-latest
     outputs:
-      all_versions: ${{ steps.step1.outputs.matrix }}
+      APPS: ${{ steps.step1.outputs.matrix }}
     steps:
       - name: Create Matrix Variable
         id: step1
-        run: echo "matrix=${{env.VERSIONS}}" >> $GITHUB_OUTPUT  apps:
+        run: echo "matrix=${{env.APPS}}" >> $GITHUB_OUTPUT
+  apps:
     runs-on: ubuntu-latest
     permissions:
       contents: read
