@@ -43,7 +43,7 @@ jobs:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/${{ matrix.app }}
           tags: |
             type=raw,enable={{is_default_branch}},priority=10000,value={{date 'YYYYMMDD-HHmmss' tz='Pacific/Los Angeles'}}
-            type=raw,enable=true,priority=5000,value={{date 'YYYYMMDD-HHmmss' tz='Pacific/Los Angeles'}}.{{branch}}.{{sha}}
+            type=raw,enable=true,priority=5000,value={{branch}}.{{date 'YYYYMMDD-HHmmss' tz='Pacific/Los Angeles'}}.{{sha}}
       - name: Build and push Docker images
         uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
         with:
