@@ -2,7 +2,7 @@
 
 VERSION ?= $(shell date +'%Y%m%d_%H%M%S')
 
-APPS := buttons clocktime switches backup-todoist chime
+APPS := buttons clocktime switches backup-tidal backup-todoist chime
 
 info:
 	for APP in ${APPS}; do cd $${APP} && VERSION=${VERSION} make info $@ && cd ..; done
