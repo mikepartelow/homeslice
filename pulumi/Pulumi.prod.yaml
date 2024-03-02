@@ -1,6 +1,10 @@
 encryptionsalt: v1:VKuGdX6V+cI=:v1:NjPNhDyrBhgOUzh7:ZORqZH2ALQT0/D+qYIhNJOAoCraRjw==
 config:
   homeslice:namespace: homeslice
+  homeslice:backup_tidal:
+    image: registry.localdomain:32000/backup-tidal:20240302_103436
+    schedule: 0 0 * * *
+    tidal_creds_path: /var/run/secrets/tidal-creds.json
   homeslice:backup_todoist:
     image: registry.localdomain:32000/backup-todoist:20240207_212433
     author_name: Mike Partelow
