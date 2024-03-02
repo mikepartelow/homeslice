@@ -1,0 +1,5 @@
+*.pyc
+/backup-tidal
+/backup-tidal.json
+/tidal-creds.json
+/venv
