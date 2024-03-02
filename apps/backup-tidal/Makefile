@@ -28,7 +28,7 @@ venv:
 	$(VENV)/bin/pip install --no-deps -r requirements.txt
 
 login: dev
-	docker run --rm --entrypoint '' -ti ${--shell-args} $(PROJECT)-dev /venv/bin/python3 login-tidal.py
+	docker run --rm --entrypoint '' -ti ${--shell-args} $(PROJECT)-dev ./login-tidal.py
 
 backup: dev
-	docker run --rm --entrypoint '' -ti ${--shell-args} $(PROJECT)-dev /venv/bin/python3 backup-tidal.py
+	docker run --rm --entrypoint '' -ti ${--shell-args} $(PROJECT)-dev ./backup-tidal.py

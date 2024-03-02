@@ -1,3 +1,4 @@
+#!/venv/bin/python
 """Fetch a Tidal playlist and write it to a JSON file."""
 from datetime import datetime
 from lib import auth
