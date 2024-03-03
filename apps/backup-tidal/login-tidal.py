@@ -15,5 +15,6 @@ def main():
 
     auth.store_creds(session, PATH_TO_CREDS)
 
+
 if __name__ == "__main__":
     main()

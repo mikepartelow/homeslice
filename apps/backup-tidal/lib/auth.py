@@ -2,6 +2,7 @@ from pathlib import Path
 import json
 import tidalapi
 
+
 def store_creds(session: tidalapi.Session, path_to_creds: str):
     """Store Tidal session credentials to a JSON file."""
     creds = dict(

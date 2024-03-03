@@ -25,10 +25,14 @@ Download a playlist from Tidal and store it in a local JSON file.
 3. Backup playlist
 
 ```bash
+% export BACKUP_REPO=git@github.com:somebody/some-repo.git
+% export GIT_AUTHOR='Your Name <your@email.address>'
 % make backup
 ```
 
-Playlist can be found in `./$PLAYLIST_NAME.$DATESTAMP.json`
+Playlist JSON will be committed and pushed to `$BACKUP_REPO`.
+
+`make backup` uses a `readonly` bind mount to mount your local `$HOME/.ssh` into the container, so you can authenticate to `$BACKUP_REPO`.
 
 
 ## Credits

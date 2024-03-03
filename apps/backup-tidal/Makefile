@@ -1,8 +1,14 @@
 SHELL := /bin/bash
 CURRENCY := $(shell [[ ../make.mk -nt ./.make ]] && cp -v ../make.mk ./.make.mk 1>&2)
 
-override --docker-run-env += -e PATH_TO_CONFIG=/app/backup-tidal.json \
- 							 -e PATH_TO_CREDS=/app/tidal-creds.json
+override --docker-run-env += -e BACKUP_REPO='$(BACKUP_REPO)' \
+							 -e CLONE_PATH=tmp \
+							 -e GIT_AUTHOR='$(GIT_AUTHOR)' \
+							 -e PATH_TO_CONFIG=/app/backup-tidal.json \
+ 							 -e PATH_TO_CREDS=/app/tidal-creds.json \
+							 -e PLAYLIST_PATH=tmp \
+							 --mount type=bind,source=$(realpath $(HOME))/.ssh,target=/root/.ssh,readonly
+
 
 include ./.make.mk
 

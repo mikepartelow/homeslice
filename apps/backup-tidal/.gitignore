@@ -2,4 +2,6 @@
 /backup-tidal
 /backup-tidal.json
 /tidal-creds.json
+/tmp
 /venv
+/venv.lint

@@ -2,49 +2,33 @@
 """Fetch a Tidal playlist and write it to a JSON file."""
 from datetime import datetime
 from pathlib import Path
-from lib import auth
+from lib import auth, git, playlist
 import json
 import os
-import time
+import shutil
+import sys
 import tidalapi
 
+
+def require_env(name: str) -> str:
+    if (val := os.environ[name]) != "":
+        return val
+
+    print(f"{name} is required")
+    sys.exit(1)
+
+
+# Required
+BACKUP_REPO = require_env("BACKUP_REPO")
+CLONE_PATH = require_env("CLONE_PATH")
+GIT_AUTHOR = require_env("GIT_AUTHOR")
+PATH_TO_CONFIG = require_env("PATH_TO_CONFIG")
+PATH_TO_CREDS = require_env("PATH_TO_CREDS")
+PLAYLIST_PATH = require_env("PLAYLIST_PATH")
+
+# Optional
 # time to sleep between tracks() API calls to avoid rate limits
 RATE_LIMIT_SLEEP_SECONDS = os.environ.get("RATE_LIMIT_SLEEP_SECONDS", 8)
-
-# a JSON file with playlist_id to downloand and playlist_name base filename to write
-PATH_TO_CONFIG = os.environ["PATH_TO_CONFIG"]
-
-PATH_TO_CREDS = os.environ["PATH_TO_CREDS"]
-
-OUTPUT_PATH = os.environ.get("OUTPUT_PATH", "./")
-
-def write_playlist(session: tidalapi.Session, playlist_id: str, playlist_path: str) -> None:
-    """Writes the given playlist as JSON to the given path."""
-    playlist = session.playlist(playlist_id)
-
-    playlist_tracks = []
-
-    offset = 0
-
-    while tracks := playlist.tracks(offset=offset):
-        offset += len(tracks)
-
-        for track in tracks:
-            playlist_tracks.append(
-                dict(
-                    name=track.name,
-                    artist=track.artist.name,
-                    album=track.album.name,
-                    version=track.version,
-                    num=track.track_num,
-                    id=track.id,
-                    artists=[a.name for a in track.artists],
-                )
-            )
-        time.sleep(RATE_LIMIT_SLEEP_SECONDS)
-
-        with open(playlist_path, "w", encoding="utf-8") as tracks_f:
-            json.dump(playlist_tracks, tracks_f, default=str)
 
 
 def main():
@@ -55,15 +39,34 @@ def main():
     session = tidalapi.Session()
     auth.login(session, PATH_TO_CREDS)
 
+    playlist_filename = f"{config['playlist_name']}.json"
+    playlist_path = Path(PLAYLIST_PATH) / Path(playlist_filename)
+
+    print(
+        f"🥡 Fetching Tidal Playlist {config['playlist_name']} to {str(playlist_path)}"
+    )
+    playlist.write(
+        session, config["playlist_id"], playlist_path, RATE_LIMIT_SLEEP_SECONDS
+    )
+    print(f"🎵 Wrote Tidal Playlist to {str(playlist_path)}")
+
+    repo_name = Path(BACKUP_REPO.split("/")[-1]).stem
+    clone_path = Path(CLONE_PATH) / Path(repo_name)
+
+    git.clone(BACKUP_REPO, clone_path)
+    print(f"👯 Cloned {BACKUP_REPO} to {clone_path}")
+
+    shutil.copy(playlist_path, clone_path)
+
+    git.add(clone_path, playlist_filename)
+
     datestamp = datetime.now().strftime("%Y%m%d%H%M%S")
-    playlist_path = f"{config['playlist_name']}.{datestamp}.json"
+    if git.commit(clone_path, GIT_AUTHOR, datestamp):
+        git.push(clone_path)
+        print(f"🚢 Pushed {clone_path} to {BACKUP_REPO}")
+    else:
+        print(f"🧘 Nothing to do, backup is up to date.")
 
-    write_playlist(session, config["playlist_id"], Path(OUTPUT_PATH) / Path(playlist_path))
-    print(f"Wrote Tidal Playlist to {playlist_path}")
-
-    while True:
-        print("Sleeping")
-        time.sleep(60*2)
 
 if __name__ == "__main__":
     main()
