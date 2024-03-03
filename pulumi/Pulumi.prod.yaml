@@ -3,9 +3,10 @@ config:
   homeslice:namespace: homeslice
   homeslice:backup_tidal:
     config_path: /var/run/secrets/backup-tidal.json
-    image: registry.localdomain:32000/backup-tidal:20240302_110551
+    image: registry.localdomain:32000/backup-tidal:20240303_100403
     schedule: 0 0 * * *
     tidal_creds_path: /var/run/secrets/tidal-creds.json
+    backup_path: /tmp
   homeslice:backup_todoist:
     author_email: github@mikepartelow.com
     author_name: Mike Partelow

@@ -16,6 +16,7 @@ def app(config: pulumi.Config) -> None:
 
     config_path = config["config_path"]
     image = config["image"]
+    output_path = config["backup_path"]
     schedule = config["schedule"]
     tidal_creds_path = config["tidal_creds_path"]
 
@@ -51,6 +52,21 @@ def app(config: pulumi.Config) -> None:
         ),
     ]
 
+    env = [
+        kubernetes.core.v1.EnvVarArgs(
+            name="OUTPUT_PATH",
+            value=output_path,
+        ),
+        kubernetes.core.v1.EnvVarArgs(
+            name="PATH_TO_CONFIG",
+            value=config_path,
+        ),
+        kubernetes.core.v1.EnvVarArgs(
+            name="PATH_TO_CREDS",
+            value=tidal_creds_path,
+        ),
+    ]
+
     # homeslice.cronjob(
     #     NAME,
     #     image,
@@ -63,6 +79,7 @@ def app(config: pulumi.Config) -> None:
     homeslice.deployment(
         NAME,
         image,
+        env=env,
         volumes=volumes,
         volume_mounts=volume_mounts,
     )

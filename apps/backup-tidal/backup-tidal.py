@@ -1,6 +1,7 @@
 #!/venv/bin/python
 """Fetch a Tidal playlist and write it to a JSON file."""
 from datetime import datetime
+from pathlib import Path
 from lib import auth
 import json
 import os
@@ -14,6 +15,8 @@ RATE_LIMIT_SLEEP_SECONDS = os.environ.get("RATE_LIMIT_SLEEP_SECONDS", 8)
 PATH_TO_CONFIG = os.environ["PATH_TO_CONFIG"]
 
 PATH_TO_CREDS = os.environ["PATH_TO_CREDS"]
+
+OUTPUT_PATH = os.environ.get("OUTPUT_PATH", "./")
 
 def write_playlist(session: tidalapi.Session, playlist_id: str, playlist_path: str) -> None:
     """Writes the given playlist as JSON to the given path."""
@@ -55,7 +58,7 @@ def main():
     datestamp = datetime.now().strftime("%Y%m%d%H%M%S")
     playlist_path = f"{config['playlist_name']}.{datestamp}.json"
 
-    write_playlist(session, config["playlist_id"], playlist_path)
+    write_playlist(session, config["playlist_id"], Path(OUTPUT_PATH) / Path(playlist_path))
     print(f"Wrote Tidal Playlist to {playlist_path}")
 
     while True:
