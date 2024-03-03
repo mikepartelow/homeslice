@@ -2,7 +2,11 @@
 
 VERSION ?= $(shell date +'%Y%m%d_%H%M%S')
 
+<<<<<<< HEAD
 APPS := buttons clocktime switches backup-tidal backup-todoist chime
+=======
+APPS := backup-todoist buttons chime clocktime switches
+>>>>>>> ghcr
 
 info:
 	for APP in ${APPS}; do cd $${APP} && VERSION=${VERSION} make info $@ && cd ..; done
