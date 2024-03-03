@@ -12,6 +12,7 @@ COPY --from=venv /venv /venv
 
 WORKDIR /app
 COPY backup-tidal.py backup-tidal.py
+COPY lib lib
 
 ENV PATH=/venv/bin:$PATH
 

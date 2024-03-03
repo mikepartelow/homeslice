@@ -14,26 +14,28 @@ NAME = "backup-tidal"
 def app(config: pulumi.Config) -> None:
     """define resources for the homeslice/backup-tidal app"""
 
+    config_path = config["config_path"]
     image = config["image"]
     schedule = config["schedule"]
     tidal_creds_path = config["tidal_creds_path"]
 
-    tidal_creds_name = NAME + "-creds"
+    secrets_name = NAME + "-secrets"
 
     # FIXME: refactor the github boilerplate here and todoist
 
     kubernetes.core.v1.Secret(
-        tidal_creds_name,
-        metadata=homeslice.metadata(tidal_creds_name),
+        secrets_name,
+        metadata=homeslice.metadata(secrets_name),
         type="Opaque",
         string_data={
             Path(tidal_creds_path).name: BACKUP_TIDAL_SECRETS.TIDAL_CREDS_JSON,
+            Path(config_path).name: BACKUP_TIDAL_SECRETS.CONFIG_JSON,
         },
     )
 
     volume_mounts = [
         kubernetes.core.v1.VolumeMountArgs(
-            name=tidal_creds_name,
+            name=secrets_name,
             mount_path=str(Path(tidal_creds_path).parent),
             read_only=True,
         ),
@@ -41,9 +43,9 @@ def app(config: pulumi.Config) -> None:
 
     volumes = [
         kubernetes.core.v1.VolumeArgs(
-            name=tidal_creds_name,
+            name=secrets_name,
             secret=kubernetes.core.v1.SecretVolumeSourceArgs(
-                secret_name=tidal_creds_name,
+                secret_name=secrets_name,
                 default_mode=0o444,
             ),
         ),
