@@ -14,7 +14,7 @@ jobs:
       packages: write
     strategy:
       matrix:
-        app: [backup-todoist, buttons, chime, clocktime, switches]
+        app: [backup-tidal, backup-todoist, buttons, chime, clocktime, switches]
     steps:
       - uses: actions/checkout@v4
       - name: Setup Go
