@@ -6,6 +6,7 @@ import homeslice
 def deployment(
     name: str,
     image: str,
+    command: list[str] = None,
     args: list[str] = None,
     replicas: int = 1,
     env_from: list[kubernetes.core.v1.EnvFromSourceArgs] = None,
@@ -18,7 +19,7 @@ def deployment(
 
     metadata = homeslice.metadata(name)
 
-    for a in ("args", "env_from", "ports", "volume_mounts", "volumes"):
+    for a in ("args", "command", "env_from", "ports", "volume_mounts", "volumes"):
         if locals()[a] is None:
             locals()[a] = []
 
@@ -40,6 +41,7 @@ def deployment(
                             name=name,
                             image=image,
                             args=args,
+                            command=command,
                             env_from=env_from,
                             ports=ports,
                             volume_mounts=volume_mounts,

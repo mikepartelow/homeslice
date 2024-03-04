@@ -1,6 +1,7 @@
 """The center of the homeslice deployment multiverse."""
 import pulumi
 import homeslice
+from backup_tidal import backup_tidal
 from backup_todoist import backup_todoist
 from buttons import buttons
 from chime import chime
@@ -11,6 +12,9 @@ config = pulumi.Config("homeslice")
 name = config.require("namespace")
 
 namespace = homeslice.namespace(name)
+
+if cfg := config.get_object("backup_tidal"):
+    backup_tidal.app(cfg)
 
 if cfg := config.get_object("backup_todoist"):
     backup_todoist.app(cfg)

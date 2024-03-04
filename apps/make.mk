@@ -1,8 +1,8 @@
 DEFAULT_REGISTRY := registry.localdomain:32000
 
 PROJECT := $(notdir $(patsubst %/,%,$(dir $(abspath $(firstword $(MAKEFILE_LIST))))))
-REGISTRY ?= $(DEFAULT_REGISTRY)
-VERSION ?= $(shell date +'%Y%m%d_%H%M%S')
+REGISTRY := $(if $(REGISTRY),$(REGISTRY),$(DEFAULT_REGISTRY))
+VERSION := $(if $(VERSION),$(VERSION),$(shell date +'%Y%m%d_%H%M%S'))
 IMAGE = $(REGISTRY)/$(PROJECT)
 
 --docker-run-env :=
