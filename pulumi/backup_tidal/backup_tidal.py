@@ -20,13 +20,20 @@ def app(config: pulumi.Config) -> None:
     schedule = config["schedule"]
     tidal_creds_path = config["tidal_creds_path"]
 
-    secrets_name = NAME + "-secrets"
-
     # FIXME: refactor the github boilerplate here and todoist
 
+    homeslice.configmap(
+        NAME,
+        {
+            "OUTPUT_PATH": output_path,
+            "PATH_TO_CONFIG": config_path,
+            "PATH_TO_CREDS": tidal_creds_path,
+        },
+    )
+
     kubernetes.core.v1.Secret(
-        secrets_name,
-        metadata=homeslice.metadata(secrets_name),
+        NAME,
+        metadata=homeslice.metadata(NAME),
         type="Opaque",
         string_data={
             Path(tidal_creds_path).name: BACKUP_TIDAL_SECRETS.TIDAL_CREDS_JSON,
@@ -36,7 +43,7 @@ def app(config: pulumi.Config) -> None:
 
     volume_mounts = [
         kubernetes.core.v1.VolumeMountArgs(
-            name=secrets_name,
+            name=NAME,
             mount_path=str(Path(tidal_creds_path).parent),
             read_only=True,
         ),
@@ -44,28 +51,15 @@ def app(config: pulumi.Config) -> None:
 
     volumes = [
         kubernetes.core.v1.VolumeArgs(
-            name=secrets_name,
+            name=NAME,
             secret=kubernetes.core.v1.SecretVolumeSourceArgs(
-                secret_name=secrets_name,
+                secret_name=NAME,
                 default_mode=0o444,
             ),
         ),
     ]
 
-    env = [
-        kubernetes.core.v1.EnvVarArgs(
-            name="OUTPUT_PATH",
-            value=output_path,
-        ),
-        kubernetes.core.v1.EnvVarArgs(
-            name="PATH_TO_CONFIG",
-            value=config_path,
-        ),
-        kubernetes.core.v1.EnvVarArgs(
-            name="PATH_TO_CREDS",
-            value=tidal_creds_path,
-        ),
-    ]
+    env_from = [ homeslice.env_from_configmap(NAME) ]
 
     # homeslice.cronjob(
     #     NAME,
@@ -79,7 +73,7 @@ def app(config: pulumi.Config) -> None:
     homeslice.deployment(
         NAME,
         image,
-        env=env,
+        env_from=env_from,
         volumes=volumes,
         volume_mounts=volume_mounts,
     )
