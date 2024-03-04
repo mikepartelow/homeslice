@@ -1,3 +1,4 @@
+"""Functions for authenticating to Tidal."""
 from pathlib import Path
 import json
 import tidalapi
@@ -5,12 +6,12 @@ import tidalapi
 
 def store_creds(session: tidalapi.Session, path_to_creds: str):
     """Store Tidal session credentials to a JSON file."""
-    creds = dict(
-        token_type=session.token_type,
-        access_token=session.access_token,
-        refresh_token=session.refresh_token,
-        expiry_time=session.expiry_time,
-    )
+    creds = {
+        "token_type": session.token_type,
+        "access_token": session.access_token,
+        "refresh_token": session.refresh_token,
+        "expiry_time": session.expiry_time,
+    }
 
     with open(path_to_creds, "w", encoding="utf-8") as creds_f:
         json.dump(creds, creds_f, default=str)

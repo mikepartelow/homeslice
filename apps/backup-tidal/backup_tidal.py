@@ -2,15 +2,18 @@
 """Fetch a Tidal playlist and write it to a JSON file."""
 from datetime import datetime
 from pathlib import Path
-from lib import auth, git, playlist
 import json
 import os
 import shutil
 import sys
+
 import tidalapi
+
+from lib import auth, git, playlist
 
 
 def require_env(name: str) -> str:
+    """Returns the value of the given environment variable or prints a message and exits."""
     if (val := os.environ[name]) != "":
         return val
 
@@ -65,7 +68,7 @@ def main():
         git.push(clone_path)
         print(f"🚢 Pushed {clone_path} to {BACKUP_REPO}")
     else:
-        print(f"🧘 Nothing to do, backup is up to date.")
+        print("🧘 Nothing to do, backup is up to date.")
 
 
 if __name__ == "__main__":

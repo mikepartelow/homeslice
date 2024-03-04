@@ -1,6 +1,7 @@
+"""Functions for manipulating Tidal playlists."""
 import json
-import tidalapi
 import time
+import tidalapi
 
 
 def write(
@@ -21,15 +22,15 @@ def write(
 
         for track in tracks:
             playlist_tracks.append(
-                dict(
-                    name=track.name,
-                    artist=track.artist.name,
-                    album=track.album.name,
-                    version=track.version,
-                    num=track.track_num,
-                    id=track.id,
-                    artists=[a.name for a in track.artists],
-                )
+                {
+                    "name": track.name,
+                    "artist": track.artist.name,
+                    "album": track.album.name,
+                    "version": track.version,
+                    "num": track.track_num,
+                    "id": track.id,
+                    "artists": [a.name for a in track.artists],
+                }
             )
         time.sleep(rate_limit_sleep_seconds)
 

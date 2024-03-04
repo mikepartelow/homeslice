@@ -1,9 +1,8 @@
 #!/venv/bin/python
 """Fetch a Tidal playlist and write it to a JSON file."""
-from datetime import datetime
-from lib import auth
 import os
 import tidalapi
+from lib import auth
 
 PATH_TO_CREDS = os.environ["PATH_TO_CREDS"]
 

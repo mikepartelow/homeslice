@@ -11,7 +11,7 @@ FROM python AS dev
 COPY --from=venv /venv /venv
 
 WORKDIR /app
-COPY backup-tidal.py backup-tidal.py
+COPY backup_tidal.py backup_tidal.py
 COPY lib lib
 
 ENV PATH=/venv/bin:$PATH
@@ -22,4 +22,4 @@ WORKDIR /app
 
 USER nobody
 
-ENTRYPOINT ["/app/backup-tidal.py"]
+ENTRYPOINT ["/app/backup_tidal.py"]
