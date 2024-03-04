@@ -1,8 +1,8 @@
 .PHONY: fmt lint test build push info
 
-VERSION ?= $(shell date +'%Y%m%d_%H%M%S')
+VERSION := $(if $(VERSOIN),$(VERSOIN),$(shell date +'%Y%m%d_%H%M%S'))
 
-APPS := backup-tidal backup-todoist buttons chime clocktime switches
+APPS := $(shell /bin/ls -d */ | sed 's^/^^' | sort)
 
 info:
 	for APP in ${APPS}; do cd $${APP} && VERSION=${VERSION} make info $@ && cd ..; done
