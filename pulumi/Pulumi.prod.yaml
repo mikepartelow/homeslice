@@ -3,10 +3,10 @@ config:
   homeslice:namespace: homeslice
   homeslice:backup_tidal:
     git_author: "Mike Partelow <github@mikepartelow.com>"
-    image: registry.localdomain:32000/backup-tidal:20240303_211426
+    image: registry.localdomain:32000/backup-tidal:20240303_223015
     known_hosts: |
       github.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl
-    schedule: 0 0 * * *
+    schedule: 0 1 * * *
   homeslice:backup_todoist:
     author_email: github@mikepartelow.com
     author_name: Mike Partelow

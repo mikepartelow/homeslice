@@ -37,7 +37,7 @@ def app(config: pulumi.Config) -> None:
     )
 
     kubernetes.core.v1.Secret(
-        NAME,
+        NAME,  # pylint: disable=R0801
         metadata=homeslice.metadata(NAME),
         type="Opaque",
         string_data={
@@ -96,6 +96,7 @@ def app(config: pulumi.Config) -> None:
         homeslice.env_from_secret(NAME),
     ]
 
+    # pylint: disable=R0801
     homeslice.cronjob(
         NAME,
         image,
