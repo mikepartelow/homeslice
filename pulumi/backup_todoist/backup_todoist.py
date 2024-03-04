@@ -9,37 +9,30 @@ from homeslice_secrets import (  # pylint: disable=no-name-in-module
 )
 
 NAME = "backup-todoist"
+KNOWN_HOSTS_PATH = "/var/run/known_hosts/known_hosts"
+PRIVATE_KEY_PATH = "/var/run/ssh-privatekey/ssh-privatekey"
 
 
 def app(config: pulumi.Config) -> None:
     """define resources for the homeslice/backup-todoist app"""
 
-    image = config["image"]
-    private_key_path = config["private_key_path"]
     author_name = config["author_name"]
     author_email = config["author_email"]
+    image = config["image"]
+    known_hosts = config["known_hosts"]
     schedule = config["schedule"]
 
-    ssh_name = NAME + "-ssh"
-
     known_hosts_name = NAME + "-known-hosts"
-    known_hosts_path = config["known_hosts_path"]
-    known_hosts = config["known_hosts"]
+    ssh_name = NAME + "-ssh"
 
     homeslice.configmap(
         NAME,
         {
-            "TODOIST_BACKUP_PRIVATE_KEY_PATH": private_key_path,
+            "TODOIST_BACKUP_PRIVATE_KEY_PATH": PRIVATE_KEY_PATH,
             "TODOIST_BACKUP_AUTHOR_NAME": author_name,
             "TODOIST_BACKUP_AUTHOR_EMAIL": author_email,
-            "SSH_KNOWN_HOSTS": str(known_hosts_path),
-        },
-    )
-
-    homeslice.configmap(
-        known_hosts_name,
-        {
-            str(Path(known_hosts_path).name): known_hosts,
+            "SSH_KNOWN_HOSTS": str(KNOWN_HOSTS_PATH),
+            str(Path(KNOWN_HOSTS_PATH).name): known_hosts,
         },
     )
 
@@ -65,12 +58,12 @@ def app(config: pulumi.Config) -> None:
     volume_mounts = [
         kubernetes.core.v1.VolumeMountArgs(
             name=ssh_name,
-            mount_path=str(Path(private_key_path).parent),
+            mount_path=str(Path(PRIVATE_KEY_PATH).parent),
             read_only=True,
         ),
         kubernetes.core.v1.VolumeMountArgs(
             name=known_hosts_name,
-            mount_path=str(Path(known_hosts_path).parent),
+            mount_path=str(Path(KNOWN_HOSTS_PATH).parent),
             read_only=True,
         ),
     ]
@@ -86,8 +79,14 @@ def app(config: pulumi.Config) -> None:
         kubernetes.core.v1.VolumeArgs(
             name=known_hosts_name,
             config_map=kubernetes.core.v1.ConfigMapVolumeSourceArgs(
-                name=known_hosts_name,
+                name=NAME,
                 default_mode=0o444,
+                items=[
+                    {
+                        "key": str(Path(KNOWN_HOSTS_PATH).name),
+                        "path": str(Path(KNOWN_HOSTS_PATH).name),
+                    }
+                ],
             ),
         ),
     ]

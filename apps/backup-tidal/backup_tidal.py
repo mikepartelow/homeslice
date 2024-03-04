@@ -48,9 +48,13 @@ def main():
     print(
         f"🥡 Fetching Tidal Playlist {config['playlist_name']} to {str(playlist_path)}"
     )
-    playlist.write(
-        session, config["playlist_id"], playlist_path, RATE_LIMIT_SLEEP_SECONDS
-    )
+    # playlist.write(
+    #     session, config["playlist_id"], playlist_path, RATE_LIMIT_SLEEP_SECONDS
+    # )
+
+    with open(playlist_path, "w"):
+        pass
+
     print(f"🎵 Wrote Tidal Playlist to {str(playlist_path)}")
 
     repo_name = Path(BACKUP_REPO.split("/")[-1]).stem
