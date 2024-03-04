@@ -1,6 +1,6 @@
 .PHONY: fmt lint test build push info
 
-VERSION := $(if $(VERSOIN),$(VERSOIN),$(shell date +'%Y%m%d_%H%M%S'))
+VERSION := $(if $(VERSION),$(VERSION),$(shell date +'%Y%m%d_%H%M%S'))
 
 APPS := $(shell /bin/ls -d */ | sed 's^/^^' | sort)
 
