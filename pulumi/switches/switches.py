@@ -1,4 +1,5 @@
 """Resources for the homeslice/switches app."""
+
 from pathlib import Path
 import pulumi_kubernetes as kubernetes
 import pulumi

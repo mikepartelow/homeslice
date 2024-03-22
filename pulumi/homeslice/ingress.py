@@ -1,4 +1,5 @@
 """kubernetes Ingress factory"""
+
 import pulumi_kubernetes as kubernetes
 import homeslice
 

@@ -1,4 +1,5 @@
 """kubernetes Cronjob factory"""
+
 import pulumi_kubernetes as kubernetes
 import homeslice
 
