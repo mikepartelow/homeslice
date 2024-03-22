@@ -1,4 +1,5 @@
 """Functions for manipulating Tidal playlists."""
+
 import json
 import time
 import tidalapi

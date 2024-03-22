@@ -1,4 +1,5 @@
 """Functions for authenticating to Tidal."""
+
 from pathlib import Path
 import json
 import tidalapi
