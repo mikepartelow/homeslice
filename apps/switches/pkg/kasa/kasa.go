@@ -74,6 +74,11 @@ func (k *Kasa) setState(state OnOff) error {
 				OnOff: state,
 			},
 		},
+		System: &SystemRequests{
+			SetRelayState: &SetRelayStateRequest{
+				State: state,
+			},
+		},
 	}
 	var response GenericResponse
 	if err := k.sendCommand(request, &response); err != nil {
