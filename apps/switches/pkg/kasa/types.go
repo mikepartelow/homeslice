@@ -26,8 +26,13 @@ type GenericResponse struct {
 type GetSysinfoRequest struct {
 }
 
+type SetRelayStateRequest struct {
+	State OnOff `json:"state"`
+}
+
 type SystemRequests struct {
-	GetSysinfo *GetSysinfoRequest `json:"get_sysinfo,omitempty"`
+	GetSysinfo    *GetSysinfoRequest    `json:"get_sysinfo,omitempty"`
+	SetRelayState *SetRelayStateRequest `json:"set_relay_state,omitempty"`
 }
 
 type TransitionLightState struct {

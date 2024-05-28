@@ -3,7 +3,7 @@
 
 import time
 import argparse
-from soco import snapshot, SoCo
+from soco import exceptions, snapshot, SoCo
 
 
 def parse_args():
@@ -57,7 +57,10 @@ def main():
         if not member.mute:
             member.volume = args.player_volume
 
-    zone.play_uri(args.media_uri, title=args.media_title)
+    try:
+        zone.play_uri(args.media_uri, title=args.media_title)
+    except exceptions.SoCoSlaveException as e:
+        print(f"  exception: zone.play_uri {e}")
 
     time.sleep(6)
 
