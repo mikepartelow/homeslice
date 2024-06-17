@@ -57,3 +57,5 @@ config:
       ]
     switches_json_path: /var/run/switches.json
   kubernetes:context: nucnuc
+  homeslice:homebridge:
+    image: ghcr.io/homebridge/homebridge:2024-05-02@sha256:c13910618a3dbe6ed1afd01def54f800a10228ca1a6e540bb302ab56762fbd66
