@@ -19,6 +19,7 @@ def app(config: pulumi.Config) -> None:
 
     # an nginx deployment serves up media from a persistent volume
     #
+    # pylint: disable=R0801
     kubernetes.core.v1.PersistentVolumeClaim(
         NAME,
         metadata=homeslice.metadata(NAME),

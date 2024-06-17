@@ -1,15 +1,18 @@
 """Resources for the a Homebridge instance."""
 
+import pulumi_kubernetes as kubernetes
 import pulumi
 import homeslice
-import pulumi_kubernetes as kubernetes
 
 NAME = "homebridge"
 PORT = 8581
 
 
 def app(config: pulumi.Config) -> None:
+    """define resources for the homeslice/homebridge app"""
     image = config["image"]
+    redirect_host = config["redirect_host"]
+    redirect_prefix = config["redirect_prefix"]
 
     ports = [
         kubernetes.core.v1.ContainerPortArgs(
@@ -18,6 +21,7 @@ def app(config: pulumi.Config) -> None:
         )
     ]
 
+    # pylint: disable=R0801
     kubernetes.core.v1.PersistentVolumeClaim(
         NAME,
         metadata=homeslice.metadata(NAME),
@@ -59,3 +63,14 @@ def app(config: pulumi.Config) -> None:
         volume_mounts=volume_mounts,
     )
     homeslice.service(NAME, port=PORT)
+
+    homeslice.ingress(
+        NAME,
+        [redirect_prefix],
+        metadata=homeslice.metadata(
+            NAME,
+            annotations={
+                "nginx.ingress.kubernetes.io/permanent-redirect": f"http://{redirect_host}:{PORT}",
+            },
+        ),
+    )
