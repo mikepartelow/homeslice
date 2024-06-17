@@ -14,6 +14,7 @@ def deployment(
     ports: list[kubernetes.core.v1.ContainerPortArgs] = None,
     volumes: list[kubernetes.core.v1.VolumeArgs] = None,
     volume_mounts: list[kubernetes.core.v1.VolumeMountArgs] = None,
+    host_network: bool = False,
 ) -> kubernetes.apps.v1.Deployment:
     # pylint: disable=too-many-arguments
     """THE kubernetes Deployment factory"""
@@ -37,6 +38,7 @@ def deployment(
                     labels=metadata.labels,
                 ),
                 spec=kubernetes.core.v1.PodSpecArgs(
+                    host_network=host_network,
                     containers=[
                         kubernetes.core.v1.ContainerArgs(
                             name=name,
