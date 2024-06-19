@@ -22,8 +22,7 @@ def deployment(
     metadata = homeslice.metadata(name)
 
     for a in ("args", "command", "env_from", "ports", "volume_mounts", "volumes"):
-        if locals()[a] is None:
-            locals()[a] = []
+        locals()[a] = locals()[a] or []
 
     return kubernetes.apps.v1.Deployment(
         name,

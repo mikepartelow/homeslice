@@ -12,8 +12,7 @@ def ingress(
 ) -> kubernetes.core.v1.Service:
     """THE kubernetes Ingress factory"""
 
-    if metadata is None:
-        metadata = homeslice.metadata(name)
+    metadata = metadata or homeslice.metadata(name)
 
     return kubernetes.networking.v1.Ingress(
         name,
