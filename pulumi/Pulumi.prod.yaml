@@ -26,7 +26,7 @@ config:
         media_uri: http://{{ingress}}/api/v0/chime/swed.mp3
         schedule: 20 16 * * *
     container_port: 80
-    image: ghcr.io/mikepartelow/homeslice/chime:main.20240528-032019.8ead57c@sha256:61fc880967df230f9887958858d851423fa24f98c30745224412d938c2aa159f
+    image: ghcr.io/mikepartelow/homeslice/chime:main.20240528-034125.5ad544c@sha256:ac6caf5235d5ef264cbd2d1a01fc9035823e981271297ce2e21607008c7dff46
     ingress_prefix: /(api/v0/chime/)(.*)$
     nginx: nginx:1.25
     pvc_mount_path: /usr/share/nginx/html
@@ -57,3 +57,7 @@ config:
       ]
     switches_json_path: /var/run/switches.json
   kubernetes:context: nucnuc
+  homeslice:homebridge:
+    image: ghcr.io/homebridge/homebridge:2024-05-02@sha256:c13910618a3dbe6ed1afd01def54f800a10228ca1a6e540bb302ab56762fbd66
+    redirect_host: nucnuc
+    redirect_prefix: /homebridge

@@ -6,6 +6,7 @@ import homeslice
 
 def service(
     name: str,
+    port: int = 80,
 ) -> kubernetes.core.v1.Service:
     """THE kubernetes Service factory"""
 
@@ -21,7 +22,7 @@ def service(
                 kubernetes.core.v1.ServicePortArgs(
                     name="http",
                     protocol="TCP",
-                    port=80,
+                    port=port,
                     target_port="http",
                 )
             ],
