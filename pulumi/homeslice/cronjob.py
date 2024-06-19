@@ -19,11 +19,9 @@ def cronjob(
     """THE kubernetes Cronjob factory"""
 
     for a in ("args", "env_from", "volume_mounts", "volumes"):
-        if locals()[a] is None:
-            locals()[a] = []
+        locals()[a] = locals()[a] or []
 
-    if metadata is None:
-        metadata = homeslice.metadata(name)
+    metadata = metadata or homeslice.metadata(name)
 
     return kubernetes.batch.v1.CronJob(
         name,
