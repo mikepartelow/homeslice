@@ -19,14 +19,15 @@ def app(config: pulumi.Config) -> None:
         "prometheus",
         kubernetes.helm.v3.ReleaseArgs(
             chart="prometheus",
+            namespace=namespace_name,
             version=prometheus_chart_version,
             repository_opts=kubernetes.helm.v3.RepositoryOptsArgs(
                 repo="https://prometheus-community.github.io/helm-charts",
             ),
-        ),
-        values={
-            "prometheus-pushgateway": {
-                "enabled": False,
+            values={
+                "prometheus-pushgateway": {
+                    "enabled": False,
+                },
             },
-        },
+        ),
     )
