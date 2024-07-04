@@ -12,10 +12,9 @@ def app(config: pulumi.Config) -> None:
     namespace_name = config["namespace"]
     prometheus_chart_version = config["prometheus-chart-version"]
 
-    namespace = homeslice.namespace(namespace_name)
+    homeslice.namespace(namespace_name)
 
-    # https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus
-    prometheus = kubernetes.helm.v3.Release(
+    kubernetes.helm.v3.Release(
         "prometheus",
         kubernetes.helm.v3.ReleaseArgs(
             chart="prometheus",
