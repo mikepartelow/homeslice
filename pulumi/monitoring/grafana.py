@@ -4,29 +4,22 @@ import pulumi_kubernetes as kubernetes
 import pulumi
 import homeslice
 
-NAME = "monitoring"
+NAME = "grafana"
 
 
 def app(config: pulumi.Config) -> None:
     """define resources for the homeslice/monitoring app"""
     namespace_name = config["namespace"]
-    prometheus_chart_version = config["prometheus-chart-version"]
-
-    homeslice.namespace(namespace_name)
+    chart_version = config["grafana_chart_version"]
 
     kubernetes.helm.v3.Release(
-        "prometheus",
+        "grafana",
         kubernetes.helm.v3.ReleaseArgs(
-            chart="prometheus",
+            chart="grafana",
             namespace=namespace_name,
-            version=prometheus_chart_version,
+            version=chart_version,
             repository_opts=kubernetes.helm.v3.RepositoryOptsArgs(
-                repo="https://prometheus-community.github.io/helm-charts",
+                repo="https://grafana.github.io/helm-charts",
             ),
-            values={
-                "prometheus-pushgateway": {
-                    "enabled": False,
-                },
-            },
         ),
     )

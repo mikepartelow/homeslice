@@ -8,7 +8,7 @@ from buttons import buttons
 from chime import chime
 from clocktime import clocktime
 from homebridge import homebridge
-from monitoring import monitoring
+from monitoring import grafana, prometheus
 from switches import switches
 
 config = pulumi.Config("homeslice")
@@ -35,7 +35,9 @@ if cfg := config.get_object("homebridge"):
     homebridge.app(cfg)
 
 if cfg := config.get_object("monitoring"):
-    monitoring.app(cfg)
+    homeslice.namespace(cfg["namespace"])
+    prometheus.app(cfg)
+    grafana.app(cfg)
 
 if cfg := config.get_object("switches"):
     switches.app(cfg)

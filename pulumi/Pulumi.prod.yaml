@@ -36,8 +36,12 @@ config:
     ingress_prefix: /api/v0/clocktime/
     location: America/Los_Angeles
   homeslice:monitoring:
+    hostname: nucnuc.local
     namespace: monitoring
-    prometheus-chart-version: "25.22.0"
+    grafana_chart_version: "8.3.2"
+    grafana_ingress_prefix: /grafana/
+    prometheus_chart_version: "25.22.0"
+    prometheus_ingress_prefix: /prometheus/
   homeslice:namespace: homeslice
   homeslice:switches:
     container_port: 8000
