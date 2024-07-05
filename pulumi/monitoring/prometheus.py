@@ -6,6 +6,7 @@ import homeslice
 
 NAME = "prometheus"
 
+
 def app(config: pulumi.Config) -> None:
     """define resources for the homeslice/monitoring app"""
     namespace_name = config["namespace"]
@@ -30,7 +31,7 @@ def app(config: pulumi.Config) -> None:
                     ],
                     "ingress": {
                         "enabled": True,
-                        "ingressClassName": "nginx",
+                        "ingressClassName": "public",
                         "annotations": {
                             "nginx.ingress.kubernetes.io/rewrite-target": "/$2",
                         },
@@ -44,5 +45,6 @@ def app(config: pulumi.Config) -> None:
             },
         ),
     )
+
 
 # https://github.com/prometheus-community/helm-charts/issues/1594#issuecomment-1044758479

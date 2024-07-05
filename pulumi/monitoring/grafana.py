@@ -21,5 +21,17 @@ def app(config: pulumi.Config) -> None:
             repository_opts=kubernetes.helm.v3.RepositoryOptsArgs(
                 repo="https://grafana.github.io/helm-charts",
             ),
+            values={
+                "ingress": {
+                    "enabled": True,
+                    "ingressClassName": "public",
+                    "annotations": {
+                        "nginx.ingress.kubernetes.io/rewrite-target": "/$2",
+                    },
+                    "path": "/grafana(/|$)(.*)",
+                    "hosts": [""],
+                },
+                "grafana.ini": {"server": {"root_url": "http://nucnuc.local/grafana"}},
+            },
         ),
     )
