@@ -6,6 +6,8 @@ import homeslice
 
 NAME = "prometheus"
 
+# FIXME:
+# - persistent metrics (PVC)
 
 def app(config: pulumi.Config) -> None:
     """define resources for the homeslice/monitoring app"""
@@ -17,6 +19,7 @@ def app(config: pulumi.Config) -> None:
         "prometheus",
         kubernetes.helm.v3.ReleaseArgs(
             chart="prometheus",
+            name=NAME,
             namespace=namespace_name,
             version=chart_version,
             repository_opts=kubernetes.helm.v3.RepositoryOptsArgs(
@@ -45,6 +48,3 @@ def app(config: pulumi.Config) -> None:
             },
         ),
     )
-
-
-# https://github.com/prometheus-community/helm-charts/issues/1594#issuecomment-1044758479
