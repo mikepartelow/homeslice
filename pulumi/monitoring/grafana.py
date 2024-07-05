@@ -2,12 +2,10 @@
 
 import pulumi_kubernetes as kubernetes
 import pulumi
-import homeslice
 
 NAME = "grafana"
 
 # FIXME:
-# - import dashboard like: https://github.com/grafana/helm-charts/blob/main/charts/grafana/values.yaml#L741
 # useful dash:
 #  - https://grafana.com/grafana/dashboards/10884-aggregated-k8s-job-monitoring/
 #  - https://grafana.com/grafana/dashboards/14279-cronjobs/
@@ -51,7 +49,6 @@ def app(config: pulumi.Config) -> None:
                             {
                                 "name": "homeslice",
                                 "orgId": 1,
-                                "folder": "homeslice",
                                 "type": "file",
                                 "disableDeletion": False,
                                 "editable": True,
