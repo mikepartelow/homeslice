@@ -6,9 +6,6 @@ import homeslice
 
 NAME = "prometheus"
 
-# FIXME:
-# - persistent metrics (PVC)
-
 def app(config: pulumi.Config) -> None:
     """define resources for the homeslice/monitoring app"""
     namespace_name = config["namespace"]
