@@ -2,9 +2,9 @@
 
 import pulumi_kubernetes as kubernetes
 import pulumi
-import homeslice
 
 NAME = "prometheus"
+
 
 def app(config: pulumi.Config) -> None:
     """define resources for the homeslice/monitoring app"""
@@ -29,6 +29,7 @@ def app(config: pulumi.Config) -> None:
                         "web.route-prefix=/",
                         f"web.external-url=http://{hostname}/prometheus",
                     ],
+                    # pylint: disable=R0801
                     "ingress": {
                         "enabled": True,
                         "ingressClassName": "public",

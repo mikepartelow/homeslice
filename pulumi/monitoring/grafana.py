@@ -5,12 +5,6 @@ import pulumi
 
 NAME = "grafana"
 
-# FIXME:
-# useful dash:
-#  - https://grafana.com/grafana/dashboards/10884-aggregated-k8s-job-monitoring/
-#  - https://grafana.com/grafana/dashboards/14279-cronjobs/
-#  - https://devops.stackexchange.com/questions/14737/monitoring-kubernetes-cronjob-job-in-grafana-for-today-day-only
-#  - https://github.com/scottsbaldwin/k8s-cronjob-monitoring-talk/blob/master/k8s-cronjob-monitoring.md
 
 def app(config: pulumi.Config) -> None:
     """define resources for the homeslice/monitoring app"""
@@ -18,7 +12,7 @@ def app(config: pulumi.Config) -> None:
     chart_version = config["grafana_chart_version"]
     prometheus_datasource = config["prometheus_datasource"]
 
-    with open("monitoring/dashboards/cronjobs.json") as f:
+    with open("monitoring/dashboards/cronjobs.json", encoding="utf-8") as f:
         cronjobs_json = f.read()
 
     kubernetes.helm.v3.Release(
@@ -33,6 +27,7 @@ def app(config: pulumi.Config) -> None:
             ),
             values={
                 "adminPassword": "admin",
+                # pylint: disable=R0801
                 "ingress": {
                     "enabled": True,
                     "ingressClassName": "public",
