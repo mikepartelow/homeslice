@@ -14,8 +14,8 @@ venv-lint:
 	$(VENV_LINT)/bin/pip install --no-deps -r requirements-lint.txt -r requirements.txt
 
 lint: venv-lint
-	$(VENV_LINT)/bin/black --exclude 'venv.*' --check .
+	$(VENV_LINT)/bin/black --exclude '.venv.*' --check .
 	$(VENV_LINT)/bin/pylint --ignore-paths=venv,venv.lint "**/*.py"
 
 fmt: venv-lint
-	$(VENV_LINT)/bin/black --exclude 'venv.*' .
+	$(VENV_LINT)/bin/black --exclude '.venv.*' .
