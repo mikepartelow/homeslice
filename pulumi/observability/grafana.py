@@ -2,8 +2,10 @@
 
 import pulumi_kubernetes as kubernetes
 import pulumi
+import os
 
 NAME = "grafana"
+DASHBOARDS_ROOT = "observability/dashboards"
 
 
 def app(config: pulumi.Config) -> None:
@@ -14,8 +16,13 @@ def app(config: pulumi.Config) -> None:
     loki_datasource = config["loki_datasource"]
     prometheus_datasource = config["prometheus_datasource"]
 
-    with open("observability/dashboards/cronjobs.json", encoding="utf-8") as f:
-        cronjobs_json = f.read()
+    dashboards = []
+
+    for filename in os.listdir(DASHBOARDS_ROOT):
+        name = os.path.splitext(filename)[0]
+        filename = os.path.join(DASHBOARDS_ROOT, filename)
+        with open(filename, encoding="utf-8") as f:
+            dashboards.append((name, f.read()))
 
     kubernetes.helm.v3.Release(
         NAME,
@@ -58,9 +65,9 @@ def app(config: pulumi.Config) -> None:
                 },
                 "dashboards": {
                     "homeslice": {
-                        "cronjobs": {
-                            "json": cronjobs_json,
-                        },
+                        item[0].replace(".json", ""): {
+                            "json": item[1]
+                        } for item in dashboards
                     },
                 },
                 "datasources": {
