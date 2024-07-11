@@ -39,9 +39,11 @@ config:
     hostname: nucnuc.local
     namespace: observability
     grafana_chart_version: "8.3.2"
-    grafana_ingress_prefix: /grafana/
+    grafana_ingress_prefix: /grafana
+    loki_chart_version: "6.6.5"
+    loki_datasource: http://loki:3100
     prometheus_chart_version: "25.22.0"
-    prometheus_ingress_prefix: /prometheus/
+    prometheus_ingress_prefix: /prometheus
     prometheus_datasource: http://prometheus-server
   homeslice:namespace: homeslice
   homeslice:switches:

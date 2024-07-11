@@ -10,13 +10,15 @@ def app(config: pulumi.Config) -> None:
     """define resources for the homeslice/observability app"""
     namespace_name = config["namespace"]
     chart_version = config["grafana_chart_version"]
+    ingress_prefix = config["grafana_ingress_prefix"]
+    loki_datasource = config["loki_datasource"]
     prometheus_datasource = config["prometheus_datasource"]
 
     with open("observability/dashboards/cronjobs.json", encoding="utf-8") as f:
         cronjobs_json = f.read()
 
     kubernetes.helm.v3.Release(
-        "grafana",
+        NAME,
         kubernetes.helm.v3.ReleaseArgs(
             chart="grafana",
             name=NAME,
@@ -34,7 +36,7 @@ def app(config: pulumi.Config) -> None:
                     "annotations": {
                         "nginx.ingress.kubernetes.io/rewrite-target": "/$2",
                     },
-                    "path": "/grafana(/|$)(.*)",
+                    "path": f"{ingress_prefix}(/|$)(.*)",
                     "hosts": [""],
                 },
                 "dashboardProviders": {
@@ -71,7 +73,12 @@ def app(config: pulumi.Config) -> None:
                                 "url": prometheus_datasource,
                                 "access": "proxy",
                                 "isDefault": "true",
-                            }
+                            },
+                            {
+                                "name": "Loki",
+                                "type": "loki",
+                                "url": loki_datasource,
+                            },
                         ],
                     },
                 },
