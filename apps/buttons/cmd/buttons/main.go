@@ -11,7 +11,7 @@ import (
 const Port = 8000
 
 func main() {
-	logger := slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: slog.LevelDebug}))
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{AddSource: true, Level: slog.LevelInfo}))
 	server := buttons.NewServer(logger, mustGetClocktimeUrl(logger))
 	logger.Info("Listening", "port", Port)
 	err := http.ListenAndServe(":"+strconv.Itoa(Port), server)
