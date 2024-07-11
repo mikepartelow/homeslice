@@ -15,6 +15,7 @@ def app(config: pulumi.Config) -> None:
     kubernetes.helm.v3.Release(
         NAME,
         kubernetes.helm.v3.ReleaseArgs(
+            # pylint: disable=R0801
             chart="promtail",
             name=NAME,
             namespace=namespace_name,

@@ -33,7 +33,7 @@ def app(config: pulumi.Config) -> None:
                                 "from": "2024-01-01",
                                 "store": "tsdb",
                                 "index": {"prefix": "loki_index_", "period": "24h"},
-                                "object_store": "filesystem",  # we're storing on filesystem so there's no real persistence here.
+                                "object_store": "filesystem",  # Warning: no persistence
                                 "schema": "v13",
                             }
                         ]

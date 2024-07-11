@@ -1,8 +1,8 @@
 """Resources for the homeslice/observability app."""
 
+import os
 import pulumi_kubernetes as kubernetes
 import pulumi
-import os
 
 NAME = "grafana"
 DASHBOARDS_ROOT = "observability/dashboards"
@@ -27,6 +27,7 @@ def app(config: pulumi.Config) -> None:
     kubernetes.helm.v3.Release(
         NAME,
         kubernetes.helm.v3.ReleaseArgs(
+            # pylint: disable=R0801
             chart="grafana",
             name=NAME,
             namespace=namespace_name,
@@ -65,9 +66,8 @@ def app(config: pulumi.Config) -> None:
                 },
                 "dashboards": {
                     "homeslice": {
-                        item[0].replace(".json", ""): {
-                            "json": item[1]
-                        } for item in dashboards
+                        item[0].replace(".json", ""): {"json": item[1]}
+                        for item in dashboards
                     },
                 },
                 "datasources": {
