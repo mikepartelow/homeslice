@@ -1,4 +1,4 @@
-"""Resources for the homeslice/monitoring app."""
+"""Resources for the homeslice/observability app."""
 
 import pulumi_kubernetes as kubernetes
 import pulumi
@@ -7,7 +7,7 @@ NAME = "prometheus"
 
 
 def app(config: pulumi.Config) -> None:
-    """define resources for the homeslice/monitoring app"""
+    """define resources for the homeslice/observability app"""
     namespace_name = config["namespace"]
     chart_version = config["prometheus_chart_version"]
     hostname = config["hostname"]

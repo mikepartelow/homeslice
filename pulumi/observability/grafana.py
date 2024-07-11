@@ -1,4 +1,4 @@
-"""Resources for the homeslice/monitoring app."""
+"""Resources for the homeslice/observability app."""
 
 import pulumi_kubernetes as kubernetes
 import pulumi
@@ -7,12 +7,12 @@ NAME = "grafana"
 
 
 def app(config: pulumi.Config) -> None:
-    """define resources for the homeslice/monitoring app"""
+    """define resources for the homeslice/observability app"""
     namespace_name = config["namespace"]
     chart_version = config["grafana_chart_version"]
     prometheus_datasource = config["prometheus_datasource"]
 
-    with open("monitoring/dashboards/cronjobs.json", encoding="utf-8") as f:
+    with open("observability/dashboards/cronjobs.json", encoding="utf-8") as f:
         cronjobs_json = f.read()
 
     kubernetes.helm.v3.Release(
