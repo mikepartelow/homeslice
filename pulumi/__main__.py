@@ -8,7 +8,7 @@ from buttons import buttons
 from chime import chime
 from clocktime import clocktime
 from homebridge import homebridge
-from observability import grafana, loki, prometheus
+from observability import grafana, loki, prometheus, promtail
 from switches import switches
 
 config = pulumi.Config("homeslice")
@@ -39,6 +39,7 @@ if cfg := config.get_object("observability"):
     grafana.app(cfg)
     loki.app(cfg)
     prometheus.app(cfg)
+    promtail.app(cfg)
 
 if cfg := config.get_object("switches"):
     switches.app(cfg)

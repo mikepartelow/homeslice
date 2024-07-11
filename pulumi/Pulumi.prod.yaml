@@ -42,9 +42,11 @@ config:
     grafana_ingress_prefix: /grafana
     loki_chart_version: "6.6.5"
     loki_datasource: http://loki:3100
+    loki_push_url: http://loki:3100/api/v1/push
     prometheus_chart_version: "25.22.0"
     prometheus_ingress_prefix: /prometheus
     prometheus_datasource: http://prometheus-server
+    promtail_chart_version: "6.16.3"
   homeslice:namespace: homeslice
   homeslice:switches:
     container_port: 8000
