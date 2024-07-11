@@ -35,6 +35,18 @@ config:
     image: ghcr.io/mikepartelow/homeslice/clocktime:main.20240211-180456.c7941cd@sha256:f3cf5127294c735059b93f3809718ad3f503bc91bf79149e64364968e95133c3
     ingress_prefix: /api/v0/clocktime/
     location: America/Los_Angeles
+  homeslice:observability:
+    hostname: nucnuc.local
+    namespace: observability
+    grafana_chart_version: "8.3.2"
+    grafana_ingress_prefix: /grafana
+    loki_chart_version: "6.6.5"
+    loki_datasource: http://loki:3100
+    loki_push_url: http://loki:3100/api/v1/push
+    prometheus_chart_version: "25.22.0"
+    prometheus_ingress_prefix: /prometheus
+    prometheus_datasource: http://prometheus-server
+    promtail_chart_version: "6.16.3"
   homeslice:namespace: homeslice
   homeslice:switches:
     container_port: 8000

@@ -1,6 +1,6 @@
 .envrc
 *.pyc
-/venv
-/venv.lint
+/.venv
+/.venv.lint
 .vscode
 /homeslice_secrets/*.py
