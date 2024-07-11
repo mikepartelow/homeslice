@@ -1,4 +1,4 @@
-"""Resources for the homeslice/monitoring app."""
+"""Resources for the homeslice/observability app."""
 
 import pulumi_kubernetes as kubernetes
 import pulumi
@@ -7,13 +7,14 @@ NAME = "prometheus"
 
 
 def app(config: pulumi.Config) -> None:
-    """define resources for the homeslice/monitoring app"""
+    """define resources for the homeslice/observability app"""
     namespace_name = config["namespace"]
     chart_version = config["prometheus_chart_version"]
+    ingress_prefix = config["prometheus_ingress_prefix"]
     hostname = config["hostname"]
 
     kubernetes.helm.v3.Release(
-        "prometheus",
+        NAME,
         kubernetes.helm.v3.ReleaseArgs(
             chart="prometheus",
             name=NAME,
@@ -37,7 +38,7 @@ def app(config: pulumi.Config) -> None:
                             "nginx.ingress.kubernetes.io/rewrite-target": "/$2",
                         },
                         "hosts": [""],
-                        "path": "/prometheus(/|$)(.*)",
+                        "path": f"{ingress_prefix}(/|$)(.*)",
                     },
                 },
                 "prometheus-pushgateway": {

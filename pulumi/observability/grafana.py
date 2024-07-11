@@ -1,23 +1,33 @@
-"""Resources for the homeslice/monitoring app."""
+"""Resources for the homeslice/observability app."""
 
+import os
 import pulumi_kubernetes as kubernetes
 import pulumi
 
 NAME = "grafana"
+DASHBOARDS_ROOT = "observability/dashboards"
 
 
 def app(config: pulumi.Config) -> None:
-    """define resources for the homeslice/monitoring app"""
+    """define resources for the homeslice/observability app"""
     namespace_name = config["namespace"]
     chart_version = config["grafana_chart_version"]
+    ingress_prefix = config["grafana_ingress_prefix"]
+    loki_datasource = config["loki_datasource"]
     prometheus_datasource = config["prometheus_datasource"]
 
-    with open("monitoring/dashboards/cronjobs.json", encoding="utf-8") as f:
-        cronjobs_json = f.read()
+    dashboards = []
+
+    for filename in os.listdir(DASHBOARDS_ROOT):
+        name = os.path.splitext(filename)[0]
+        filename = os.path.join(DASHBOARDS_ROOT, filename)
+        with open(filename, encoding="utf-8") as f:
+            dashboards.append((name, f.read()))
 
     kubernetes.helm.v3.Release(
-        "grafana",
+        NAME,
         kubernetes.helm.v3.ReleaseArgs(
+            # pylint: disable=R0801
             chart="grafana",
             name=NAME,
             namespace=namespace_name,
@@ -34,7 +44,7 @@ def app(config: pulumi.Config) -> None:
                     "annotations": {
                         "nginx.ingress.kubernetes.io/rewrite-target": "/$2",
                     },
-                    "path": "/grafana(/|$)(.*)",
+                    "path": f"{ingress_prefix}(/|$)(.*)",
                     "hosts": [""],
                 },
                 "dashboardProviders": {
@@ -56,9 +66,8 @@ def app(config: pulumi.Config) -> None:
                 },
                 "dashboards": {
                     "homeslice": {
-                        "cronjobs": {
-                            "json": cronjobs_json,
-                        },
+                        item[0].replace(".json", ""): {"json": item[1]}
+                        for item in dashboards
                     },
                 },
                 "datasources": {
@@ -71,7 +80,12 @@ def app(config: pulumi.Config) -> None:
                                 "url": prometheus_datasource,
                                 "access": "proxy",
                                 "isDefault": "true",
-                            }
+                            },
+                            {
+                                "name": "Loki",
+                                "type": "loki",
+                                "url": loki_datasource,
+                            },
                         ],
                     },
                 },
