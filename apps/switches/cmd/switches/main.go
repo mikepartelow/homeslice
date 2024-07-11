@@ -78,7 +78,7 @@ func mustMakeLogger() *slog.Logger {
 		}
 	}
 
-	h := slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: level})
+	h := slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{AddSource: true, Level: level})
 	return slog.New(h)
 }
 
