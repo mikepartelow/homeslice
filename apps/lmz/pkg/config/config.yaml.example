@@ -1,0 +1,7 @@
+auth:
+    username: your@email.com
+    password: yaddayadda
+    # client_id and client_secret are hardcoded in the La Marzocco app and can be found online
+    client_id: "https://community.home-assistant.io/t/la-marzocco-gs-3-linea-mini-support/203581/2"
+    client_secret: "https://github.com/rccoleman/lmdirect/blob/master/lmdirect/connection.py"
+serial: your-serial
