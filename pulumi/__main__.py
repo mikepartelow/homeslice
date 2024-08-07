@@ -8,6 +8,7 @@ from buttons import buttons
 from chime import chime
 from clocktime import clocktime
 from homebridge import homebridge
+from lmz import lmz
 from observability import grafana, loki, prometheus, promtail
 from switches import switches
 
@@ -33,6 +34,9 @@ if cfg := config.get_object("clocktime"):
 
 if cfg := config.get_object("homebridge"):
     homebridge.app(cfg)
+
+if cfg := config.get_object("lmz"):
+    lmz.app(cfg)
 
 if cfg := config.get_object("observability"):
     homeslice.namespace(cfg["namespace"])

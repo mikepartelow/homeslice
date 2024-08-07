@@ -3,12 +3,12 @@ package config
 import (
 	"bytes"
 	_ "embed"
+	"os"
+	"os/user"
+	"path"
 
 	"github.com/goccy/go-yaml"
 )
-
-//go:embed config.yaml
-var configYaml []byte
 
 // Config holds auth credentials and machine serial number
 type Config struct {
@@ -23,9 +23,18 @@ type Config struct {
 
 // MustRead returns a Config initialized from embedded config, or panics.
 func MustRead() *Config {
-	var config Config
+	u, err := user.Current()
+	if err != nil {
+		panic(err)
+	}
 
-	err := yaml.NewDecoder(bytes.NewReader(configYaml)).Decode(&config)
+	configYaml, err := os.ReadFile(path.Join(u.HomeDir, ".config/lmz/config.yaml"))
+	if err != nil {
+		panic(err)
+	}
+
+	var config Config
+	err = yaml.NewDecoder(bytes.NewReader(configYaml)).Decode(&config)
 	if err != nil {
 		panic(err)
 	}
