@@ -39,6 +39,7 @@ config:
     image: registry.localdomain:32000/lmz:20240806_222343@sha256:998c0dfe5ba7c462cafcfac2aa0ba4e61a6d9fce2eec69cb2e7f8b8b49d526bf
     container_port: 8000
     ingress_prefix: /api/v0/lmz/
+    lmz_yaml_path: /home/nonroot/.config/lmz/config.yaml
   homeslice:observability:
     hostname: nucnuc.local
     namespace: observability

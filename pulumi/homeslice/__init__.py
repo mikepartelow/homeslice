@@ -10,6 +10,7 @@ from .ingress import *
 from .metadata import *
 from .namespace import *
 from .port import *
+from .secret import *
 from .service import *
 
 HOMESLICE = "homeslice"
