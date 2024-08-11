@@ -57,4 +57,15 @@ def app(config: pulumi.Config) -> None:
 
     homeslice.service(NAME)
 
-    homeslice.ingress(NAME, [ingress_prefix])
+    homeslice.ingress(
+        NAME,
+        [ingress_prefix],
+        path_type="ImplementationSpecific",
+        metadata=homeslice.metadata(
+            NAME,
+            annotations={
+                "nginx.ingress.kubernetes.io/use-regex": "true",
+                "nginx.ingress.kubernetes.io/rewrite-target": "/$2",
+            },
+        ),
+    )

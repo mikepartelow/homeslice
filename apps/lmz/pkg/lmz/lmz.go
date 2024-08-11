@@ -12,8 +12,8 @@ import (
 
 const (
 	lmzGW     = "https://gw-lmz.lamarzocco.io"
-	statusOff = "StandBy"
-	statusOn  = "BrewingMode"
+	StatusOff = "StandBy"
+	StatusOn  = "BrewingMode"
 )
 
 // LMZ communicates with a La Marzocco Linea, and possibly other La Marzocco machines.
@@ -78,12 +78,12 @@ func (l *LMZ) Status() (*Status, error) {
 
 // TurnOn sets the machine to BrewingMode, AKA "on"
 func (l *LMZ) TurnOn() error {
-	return l.setStatus(statusOn)
+	return l.setStatus(StatusOn)
 }
 
 // TurnOff sets the machine to StandBy, AKA "off"
 func (l *LMZ) TurnOff() error {
-	return l.setStatus(statusOff)
+	return l.setStatus(StatusOff)
 }
 
 func (l *LMZ) setStatus(status string) error {

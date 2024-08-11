@@ -33,25 +33,25 @@ func main() {
 	op := MustGetOp()
 
 	c := config.MustRead()
-	t := must(auth.GetToken(c))
-
-	l := lmz.New(c, t)
 
 	var output string
 	switch op {
 	case On:
+		l := lmz.New(c, must(auth.GetToken(c)))
 		check(l.TurnOn())
 		output = "ON"
 	case Off:
+		l := lmz.New(c, must(auth.GetToken(c)))
 		check(l.TurnOff())
 		output = "OFF"
 	case Status:
+		l := lmz.New(c, must(auth.GetToken(c)))
 		status := must(l.Status())
 		localTime := status.Received.Local()
 		output = "Status as of " + localTime.String() + ": " + status.MachineStatus
 	case Serve:
-		handler := makeHandler(logger, l)
-		http.HandleFunc("PUT /", handler)
+		handler := makeHandler(logger, c)
+		http.HandleFunc("GET /{op}", handler)
 
 		logger.Info("Listening", "port", Port)
 		if err := http.ListenAndServe(":"+strconv.Itoa(Port), nil); err != nil {
@@ -64,12 +64,14 @@ func main() {
 	fmt.Println(output)
 }
 
-func makeHandler(logger *slog.Logger, l *lmz.LMZ) func(http.ResponseWriter, *http.Request) {
+func makeHandler(logger *slog.Logger, c *config.Config) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		logger.Debug(r.URL.Path, "method", r.Method)
+		op := strings.ToLower(r.PathValue("op"))
+		logger.Debug(r.URL.Path, "method", r.Method, "op", op)
 
-		op := strings.ToLower(r.FormValue("op"))
-		logger.Debug(r.URL.Path, "op", op)
+		// auth tokens are relatively short lived, so we get one for every request
+		// TODO: determine the lifespan of a token and get one only when needed
+		l := lmz.New(c, must(auth.GetToken(c)))
 
 		switch op {
 		case "on":
@@ -79,6 +81,22 @@ func makeHandler(logger *slog.Logger, l *lmz.LMZ) func(http.ResponseWriter, *htt
 			}
 		case "off":
 			if err := l.TurnOff(); err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+		case "status":
+			status, err := l.Status()
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+			if status.MachineStatus == lmz.StatusOn {
+				logger.Debug("on")
+				_, _ = w.Write([]byte("ON"))
+			} else if status.MachineStatus == lmz.StatusOff {
+				logger.Debug("off")
+				_, _ = w.Write([]byte("OFF"))
+			} else {
 				w.WriteHeader(http.StatusInternalServerError)
 				return
 			}
@@ -123,7 +141,7 @@ func must[T any](thing T, err error) T {
 }
 
 func mustMakeLogger() *slog.Logger {
-	level := slog.LevelInfo
+	level := slog.LevelDebug
 	if v := os.Getenv("LOG_LEVEL"); v != "" {
 		switch strings.ToLower(v) {
 		case "debug":

@@ -2,7 +2,7 @@ FROM golang:1.22.6@sha256:87bbc3e8e2c7cb625d09ed4c3ae4663e3ba4e64c6e59797a7ec1e3
 
 WORKDIR /build
 
-COPY go.mod go.sum .
+COPY go.mod go.sum ./
 RUN go mod download
 
 COPY . .
