@@ -39,7 +39,7 @@ if cfg := config.get_object("lmz"):
     lmz.app(cfg)
 
 if cfg := config.get_object("observability"):
-    homeslice.namespace(cfg["namespace"])
+    homeslice.namespace(cfg["namespace"])  # pylint: disable=E1136
     grafana.app(cfg)
     loki.app(cfg)
     prometheus.app(cfg)
