@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"log/slog"
+	"mp/lmz/pkg/auth"
 	"mp/lmz/pkg/config"
 	"net/http"
 	"net/url"
@@ -18,15 +20,17 @@ const (
 
 // LMZ communicates with a La Marzocco Linea, and possibly other La Marzocco machines.
 type LMZ struct {
-	c     *config.Config
-	token string
+	c          *config.Config
+	logger     *slog.Logger
+	token      string
+	newTokenAt time.Time
 }
 
 // New returns a new LMZ client
-func New(c *config.Config, token string) *LMZ {
+func New(c *config.Config, l *slog.Logger) *LMZ {
 	return &LMZ{
-		c:     c,
-		token: token,
+		c:      c,
+		logger: l,
 	}
 }
 
@@ -40,6 +44,10 @@ type Status struct {
 
 // Status returns the status of the machine, or an error.
 func (l *LMZ) Status() (*Status, error) {
+	if err := l.auth(); err != nil {
+		return nil, err
+	}
+
 	endpoint, err := url.JoinPath(lmzGW, fmt.Sprintf("/v1/home/machines/%s/status", l.c.Serial))
 	if err != nil {
 		return nil, fmt.Errorf("error constructing URL: %w", err)
@@ -87,6 +95,10 @@ func (l *LMZ) TurnOff() error {
 }
 
 func (l *LMZ) setStatus(status string) error {
+	if err := l.auth(); err != nil {
+		return err
+	}
+
 	endpoint, err := url.JoinPath(lmzGW, fmt.Sprintf("/v1/home/machines/%s/status", l.c.Serial))
 	if err != nil {
 		return fmt.Errorf("error constructing URL: %w", err)
@@ -122,5 +134,17 @@ func (l *LMZ) setStatus(status string) error {
 		return fmt.Errorf("API error: %s", resp.Status)
 	}
 
+	return nil
+}
+
+func (l *LMZ) auth() error {
+	if l.token == "" || time.Now().After(l.newTokenAt) {
+		l.logger.Warn("fetching auth token")
+		token, newTokenAt, err := auth.GetToken(l.c)
+		if err != nil {
+			return err
+		}
+		l.token, l.newTokenAt = token, newTokenAt
+	}
 	return nil
 }

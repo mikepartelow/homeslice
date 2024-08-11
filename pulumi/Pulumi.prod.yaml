@@ -36,7 +36,7 @@ config:
     ingress_prefix: /api/v0/clocktime/
     location: America/Los_Angeles
   homeslice:lmz:
-    image: registry.localdomain:32000/lmz:20240811_084004
+    image: registry.localdomain:32000/lmz:20240811_090259
     container_port: 8000
     ingress_prefix: /(api/v0/lmz)/(.*)$
     lmz_yaml_path: /home/nonroot/.config/lmz/config.yaml

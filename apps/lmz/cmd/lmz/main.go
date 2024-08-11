@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"mp/lmz/pkg/auth"
 	"mp/lmz/pkg/config"
 	"mp/lmz/pkg/lmz"
 	"net/http"
@@ -33,24 +32,22 @@ func main() {
 	op := MustGetOp()
 
 	c := config.MustRead()
+	l := lmz.New(c, logger)
 
 	var output string
 	switch op {
 	case On:
-		l := lmz.New(c, must(auth.GetToken(c)))
 		check(l.TurnOn())
 		output = "ON"
 	case Off:
-		l := lmz.New(c, must(auth.GetToken(c)))
 		check(l.TurnOff())
 		output = "OFF"
 	case Status:
-		l := lmz.New(c, must(auth.GetToken(c)))
 		status := must(l.Status())
 		localTime := status.Received.Local()
 		output = "Status as of " + localTime.String() + ": " + status.MachineStatus
 	case Serve:
-		handler := makeHandler(logger, c)
+		handler := makeHandler(logger, l)
 		http.HandleFunc("GET /{op}", handler)
 
 		logger.Info("Listening", "port", Port)
@@ -64,14 +61,10 @@ func main() {
 	fmt.Println(output)
 }
 
-func makeHandler(logger *slog.Logger, c *config.Config) func(http.ResponseWriter, *http.Request) {
+func makeHandler(logger *slog.Logger, l *lmz.LMZ) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		op := strings.ToLower(r.PathValue("op"))
 		logger.Debug(r.URL.Path, "method", r.Method, "op", op)
-
-		// auth tokens are relatively short lived, so we get one for every request
-		// TODO: determine the lifespan of a token and get one only when needed
-		l := lmz.New(c, must(auth.GetToken(c)))
 
 		switch op {
 		case "on":
