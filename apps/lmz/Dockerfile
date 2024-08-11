@@ -2,7 +2,7 @@ FROM golang:1.22.6@sha256:87bbc3e8e2c7cb625d09ed4c3ae4663e3ba4e64c6e59797a7ec1e3
 
 WORKDIR /build
 
-COPY go.mod go.sum .
+COPY go.mod go.sum ./
 RUN go mod download
 
 COPY . .
@@ -13,8 +13,8 @@ WORKDIR /app
 
 FROM gcr.io/distroless/static:nonroot@sha256:112a87f19e83c83711cc81ce8ed0b4d79acd65789682a6a272df57c4a0858534 AS prod
 
-COPY --from=build /build/switches /switches
+COPY --from=build /build/lmz /lmz
 
 USER nonroot
 
-ENTRYPOINT ["/switches"]
+ENTRYPOINT ["/lmz"]
