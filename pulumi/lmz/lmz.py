@@ -46,7 +46,7 @@ def app(config: pulumi.Config) -> None:
 
     ports = [homeslice.port(container_port)]
 
-    homeslice.deployment(
+    homeslice.deployment(  # pylint: disable=R0801
         NAME,
         image,
         args=["serve"],
