@@ -85,10 +85,10 @@ func makeHandler(logger *slog.Logger, l *lmz.LMZ) func(http.ResponseWriter, *htt
 			}
 			if status.MachineStatus == lmz.StatusOn {
 				logger.Debug("on")
-				_, _ = w.Write([]byte("ON"))
+				_, _ = w.Write([]byte("1"))
 			} else if status.MachineStatus == lmz.StatusOff {
 				logger.Debug("off")
-				_, _ = w.Write([]byte("OFF"))
+				_, _ = w.Write([]byte("0"))
 			} else {
 				w.WriteHeader(http.StatusInternalServerError)
 				return

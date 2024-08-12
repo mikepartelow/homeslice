@@ -20,7 +20,7 @@ The following Plugin Config works nicely. Be sure to use `no` for `switchHandlin
 {
     "accessory": "Http",
     "name": "LMZ",
-    "switchHandling": "no",
+    "switchHandling": "yes",
     "http_method": "GET",
     "on_url": "http://nucnuc.local/api/v0/lmz/ON",
     "off_url": "http://nucnuc.local/api/v0/lmz/OFF",
