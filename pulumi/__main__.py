@@ -11,6 +11,7 @@ from homebridge import homebridge
 from lmz import lmz
 from observability import grafana, loki, prometheus, promtail
 from switches import switches
+from pulumi_config import HomeBridgeConfig
 
 config = pulumi.Config("homeslice")
 name = config.require("namespace")
@@ -33,7 +34,7 @@ if cfg := config.get_object("clocktime"):
     clocktime.app(cfg)
 
 if cfg := config.get_object("homebridge"):
-    homebridge.app(cfg)
+    homebridge.app(HomeBridgeConfig(**dict(cfg)))
 
 if cfg := config.get_object("lmz"):
     lmz.app(cfg)
