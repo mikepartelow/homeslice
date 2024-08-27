@@ -2,12 +2,13 @@
 
 import pulumi_kubernetes as kubernetes
 import homeslice
-import pulumi_config
+import homeslice_config
 
 NAME = "homebridge"
 PORT = 8581
 
-def app(config: pulumi_config.HomeBridgeConfig) -> None:
+
+def app(config: homeslice_config.HomeBridgeConfig) -> None:
     """define resources for the homeslice/homebridge app"""
     image = config.image
     redirect_host = config.redirect_host

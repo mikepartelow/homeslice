@@ -36,7 +36,7 @@ config:
     ingress_prefix: /api/v0/clocktime/
     location: America/Los_Angeles
   homeslice:lmz:
-    image: ghcr.io/mikepartelow/homeslice/lmz:main.20240811-170229.6402cf5@sha256:6a6b24e3fc408ec50b9c1ea636841c9297edb84e5e4e944af1df038c2761b457
+    image: ghcr.io/mikepartelow/homeslice/lmz:main.20240812-035613.298ef89@sha256:dd60eb2d93514c4fcd315376e767217da80c4b580d915156cea75444db9a22d4
     container_port: 8000
     ingress_prefix: /(api/v0/lmz)/(.*)$
     lmz_yaml_path: /home/nonroot/.config/lmz/config.yaml
