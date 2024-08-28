@@ -11,6 +11,7 @@ from homebridge import homebridge
 from lmz import lmz
 from observability import grafana, loki, prometheus, promtail
 from switches import switches
+from sonos import sonos
 
 config = pulumi.Config("homeslice")
 name = config.require("namespace")
@@ -44,6 +45,9 @@ if cfg := config.get_object("observability"):
     loki.app(cfg)
     prometheus.app(cfg)
     promtail.app(cfg)
+
+if cfg := config.get_object("sonos"):
+    sonos.app(cfg)
 
 if cfg := config.get_object("switches"):
     switches.app(cfg)

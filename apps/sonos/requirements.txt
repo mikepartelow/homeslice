@@ -1,0 +1,12 @@
+appdirs==1.4.4
+certifi==2024.7.4
+charset-normalizer==3.3.1
+idna==3.7
+ifaddr==0.2.0
+lxml==4.9.3
+requests==2.32.2
+setuptools==70.0.0
+soco==0.29.1
+urllib3==2.2.2
+wheel==0.41.2
+xmltodict==0.13.0

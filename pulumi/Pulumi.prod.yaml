@@ -78,3 +78,7 @@ config:
     image: ghcr.io/homebridge/homebridge:2024-05-02@sha256:c13910618a3dbe6ed1afd01def54f800a10228ca1a6e540bb302ab56762fbd66
     redirect_host: nucnuc
     redirect_prefix: /homebridge
+  # homeslice:sonos:
+  #   image: registry.localdomain:32000/sonos:20240827_183915
+  #   container_port: 8000
+  #   ingress_prefix: /(api/v0/sonos/)(.*)$
