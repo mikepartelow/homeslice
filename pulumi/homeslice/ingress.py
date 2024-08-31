@@ -18,6 +18,7 @@ def ingress(
         name,
         metadata=metadata,
         spec=kubernetes.networking.v1.IngressSpecArgs(
+            ingress_class_name="public",
             rules=[
                 kubernetes.networking.v1.IngressRuleArgs(
                     http=kubernetes.networking.v1.HTTPIngressRuleValueArgs(
