@@ -1,15 +1,15 @@
 """Resources for the Unifi auxiliary support."""
 
-import pulumi
+import homeslice_config
 import homeslice
 
 NAME = "unifi"
 
 
-def app(config: pulumi.Config) -> None:
+def app(config: homeslice_config.LmzConfig) -> None:
     """define resources for the unifi/unifi app"""
-    redirect_url = config["redirect_url"]
-    redirect_prefix = config["redirect_prefix"]
+    redirect_url = config.redirect_url
+    redirect_prefix = config.redirect_prefix
 
     homeslice.ingress(
         NAME,

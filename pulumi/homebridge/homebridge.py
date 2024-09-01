@@ -1,18 +1,18 @@
 """Resources for the a Homebridge instance."""
 
 import pulumi_kubernetes as kubernetes
-import pulumi
 import homeslice
+import homeslice_config
 
 NAME = "homebridge"
 PORT = 8581
 
 
-def app(config: pulumi.Config) -> None:
+def app(config: homeslice_config.HomeBridgeConfig) -> None:
     """define resources for the homeslice/homebridge app"""
-    image = config["image"]
-    redirect_host = config["redirect_host"]
-    redirect_prefix = config["redirect_prefix"]
+    image = config.image
+    redirect_host = config.redirect_host
+    redirect_prefix = config.redirect_prefix
 
     ports = [
         kubernetes.core.v1.ContainerPortArgs(

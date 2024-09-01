@@ -11,6 +11,7 @@ from homebridge import homebridge
 from lmz import lmz
 from observability import grafana, loki, prometheus, promtail
 from switches import switches
+from homeslice_config import HomeBridgeConfig, LmzConfig, UnifiConfig
 from unifi import unifi
 
 config = pulumi.Config("homeslice")
@@ -34,10 +35,10 @@ if cfg := config.get_object("clocktime"):
     clocktime.app(cfg)
 
 if cfg := config.get_object("homebridge"):
-    homebridge.app(cfg)
+    homebridge.app(HomeBridgeConfig(**dict(cfg)))
 
 if cfg := config.get_object("lmz"):
-    lmz.app(cfg)
+    lmz.app(LmzConfig(**dict(cfg)))
 
 if cfg := config.get_object("observability"):
     homeslice.namespace(cfg["namespace"])  # pylint: disable=E1136
@@ -50,4 +51,4 @@ if cfg := config.get_object("switches"):
     switches.app(cfg)
 
 if cfg := config.get_object("unifi"):
-    unifi.app(cfg)
+    unifi.app(UnifiConfig(**dict(cfg)))
