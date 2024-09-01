@@ -11,7 +11,8 @@ from homebridge import homebridge
 from lmz import lmz
 from observability import grafana, loki, prometheus, promtail
 from switches import switches
-from homeslice_config import HomeBridgeConfig, LmzConfig
+from homeslice_config import HomeBridgeConfig, LmzConfig, UnifiConfig
+from unifi import unifi
 
 config = pulumi.Config("homeslice")
 name = config.require("namespace")
@@ -48,3 +49,6 @@ if cfg := config.get_object("observability"):
 
 if cfg := config.get_object("switches"):
     switches.app(cfg)
+
+if cfg := config.get_object("unifi"):
+    unifi.app(UnifiConfig(**dict(cfg)))

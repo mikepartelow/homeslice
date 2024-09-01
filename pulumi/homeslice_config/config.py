@@ -19,3 +19,10 @@ class LmzConfig(BaseModel):
     container_port: int
     lmz_yaml_path: str
     ingress_prefix: Optional[str]
+
+
+class UnifiConfig(BaseModel):
+    """Unifi Config"""
+
+    redirect_prefix: str
+    redirect_url: str

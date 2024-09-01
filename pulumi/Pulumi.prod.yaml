@@ -78,3 +78,6 @@ config:
     image: ghcr.io/homebridge/homebridge:2024-05-02@sha256:c13910618a3dbe6ed1afd01def54f800a10228ca1a6e540bb302ab56762fbd66
     redirect_host: nucnuc
     redirect_prefix: /homebridge
+  homeslice:unifi:
+    redirect_prefix: /unifi
+    redirect_url: https://nucnuc.local:8443

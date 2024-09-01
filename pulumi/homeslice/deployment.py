@@ -24,6 +24,21 @@ def deployment(
     for a in ("args", "command", "env_from", "ports", "volume_mounts", "volumes"):
         locals()[a] = locals()[a] or []
 
+    tolerations = [
+        kubernetes.core.v1.TolerationArgs(
+            key="node.kubernetes.io/unreachable",
+            operator="Exists",
+            effect="NoExecute",
+            toleration_seconds=2,
+        ),
+        kubernetes.core.v1.TolerationArgs(
+            key="node.kubernetes.io/not-ready",
+            operator="Exists",
+            effect="NoExecute",
+            toleration_seconds=2,
+        ),
+    ]
+
     return kubernetes.apps.v1.Deployment(
         name,
         metadata=metadata,
@@ -47,8 +62,9 @@ def deployment(
                             env_from=env_from,
                             ports=ports,
                             volume_mounts=volume_mounts,
-                        )
+                        ),
                     ],
+                    tolerations=tolerations,
                     volumes=volumes,
                 ),
             ),
