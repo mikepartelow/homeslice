@@ -18,6 +18,7 @@ def app(config: homeslice_config.BackupTodoistConfig) -> None:
     schedule = config.schedule
 
     config.git_clone_url = BACKUP_TODOIST_SECRETS.TODOIST_BACKUP_GIT_CLONE_URL
+    config.ssh_private_key = BACKUP_TODOIST_SECRETS.SSH_PRIVATE_KEY
     btg = homeslice.BackupToGithub(NAME, config)
 
     homeslice.configmap(
