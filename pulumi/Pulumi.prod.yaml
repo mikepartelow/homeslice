@@ -7,10 +7,10 @@ config:
       github.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl
     schedule: 0 1 * * *
   homeslice:backup_todoist:
-    author_email: github@mikepartelow.com
-    author_name: Mike Partelow
+    git_author_email: github@mikepartelow.com
+    git_author_name: Mike Partelow
     image: ghcr.io/mikepartelow/homeslice/backup-todoist:main.20240211-180513.c7941cd@sha256:dea95f64a74a69cd2336d03ee8ffcca51590ec8e9d21fbcb460181bfa523ccd9
-    known_hosts: |
+    ssh_known_hosts: |
       github.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl
     schedule: 0 0 * * *
   homeslice:buttons:

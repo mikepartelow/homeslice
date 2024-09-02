@@ -11,7 +11,7 @@ from homebridge import homebridge
 from lmz import lmz
 from observability import grafana, loki, prometheus, promtail
 from switches import switches
-from homeslice_config import HomeBridgeConfig, LmzConfig, UnifiConfig
+from homeslice_config import BackupTodoistConfig, HomeBridgeConfig, LmzConfig, UnifiConfig
 from unifi import unifi
 
 config = pulumi.Config("homeslice")
@@ -23,7 +23,7 @@ if cfg := config.get_object("backup_tidal"):
     backup_tidal.app(cfg)
 
 if cfg := config.get_object("backup_todoist"):
-    backup_todoist.app(cfg)
+    backup_todoist.app(BackupTodoistConfig(**dict(cfg)))
 
 if cfg := config.get_object("buttons"):
     buttons.app(cfg)

@@ -4,33 +4,32 @@ import pulumi_kubernetes as kubernetes
 import homeslice
 
 
-class GithubBackuper:
+class BackupToGithub:
     def __init__(self, app_name: str, config: homeslice_config.GithubBackupConfig):
         self.app_name = app_name
         self.config = config
 
         self.ssh_secret_name = f"{self.app_name}-ssh"
-        self.known_hosts_name = f"{self.app_name}-known-hosts"
+        self.ssh_known_hosts_name = f"{self.app_name}-known-hosts"
 
     @property
     def configmap_items(self) -> dict:
         return {
-            self.config.private_key_path_env_var_name: self.config.private_key_path,
-            self.config.author_name_env_var_name: self.config.author_name,
-            self.config.author_email_env_var_name: self.config.author_email,
-            self.config.known_hosts_path_env_var_name: self.config.known_hosts_path,
+            self.config.ssh_private_key_path_env_var_name: self.config.ssh_private_key_path,
+            self.config.ssh_known_hosts_path_env_var_name: self.config.ssh_known_hosts_path,
             str(
-                Path(self.config.known_hosts_path).name
+                Path(self.config.ssh_known_hosts_path).name
             ): f"{self.app_name}-known-hosts",
+            self.config.git_author_name_env_var_name: self.config.git_author_name,
+            self.config.git_author_email_env_var_name: self.config.git_author_email,
         }
 
     @property
     def secret_items(self) -> dict:
-        return (
-            {
-                self.git_clone_url_env_var_name: self.git_clone_url,  # secret
-            },
-        )
+        return {
+                self.config.git_clone_url_env_var_name: self.config.git_clone_url,  # secret
+            }
+
 
     @property
     def ssh_secret(self) -> dict:
@@ -48,12 +47,12 @@ class GithubBackuper:
         return [
             kubernetes.core.v1.VolumeMountArgs(
                 name=self.ssh_secret_name,
-                mount_path=str(Path(self.config.private_key_path).parent),
+                mount_path=str(Path(self.config.ssh_private_key_path).parent),
                 read_only=True,
             ),
             kubernetes.core.v1.VolumeMountArgs(
-                name=self.known_hosts_name,
-                mount_path=str(Path(self.config.private_key_path).parent),
+                name=self.ssh_known_hosts_name,
+                mount_path=str(Path(self.config.ssh_known_hosts_path).parent),
                 read_only=True,
             ),
         ]
@@ -69,14 +68,14 @@ class GithubBackuper:
                 ),
             ),
             kubernetes.core.v1.VolumeArgs(
-                name=self.known_hosts_name,
+                name=self.ssh_known_hosts_name,
                 config_map=kubernetes.core.v1.ConfigMapVolumeSourceArgs(
                     name=self.app_name,
                     default_mode=0o444,
                     items=[
                         {
-                            "key": str(Path(self.config.known_hosts_path).name),
-                            "path": str(Path(self.config.known_hosts_path).name),
+                            "key": str(Path(self.config.ssh_known_hosts_path).name),
+                            "path": str(Path(self.config.ssh_known_hosts_path).name),
                         }
                     ],
                 ),
@@ -84,7 +83,7 @@ class GithubBackuper:
         ]
 
     @property
-    def env_from(self) -> [EnvFromSourceArgs]:
+    def env_from(self) -> [kubernetes.core.v1.EnvFromSourceArgs]:
         return [
             homeslice.env_from_configmap(self.app_name),
             homeslice.env_from_secret(self.app_name),
