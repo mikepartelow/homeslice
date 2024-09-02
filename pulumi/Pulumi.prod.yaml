@@ -8,7 +8,8 @@ config:
   homeslice:backup_todoist:
     git_author_email: github@mikepartelow.com
     git_author_name: Mike Partelow
-    image: registry.localdomain:32000/backup-tidal:20240902_103003
+    ssh_known_hosts_path_env_var_name: SSH_KNOWN_HOSTS
+    image: registry.localdomain:32000/backup-todoist:20240902_111609
     schedule: 0 0 * * *
   homeslice:buttons:
     clocktime_url: http://clocktime.homeslice.svc.cluster.local/api/v0/clocktime/
