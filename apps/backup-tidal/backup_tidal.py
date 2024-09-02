@@ -22,17 +22,23 @@ def require_env(name: str) -> str:
 
 
 # Required
-BACKUP_REPO = require_env("BACKUP_REPO")
-CLONE_PATH = require_env("CLONE_PATH")
-GIT_AUTHOR = require_env("GIT_AUTHOR")
+BACKUP_REPO = require_env("GITHUB_BACKUP_GIT_CLONE_URL")
+
+GIT_AUTHOR_NAME = require_env("GITHUB_BACKUP_AUTHOR_NAME")
+GIT_AUTHOR_EMAIL = require_env("GITHUB_BACKUP_AUTHOR_EMAIL")
+GIT_PRIVATE_KEY_PATH = require_env("GITHUB_BACKUP_PRIVATE_KEY_PATH")
+
+PATH_TO_SSH_KNOWN_HOSTS = require_env("GITHUB_BACKUP_SSH_KNOWN_HOSTS_PATH")
+
 PATH_TO_CONFIG = require_env("PATH_TO_CONFIG")
 PATH_TO_CREDS = require_env("PATH_TO_CREDS")
-PLAYLIST_PATH = require_env("PLAYLIST_PATH")
+
 
 # Optional
 # time to sleep between tracks() API calls to avoid rate limits
 RATE_LIMIT_SLEEP_SECONDS = os.environ.get("RATE_LIMIT_SLEEP_SECONDS", 8)
-
+CLONE_PATH = os.environ.get("CLONE_PATH", "/tmp")
+PLAYLIST_PATH = os.environ.get("PLAYLIST_PATH", "/tmp")
 
 def main():
     """Does the magic."""
@@ -56,6 +62,10 @@ def main():
     repo_name = Path(BACKUP_REPO.split("/")[-1]).stem
     clone_path = Path(CLONE_PATH) / Path(repo_name)
 
+    os.environ["GIT_SSH_COMMAND"] = (
+        f"ssh -i {GIT_PRIVATE_KEY_PATH} -o UserKnownHostsFile={PATH_TO_SSH_KNOWN_HOSTS}"
+    )
+
     git.clone(BACKUP_REPO, clone_path)
     print(f"👯 Cloned {BACKUP_REPO} to {clone_path}")
 
@@ -64,7 +74,7 @@ def main():
     git.add(clone_path, playlist_filename)
 
     datestamp = datetime.now().strftime("%Y%m%d%H%M%S")
-    if git.commit(clone_path, GIT_AUTHOR, datestamp):
+    if git.commit(clone_path, GIT_AUTHOR_NAME, GIT_AUTHOR_EMAIL, datestamp):
         git.push(clone_path)
         print(f"🚢 Pushed {clone_path} to {BACKUP_REPO}")
     else:

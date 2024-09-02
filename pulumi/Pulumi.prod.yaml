@@ -3,12 +3,12 @@ config:
   homeslice:backup_tidal:
     git_author_email: github@mikepartelow.com
     git_author_name: Mike Partelow
-    image: ghcr.io/mikepartelow/homeslice/backup-tidal:main.20240304-065313.1c0dfc7@sha256:89e2cfb7dd09b19f8920060bf33e8856801f78f4da64d21e296b62116c874790
+    image: registry.localdomain:32000/backup-tidal:20240902_110915
     schedule: 0 1 * * *
   homeslice:backup_todoist:
     git_author_email: github@mikepartelow.com
     git_author_name: Mike Partelow
-    image: registry.localdomain:32000/backup-todoist:20240902_094333
+    image: registry.localdomain:32000/backup-tidal:20240902_103003
     schedule: 0 0 * * *
   homeslice:buttons:
     clocktime_url: http://clocktime.homeslice.svc.cluster.local/api/v0/clocktime/

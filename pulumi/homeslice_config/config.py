@@ -10,7 +10,7 @@ class GithubBackupConfig(BaseModel):
     ssh_private_key_path: str = Field(default="/var/run/ssh-privatekey/ssh-privatekey")
     ssh_private_key: Optional[bytes] = Field(default=None)
 
-    ssh_known_hosts_path_env_var_name: str = Field(default="SSH_KNOWN_HOSTS")
+    ssh_known_hosts_path_env_var_name: str = Field(default="GITHUB_BACKUP_SSH_KNOWN_HOSTS_PATH")
     ssh_known_hosts_path: str = Field(default="/var/run/known_hosts/known_hosts")
 
     git_author_name_env_var_name: str = Field(default="GITHUB_BACKUP_AUTHOR_NAME")
