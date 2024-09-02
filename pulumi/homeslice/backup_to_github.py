@@ -12,6 +12,8 @@ class BackupToGithub:
         self.ssh_secret_name = f"{self.app_name}-ssh"
         self.ssh_known_hosts_name = f"{self.app_name}-known-hosts"
 
+        self.ssh_known_hosts = "github.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl"
+
     @property
     def configmap_items(self) -> dict:
         return {
@@ -19,7 +21,7 @@ class BackupToGithub:
             self.config.ssh_known_hosts_path_env_var_name: self.config.ssh_known_hosts_path,
             str(
                 Path(self.config.ssh_known_hosts_path).name
-            ): f"{self.app_name}-known-hosts",
+            ): self.ssh_known_hosts,
             self.config.git_author_name_env_var_name: self.config.git_author_name,
             self.config.git_author_email_env_var_name: self.config.git_author_email,
         }

@@ -9,9 +9,7 @@ config:
   homeslice:backup_todoist:
     git_author_email: github@mikepartelow.com
     git_author_name: Mike Partelow
-    image: ghcr.io/mikepartelow/homeslice/backup-todoist:main.20240211-180513.c7941cd@sha256:dea95f64a74a69cd2336d03ee8ffcca51590ec8e9d21fbcb460181bfa523ccd9
-    ssh_known_hosts: |
-      github.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl
+    image: registry.localdomain:32000/backup-todoist:20240902_094333
     schedule: 0 0 * * *
   homeslice:buttons:
     clocktime_url: http://clocktime.homeslice.svc.cluster.local/api/v0/clocktime/
