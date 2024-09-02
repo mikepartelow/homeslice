@@ -22,6 +22,13 @@ class GithubBackupConfig(BaseModel):
     git_clone_url_env_var_name: str = Field(default="GITHUB_BACKUP_GIT_CLONE_URL")
     git_clone_url: Optional[str] = Field(default=None)
 
+
+class BackupTidalConfig(GithubBackupConfig):
+    """BackupTidal Config. Inherits from GithubBackupConfig."""
+
+    image: str
+    schedule: str
+
 class BackupTodoistConfig(GithubBackupConfig):
     """BackupTodoist Config. Inherits from GithubBackupConfig."""
     image: str

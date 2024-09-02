@@ -17,7 +17,7 @@ def app(config: homeslice_config.BackupTodoistConfig) -> None:
     image = config.image
     schedule = config.schedule
 
-    config.git_clone_url = BACKUP_TODOIST_SECRETS.TODOIST_BACKUP_GIT_CLONE_URL
+    config.git_clone_url = BACKUP_TODOIST_SECRETS.GIT_CLONE_URL
     config.ssh_private_key = BACKUP_TODOIST_SECRETS.SSH_PRIVATE_KEY
     btg = homeslice.BackupToGithub(NAME, config)
 
@@ -25,6 +25,8 @@ def app(config: homeslice_config.BackupTodoistConfig) -> None:
         NAME,
         btg.configmap_items,
     )
+
+    btg.ssh_secret
 
     kubernetes.core.v1.Secret(
         NAME,  # pylint: disable=R0801
@@ -34,8 +36,6 @@ def app(config: homeslice_config.BackupTodoistConfig) -> None:
             "TODOIST_TOKEN": BACKUP_TODOIST_SECRETS.TODOIST_TOKEN,
         },
     )
-
-    btg.ssh_secret
 
     # pylint: disable=R0801
     homeslice.cronjob(

@@ -1,10 +1,9 @@
 encryptionsalt: v1:VKuGdX6V+cI=:v1:NjPNhDyrBhgOUzh7:ZORqZH2ALQT0/D+qYIhNJOAoCraRjw==
 config:
   homeslice:backup_tidal:
-    git_author: "Mike Partelow <github@mikepartelow.com>"
+    git_author_email: github@mikepartelow.com
+    git_author_name: Mike Partelow
     image: ghcr.io/mikepartelow/homeslice/backup-tidal:main.20240304-065313.1c0dfc7@sha256:89e2cfb7dd09b19f8920060bf33e8856801f78f4da64d21e296b62116c874790
-    known_hosts: |
-      github.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl
     schedule: 0 1 * * *
   homeslice:backup_todoist:
     git_author_email: github@mikepartelow.com
