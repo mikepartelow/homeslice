@@ -11,7 +11,13 @@ from homebridge import homebridge
 from lmz import lmz
 from observability import grafana, loki, prometheus, promtail
 from switches import switches
-from homeslice_config import BackupTidalConfig, BackupTodoistConfig, HomeBridgeConfig, LmzConfig, UnifiConfig
+from homeslice_config import (
+    BackupTidalConfig,
+    BackupTodoistConfig,
+    HomeBridgeConfig,
+    LmzConfig,
+    UnifiConfig,
+)
 from unifi import unifi
 
 config = pulumi.Config("homeslice")

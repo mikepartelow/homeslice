@@ -19,9 +19,7 @@ class BackupToGithub:
         return {
             self.config.ssh_private_key_path_env_var_name: self.config.ssh_private_key_path,
             self.config.ssh_known_hosts_path_env_var_name: self.config.ssh_known_hosts_path,
-            str(
-                Path(self.config.ssh_known_hosts_path).name
-            ): self.ssh_known_hosts,
+            str(Path(self.config.ssh_known_hosts_path).name): self.ssh_known_hosts,
             self.config.git_author_name_env_var_name: self.config.git_author_name,
             self.config.git_author_email_env_var_name: self.config.git_author_email,
         }
@@ -29,9 +27,8 @@ class BackupToGithub:
     @property
     def secret_items(self) -> dict:
         return {
-                self.config.git_clone_url_env_var_name: self.config.git_clone_url,  # secret
-            }
-
+            self.config.git_clone_url_env_var_name: self.config.git_clone_url,  # secret
+        }
 
     @property
     def ssh_secret(self) -> dict:

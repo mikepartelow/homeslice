@@ -16,6 +16,7 @@ def deployment(
     volume_mounts: list[kubernetes.core.v1.VolumeMountArgs] = None,
     host_network: bool = False,
     node_selector: any = None,
+    strategy: kubernetes.apps.v1.DeploymentStrategyArgs | None = None,
 ) -> kubernetes.apps.v1.Deployment:
     # pylint: disable=too-many-arguments
     """THE kubernetes Deployment factory"""
@@ -47,6 +48,7 @@ def deployment(
             selector=kubernetes.meta.v1.LabelSelectorArgs(
                 match_labels=metadata.labels,
             ),
+            strategy=strategy,
             replicas=replicas,
             template=kubernetes.core.v1.PodTemplateSpecArgs(
                 metadata=kubernetes.meta.v1.ObjectMetaArgs(

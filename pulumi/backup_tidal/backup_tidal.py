@@ -32,8 +32,8 @@ def app(config: homeslice_config.BackupTidalConfig) -> None:
 
     homeslice.configmap(
         NAME,
-        btg.configmap_items |
-        {
+        btg.configmap_items
+        | {
             "PATH_TO_CONFIG": CONFIG_PATH,
             "PATH_TO_CREDS": TIDAL_CREDS_PATH,
         },
@@ -49,10 +49,10 @@ def app(config: homeslice_config.BackupTidalConfig) -> None:
         | {
             Path(CONFIG_PATH).name: BACKUP_TIDAL_SECRETS.CONFIG_JSON,
             Path(TIDAL_CREDS_PATH).name: BACKUP_TIDAL_SECRETS.TIDAL_CREDS_JSON,
-        }
+        },
     )
 
-    volume_mounts =  [
+    volume_mounts = [
         kubernetes.core.v1.VolumeMountArgs(
             name=NAME,
             mount_path=str(Path(TIDAL_CREDS_PATH).parent),
@@ -60,7 +60,7 @@ def app(config: homeslice_config.BackupTidalConfig) -> None:
         )
     ]
 
-    volumes =  [
+    volumes = [
         kubernetes.core.v1.VolumeArgs(
             name=NAME,
             secret=kubernetes.core.v1.SecretVolumeSourceArgs(

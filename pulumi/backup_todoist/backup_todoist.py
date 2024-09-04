@@ -32,7 +32,8 @@ def app(config: homeslice_config.BackupTodoistConfig) -> None:
         NAME,  # pylint: disable=R0801
         metadata=homeslice.metadata(NAME),
         type="Opaque",
-        string_data=btg.secret_items | {
+        string_data=btg.secret_items
+        | {
             "TODOIST_TOKEN": BACKUP_TODOIST_SECRETS.TODOIST_TOKEN,
         },
     )
