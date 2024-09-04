@@ -13,6 +13,7 @@ def app(config: homeslice_config.HomeBridgeConfig) -> None:
     image = config.image
     redirect_host = config.redirect_host
     redirect_prefix = config.redirect_prefix
+    node_name = redirect_host.split('.')[0]
 
     ports = [
         kubernetes.core.v1.ContainerPortArgs(
@@ -26,7 +27,7 @@ def app(config: homeslice_config.HomeBridgeConfig) -> None:
         NAME,
         metadata=homeslice.metadata(NAME),
         spec=kubernetes.core.v1.PersistentVolumeClaimSpecArgs(
-            access_modes=["ReadWriteOnce"],
+            access_modes=["ReadWriteOnce","ReadOnlyMany"],
             resources=kubernetes.core.v1.ResourceRequirementsArgs(
                 requests={
                     "storage": "256Mi",
@@ -58,6 +59,7 @@ def app(config: homeslice_config.HomeBridgeConfig) -> None:
         NAME,
         image,
         host_network=True,
+        node_selector={"homeslice/homebridge": "true"},
         ports=ports,
         volumes=volumes,
         volume_mounts=volume_mounts,
