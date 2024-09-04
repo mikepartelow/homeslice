@@ -89,7 +89,9 @@ def app(config: pulumi.Config) -> None:
                         ],
                     },
                 },
-                "grafana.ini": {"server": {"root_url": "http://nucnuc.local/grafana"}},
+                "grafana.ini": {
+                    "server": {"root_url": "http://moe.localdomain/grafana"}
+                },
             },
         ),
     )

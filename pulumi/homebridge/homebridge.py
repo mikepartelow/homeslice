@@ -13,6 +13,7 @@ def app(config: homeslice_config.HomeBridgeConfig) -> None:
     image = config.image
     redirect_host = config.redirect_host
     redirect_prefix = config.redirect_prefix
+    node_selector = config.node_selector
 
     ports = [
         kubernetes.core.v1.ContainerPortArgs(
@@ -26,7 +27,7 @@ def app(config: homeslice_config.HomeBridgeConfig) -> None:
         NAME,
         metadata=homeslice.metadata(NAME),
         spec=kubernetes.core.v1.PersistentVolumeClaimSpecArgs(
-            access_modes=["ReadWriteOnce"],
+            access_modes=["ReadWriteOnce", "ReadOnlyMany"],
             resources=kubernetes.core.v1.ResourceRequirementsArgs(
                 requests={
                     "storage": "256Mi",
@@ -57,8 +58,13 @@ def app(config: homeslice_config.HomeBridgeConfig) -> None:
     homeslice.deployment(
         NAME,
         image,
-        host_network=True,
+        host_network=True,  # NOTICE THIS
+        node_selector=node_selector,
         ports=ports,
+        strategy=kubernetes.apps.v1.DeploymentStrategyArgs(
+            rolling_update=None,
+            type="Recreate",  # because host_network=True, we have to Recreate to release the port
+        ),
         volumes=volumes,
         volume_mounts=volume_mounts,
     )

@@ -12,5 +12,6 @@ from .namespace import *
 from .port import *
 from .secret import *
 from .service import *
+from .backup_to_github import *
 
 HOMESLICE = "homeslice"

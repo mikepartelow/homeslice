@@ -1,17 +1,15 @@
 encryptionsalt: v1:VKuGdX6V+cI=:v1:NjPNhDyrBhgOUzh7:ZORqZH2ALQT0/D+qYIhNJOAoCraRjw==
 config:
   homeslice:backup_tidal:
-    git_author: "Mike Partelow <github@mikepartelow.com>"
-    image: ghcr.io/mikepartelow/homeslice/backup-tidal:main.20240304-065313.1c0dfc7@sha256:89e2cfb7dd09b19f8920060bf33e8856801f78f4da64d21e296b62116c874790
-    known_hosts: |
-      github.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl
+    git_author_email: github@mikepartelow.com
+    git_author_name: Mike Partelow
+    image: registry.localdomain:32000/backup-tidal:20240904_123610
     schedule: 0 1 * * *
   homeslice:backup_todoist:
-    author_email: github@mikepartelow.com
-    author_name: Mike Partelow
-    image: ghcr.io/mikepartelow/homeslice/backup-todoist:main.20240211-180513.c7941cd@sha256:dea95f64a74a69cd2336d03ee8ffcca51590ec8e9d21fbcb460181bfa523ccd9
-    known_hosts: |
-      github.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl
+    git_author_email: github@mikepartelow.com
+    git_author_name: Mike Partelow
+    ssh_known_hosts_path_env_var_name: SSH_KNOWN_HOSTS
+    image: registry.localdomain:32000/backup-todoist:20240904_140506
     schedule: 0 0 * * *
   homeslice:buttons:
     clocktime_url: http://clocktime.homeslice.svc.cluster.local/api/v0/clocktime/
@@ -41,7 +39,7 @@ config:
     ingress_prefix: /(api/v0/lmz)/(.*)$
     lmz_yaml_path: /home/nonroot/.config/lmz/config.yaml
   homeslice:observability:
-    hostname: nucnuc.local
+    hostname: moe.localdomain
     namespace: observability
     grafana_chart_version: "8.3.2"
     grafana_ingress_prefix: /grafana
@@ -73,11 +71,13 @@ config:
         }
       ]
     switches_json_path: /var/run/switches.json
-  kubernetes:context: nucnuc
+  kubernetes:context: moe
   homeslice:homebridge:
     image: ghcr.io/homebridge/homebridge:2024-05-02@sha256:c13910618a3dbe6ed1afd01def54f800a10228ca1a6e540bb302ab56762fbd66
-    redirect_host: nucnuc
+    redirect_host: moe.localdomain
     redirect_prefix: /homebridge
+    node_selector:
+      "homeslice/homebridge": "true"
   homeslice:unifi:
     redirect_prefix: /unifi
-    redirect_url: https://nucnuc.local:8443
+    redirect_url: https://moe.localdomain:8443

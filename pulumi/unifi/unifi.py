@@ -21,3 +21,6 @@ def app(config: homeslice_config.LmzConfig) -> None:
             },
         ),
     )
+
+
+# backup needs host affinity, test that first
