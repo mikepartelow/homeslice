@@ -1,6 +1,5 @@
 """Resources for the homeslice/backup-todoist app."""
 
-from pathlib import Path
 import pulumi_kubernetes as kubernetes
 import homeslice_config
 import homeslice
@@ -26,7 +25,7 @@ def app(config: homeslice_config.BackupTodoistConfig) -> None:
         btg.configmap_items,
     )
 
-    btg.ssh_secret
+    _ = btg.ssh_secret  # this line does a lot more than it appears to do!
 
     kubernetes.core.v1.Secret(
         NAME,  # pylint: disable=R0801

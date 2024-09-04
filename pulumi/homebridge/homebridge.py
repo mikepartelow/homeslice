@@ -63,7 +63,7 @@ def app(config: homeslice_config.HomeBridgeConfig) -> None:
         ports=ports,
         strategy=kubernetes.apps.v1.DeploymentStrategyArgs(
             rolling_update=None,
-            type="Recreate", # because host_network=True, we have to Recreate to release the port
+            type="Recreate",  # because host_network=True, we have to Recreate to release the port
         ),
         volumes=volumes,
         volume_mounts=volume_mounts,

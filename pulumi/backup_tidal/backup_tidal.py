@@ -39,7 +39,7 @@ def app(config: homeslice_config.BackupTidalConfig) -> None:
         },
     )
 
-    btg.ssh_secret
+    _ = btg.ssh_secret  # this line does a lot more than it appears to do!
 
     kubernetes.core.v1.Secret(
         NAME,

@@ -40,6 +40,7 @@ RATE_LIMIT_SLEEP_SECONDS = os.environ.get("RATE_LIMIT_SLEEP_SECONDS", 8)
 CLONE_PATH = os.environ.get("CLONE_PATH", "/tmp")
 PLAYLIST_PATH = os.environ.get("PLAYLIST_PATH", "/tmp")
 
+
 def main():
     """Does the magic."""
     with open(PATH_TO_CONFIG, "r", encoding="utf-8") as config_f:
