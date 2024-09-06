@@ -2,16 +2,27 @@
 
 
 from pathlib import Path
-
+import sys
+import os
+import glob
 from lib import github_backup
 
 def main():
     """Does the magic."""
-    backup_path = Path(PATH_TO_BACKUPS) / "FIXME: get the most recent"
+    if len(sys.argv) < 2:
+        print("Usage: ./backup_unifi.py /path/to/backups")
+        sys.exit(1)
+
+    path_to_backups = sys.argv[1]
+
+    files = glob.glob(path_to_backups + '/*.unf')
+    latest = max(files, key=os.path.getctime)
+
+    print("Latest:", latest)
 
     # FIXME: also refactor backup_tidal
     ghb = github_backup.GithubBackup()
-    ghb.backup([backup_path])
+    ghb.backup([latest])
 
 
 if __name__ == "__main__":
