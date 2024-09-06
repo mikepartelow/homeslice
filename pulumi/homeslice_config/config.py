@@ -65,3 +65,4 @@ class UnifiConfig(BaseModel):
 
     redirect_prefix: str
     redirect_url: str
+    node_selector: dict[str, str]
