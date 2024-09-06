@@ -33,11 +33,7 @@ venv:
 	python3 -m venv $(VENV)
 	$(VENV)/bin/pip install --no-deps -r requirements.txt
 
-login: dev
-	docker run --rm --entrypoint '' -ti ${--shell-args} $(PROJECT)-dev ./login_tidal.py
-
-backup: dev
-	docker run --rm --entrypoint '' -ti ${--shell-args} $(PROJECT)-dev ./backup_tidal.py
+build: copy-then-build
 
 copy-then-build:
 	cp -v ../pylib/git.py lib/git.py
