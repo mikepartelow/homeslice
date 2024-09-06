@@ -3,6 +3,7 @@
 import subprocess
 from pathlib import Path
 
+
 def add(clone_dir: str, filename: str) -> None:
     """Add files to a commit."""
     run(f"git -C {clone_dir} add {filename}")
@@ -10,7 +11,7 @@ def add(clone_dir: str, filename: str) -> None:
 
 def clone(repo_name: str, clone_dir: str) -> None:
     """Clone a repo, possibly remote."""
-    if Path.exists(clone_dir):
+    if Path(clone_dir).exists():
         print(f"⚠️  clone already exists at {clone_dir}, not replacing it.")
         return
     run(f"git clone {repo_name} {clone_dir}")

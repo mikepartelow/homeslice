@@ -1,11 +1,11 @@
 #!/venv/bin/python
+"""Backup unifi backups to GitHub"""
 
-
-from pathlib import Path
 import sys
 import os
 import glob
 from lib import github_backup
+
 
 def main():
     """Does the magic."""
@@ -15,12 +15,11 @@ def main():
 
     path_to_backups = sys.argv[1]
 
-    files = glob.glob(path_to_backups + '/*.unf')
+    files = glob.glob(path_to_backups + "/*.unf")
     latest = max(files, key=os.path.getctime)
 
     print("Latest:", latest)
 
-    # FIXME: also refactor backup_tidal
     ghb = github_backup.GithubBackup()
     ghb.backup([latest])
 

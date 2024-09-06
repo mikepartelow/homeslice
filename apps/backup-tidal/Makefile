@@ -39,6 +39,8 @@ login: dev
 backup: dev
 	docker run --rm --entrypoint '' -ti ${--shell-args} $(PROJECT)-dev ./backup_tidal.py
 
+build: copy-then-build
+
 copy-then-build:
 	cp -v ../pylib/git.py lib/git.py
 	cp -v ../pylib/github_backup.py lib/github_backup.py
