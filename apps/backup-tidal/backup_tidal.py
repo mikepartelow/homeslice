@@ -53,7 +53,7 @@ def main():
     print(f"🎵 Wrote Tidal Playlist to {str(playlist_path)}")
 
     ghb = github_backup.GithubBackup()
-    ghb.backup([playlist_filename])
+    ghb.backup([playlist_path])
 
 
 if __name__ == "__main__":

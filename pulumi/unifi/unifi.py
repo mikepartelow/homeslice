@@ -3,16 +3,21 @@
 import homeslice_config
 import homeslice
 import pulumi_kubernetes as kubernetes
+from homeslice_secrets import (  # pylint: disable=no-name-in-module
+    unifi as UNIFI_SECRETS,
+)
 
 
 NAME = "unifi"
 
 
 def app(config: homeslice_config.LmzConfig) -> None:
-    """define resources for the unifi/unifi app"""
+    """define resources for the homeslice/unifi app"""
+    image = config.image
     redirect_url = config.redirect_url
     redirect_prefix = config.redirect_prefix
     node_selector = config.node_selector
+    schedule = config.schedule
 
     mount_path = "/mnt/backups"
 
@@ -25,6 +30,24 @@ def app(config: homeslice_config.LmzConfig) -> None:
                 "nginx.ingress.kubernetes.io/permanent-redirect": f"{redirect_url}",
             },
         ),
+    )
+
+    config.git_clone_url = UNIFI_SECRETS.GIT_CLONE_URL
+    config.ssh_private_key = UNIFI_SECRETS.SSH_PRIVATE_KEY
+    btg = homeslice.BackupToGithub(NAME, config)
+
+    homeslice.configmap(
+        NAME,
+        btg.configmap_items
+    )
+
+    _ = btg.ssh_secret  # this line does a lot more than it appears to do!
+
+    kubernetes.core.v1.Secret(
+        NAME,
+        metadata=homeslice.metadata(NAME),
+        type="Opaque",
+        string_data=btg.secret_items
     )
 
     volumes = [
@@ -44,14 +67,15 @@ def app(config: homeslice_config.LmzConfig) -> None:
         ),
     ]
 
-    homeslice.deployment(
-        NAME,
-        "busybox",
-        command=["sleep", "infinity"],
+    env_from = [homeslice.env_from_configmap(NAME)]
+
+    homeslice.cronjob(
+        f"backup-{NAME}",
+        image,
+        schedule,
+        args=[mount_path],
         node_selector=node_selector,
-        volumes=volumes,
-        volume_mounts=volume_mounts,
+        env_from=btg.env_from + env_from,
+        volumes=btg.volumes + volumes,
+        volume_mounts=btg.volume_mounts + volume_mounts,
     )
-
-
-# backup needs host affinity, test that first

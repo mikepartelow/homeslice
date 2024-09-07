@@ -60,9 +60,12 @@ class LmzConfig(BaseModel):
     ingress_prefix: Optional[str]
 
 
-class UnifiConfig(BaseModel):
+class UnifiConfig(GithubBackupConfig):
     """Unifi Config"""
 
+    image: str
     redirect_prefix: str
     redirect_url: str
+    node_selector: dict[str, str]
+    schedule: str
     node_selector: dict[str, str]

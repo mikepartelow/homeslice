@@ -31,10 +31,8 @@ class GithubBackup:  # pylint: disable=too-few-public-methods
 
         self.path_to_ssh_known_hosts = require_env("GITHUB_BACKUP_SSH_KNOWN_HOSTS_PATH")
 
-        self.path_to_backups = require_env("PATH_TO_BACKUPS")
-
         # Optional
-        self.clone_path = os.environ.get("CLONE_PATH", "/tmp")
+        self.clone_path = os.environ.get("CLONE_PATH", "/tmp/clone")
 
     def backup(self, backup_files: Sequence[str]):
         """Execute the backup."""
