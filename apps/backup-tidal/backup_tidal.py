@@ -1,11 +1,9 @@
 #!/venv/bin/python
 """Backup a Tidal playlist to GitHub"""
 
-from datetime import datetime
 from pathlib import Path
 import json
 import os
-import shutil
 import sys
 
 import tidalapi
