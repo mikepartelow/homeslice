@@ -1,10 +1,12 @@
 """Resources for the Unifi auxiliary support."""
 
-import homeslice_config
-import homeslice
 import pulumi_kubernetes as kubernetes
+import homeslice
+import homeslice_config
+
 from homeslice_secrets import (  # pylint: disable=no-name-in-module
     unifi as UNIFI_SECRETS,
+    backup_tidal as TIDAL_SECRETS,
 )
 
 
@@ -33,21 +35,18 @@ def app(config: homeslice_config.LmzConfig) -> None:
     )
 
     config.git_clone_url = UNIFI_SECRETS.GIT_CLONE_URL
-    config.ssh_private_key = UNIFI_SECRETS.SSH_PRIVATE_KEY
+    config.ssh_private_key = TIDAL_SECRETS.SSH_PRIVATE_KEY
     btg = homeslice.BackupToGithub(NAME, config)
 
-    homeslice.configmap(
-        NAME,
-        btg.configmap_items
-    )
+    homeslice.configmap(NAME, btg.configmap_items)
 
     _ = btg.ssh_secret  # this line does a lot more than it appears to do!
 
-    kubernetes.core.v1.Secret(
+    kubernetes.core.v1.Secret(  # pylint: disable=duplicate-code
         NAME,
         metadata=homeslice.metadata(NAME),
         type="Opaque",
-        string_data=btg.secret_items
+        string_data=btg.secret_items,
     )
 
     volumes = [
