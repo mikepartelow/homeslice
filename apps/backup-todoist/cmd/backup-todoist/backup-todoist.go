@@ -31,16 +31,15 @@ func main() {
 
 	bu := BackerUpper{
 		Todoist: &todoist.Client{
-			Token: mustGetenv("TODOIST_BACKUP_TODOIST_TOKEN"),
+			Token: mustGetenv("TODOIST_TOKEN"),
 		},
-		GitCloneUrl:    mustGetenv("TODOIST_BACKUP_GIT_CLONE_URL"),
-		PrivateKeyPath: mustGetenv("TODOIST_BACKUP_PRIVATE_KEY_PATH"),
-		AuthorName:     mustGetenv("TODOIST_BACKUP_AUTHOR_NAME"),
-		AuthorEmail:    mustGetenv("TODOIST_BACKUP_AUTHOR_EMAIL"),
+		GitCloneUrl:    mustGetenv("GITHUB_BACKUP_GIT_CLONE_URL"),
+		PrivateKeyPath: mustGetenv("GITHUB_BACKUP_PRIVATE_KEY_PATH"),
+		AuthorName:     mustGetenv("GITHUB_BACKUP_AUTHOR_NAME"),
+		AuthorEmail:    mustGetenv("GITHUB_BACKUP_AUTHOR_EMAIL"),
+		CommitMessage:  getenvOrDefault("GITHUB_BACKUP_COMMIT_MESSAGE", "backup"),
 		Filename:       getenvOrDefault("TODOIST_BACKUP_FILENAME", "backup.json"),
-		CommitMessage:  getenvOrDefault("TODOIST_BACKUP_COMMIT_MESSAGE", "backup"),
-
-		Logger: logger,
+		Logger:         logger,
 	}
 
 	err := bu.Backup()

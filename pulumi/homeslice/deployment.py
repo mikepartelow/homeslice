@@ -15,6 +15,8 @@ def deployment(
     volumes: list[kubernetes.core.v1.VolumeArgs] = None,
     volume_mounts: list[kubernetes.core.v1.VolumeMountArgs] = None,
     host_network: bool = False,
+    node_selector: any = None,
+    strategy: kubernetes.apps.v1.DeploymentStrategyArgs | None = None,
 ) -> kubernetes.apps.v1.Deployment:
     # pylint: disable=too-many-arguments
     """THE kubernetes Deployment factory"""
@@ -24,6 +26,21 @@ def deployment(
     for a in ("args", "command", "env_from", "ports", "volume_mounts", "volumes"):
         locals()[a] = locals()[a] or []
 
+    tolerations = [
+        kubernetes.core.v1.TolerationArgs(
+            key="node.kubernetes.io/unreachable",
+            operator="Exists",
+            effect="NoExecute",
+            toleration_seconds=2,
+        ),
+        kubernetes.core.v1.TolerationArgs(
+            key="node.kubernetes.io/not-ready",
+            operator="Exists",
+            effect="NoExecute",
+            toleration_seconds=2,
+        ),
+    ]
+
     return kubernetes.apps.v1.Deployment(
         name,
         metadata=metadata,
@@ -31,12 +48,14 @@ def deployment(
             selector=kubernetes.meta.v1.LabelSelectorArgs(
                 match_labels=metadata.labels,
             ),
+            strategy=strategy,
             replicas=replicas,
             template=kubernetes.core.v1.PodTemplateSpecArgs(
                 metadata=kubernetes.meta.v1.ObjectMetaArgs(
                     labels=metadata.labels,
                 ),
                 spec=kubernetes.core.v1.PodSpecArgs(
+                    node_selector=node_selector,
                     host_network=host_network,
                     containers=[
                         kubernetes.core.v1.ContainerArgs(
@@ -47,8 +66,9 @@ def deployment(
                             env_from=env_from,
                             ports=ports,
                             volume_mounts=volume_mounts,
-                        )
+                        ),
                     ],
+                    tolerations=tolerations,
                     volumes=volumes,
                 ),
             ),
