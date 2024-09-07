@@ -3,13 +3,13 @@ config:
   homeslice:backup_tidal:
     git_author_email: github@mikepartelow.com
     git_author_name: Mike Partelow
-    image: registry.localdomain:32000/backup-tidal:20240906_183749
+    image: ghcr.io/mikepartelow/homeslice/backup-tidal:main.20240907-042426.2f62757@sha256:c4707044888842ad5e24b3d4aec7dc7ae7be52621874c00b0871490cde62aa62
     schedule: 0 1 * * *
   homeslice:backup_todoist:
     git_author_email: github@mikepartelow.com
     git_author_name: Mike Partelow
     ssh_known_hosts_path_env_var_name: SSH_KNOWN_HOSTS
-    image: registry.localdomain:32000/backup-todoist:20240906_184239
+    image: ghcr.io/mikepartelow/homeslice/backup-todoist:main.20240907-042454.2f62757@sha256:7fdac51625aec3470b061f72c511da517644c1f8132f1a252d37d407c0fec68b
     schedule: 0 0 * * *
   homeslice:buttons:
     clocktime_url: http://clocktime.homeslice.svc.cluster.local/api/v0/clocktime/
@@ -79,7 +79,7 @@ config:
     node_selector:
       "homeslice/homebridge": "true"
   homeslice:unifi:
-    image: registry.localdomain:32000/backup-unifi:20240906_161614
+    image: ghcr.io/mikepartelow/homeslice/backup-unifi:main.20240907-042418.2f62757@sha256:0a18f8f137237bc8c64fe758ec4782459a466a0af27c91885423748bdf242f14
     redirect_prefix: /unifi
     redirect_url: https://moe.localdomain:8443
     node_selector:
