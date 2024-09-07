@@ -14,6 +14,7 @@ def cronjob(
     volumes: list[kubernetes.core.v1.VolumeArgs] = None,
     volume_mounts: list[kubernetes.core.v1.VolumeMountArgs] = None,
     metadata: kubernetes.meta.v1.ObjectMetaArgs = None,
+    node_selector: any = None,
 ) -> kubernetes.batch.v1.CronJob:
     # pylint: disable=too-many-arguments,R0801
     """THE kubernetes Cronjob factory"""
@@ -33,6 +34,7 @@ def cronjob(
                     ttl_seconds_after_finished=60 * 60 * 24,
                     template=kubernetes.core.v1.PodTemplateSpecArgs(
                         spec=kubernetes.core.v1.PodSpecArgs(
+                            node_selector=node_selector,
                             restart_policy=restart_policy,
                             containers=[
                                 kubernetes.core.v1.ContainerArgs(
