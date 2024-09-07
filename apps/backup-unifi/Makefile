@@ -33,8 +33,10 @@ venv:
 	python3 -m venv $(VENV)
 	$(VENV)/bin/pip install --no-deps -r requirements.txt
 
-build: copy-then-build
+lint: copy-libs
 
-copy-then-build:
+build: copy-libs
+
+copy-libs:
 	cp -v ../pylib/git.py lib/git.py
 	cp -v ../pylib/github_backup.py lib/github_backup.py
