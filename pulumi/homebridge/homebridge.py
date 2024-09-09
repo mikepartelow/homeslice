@@ -68,7 +68,7 @@ def app(config: homeslice_config.HomeBridgeConfig) -> None:
         volumes=volumes,
         volume_mounts=volume_mounts,
     )
-    homeslice.service(NAME, port=PORT)
+    homeslice.service(NAME, port=PORT, type="NodePort")
 
     homeslice.ingress(
         NAME,

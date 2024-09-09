@@ -48,7 +48,7 @@ config:
     loki_push_url: http://loki:3100/api/v1/push
     prometheus_chart_version: "25.22.0"
     prometheus_ingress_prefix: /prometheus
-    prometheus_datasource: http://prometheus-server
+    prometheus_datasource: http://prometheus-server.observability.svc.cluster.local
     promtail_chart_version: "6.16.3"
   homeslice:namespace: homeslice
   homeslice:switches:
