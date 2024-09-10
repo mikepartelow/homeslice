@@ -5,8 +5,7 @@ import homeslice
 
 
 def service(
-    name: str,
-    port: int = 80,
+    name: str, port: int = 80, type_: str = "ClusterIP"
 ) -> kubernetes.core.v1.Service:
     """THE kubernetes Service factory"""
 
@@ -17,7 +16,7 @@ def service(
         metadata=metadata,
         spec=kubernetes.core.v1.ServiceSpecArgs(
             selector=metadata.labels,
-            type="NodePort",
+            type=type_,
             ports=[
                 kubernetes.core.v1.ServicePortArgs(
                     name="http",
