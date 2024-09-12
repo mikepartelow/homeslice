@@ -9,6 +9,7 @@ idna==3.7
 parver==0.5
 protobuf==4.25.4
 pulumi==3.128.0
+pulumi_command==1.0.1
 pulumi_kubernetes==4.16.0
 pydantic==2.8.2
 pydantic_core==2.20.1
