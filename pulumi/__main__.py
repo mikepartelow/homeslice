@@ -14,6 +14,7 @@ from switches import switches
 from homeslice_config import (
     BackupTidalConfig,
     BackupTodoistConfig,
+    ChimeConfig,
     HomeBridgeConfig,
     LmzConfig,
     UnifiConfig,
@@ -35,8 +36,11 @@ if cfg := config.get_object("buttons"):
     buttons.app(cfg)
 
 if cfg := config.get_object("chime"):
-    cfg["namespace"] = config.require("namespace")
-    chime.app(cfg, pulumi.Config("kubernetes").get("context"))
+    chime.app(
+        ChimeConfig(**dict(cfg)),
+        pulumi.Config("kubernetes").get("context"),
+        config.require("namespace"),
+    )
 
 if cfg := config.get_object("clocktime"):
     clocktime.app(cfg)

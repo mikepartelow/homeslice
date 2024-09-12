@@ -1,6 +1,6 @@
 """Homeslice Config"""
 
-from typing import Optional
+from typing import Optional, Sequence, Mapping
 from pydantic import BaseModel, Field
 
 
@@ -40,6 +40,17 @@ class BackupTodoistConfig(GithubBackupConfig):
 
     image: str
     schedule: str
+
+
+class ChimeConfig(BaseModel):
+    """Chime Config"""
+
+    image: str
+    chimes: Sequence[Mapping[str, str]]
+    nginx: str
+    pvc_mount_path: str
+    container_port: int
+    ingress_prefix: str
 
 
 class HomeBridgeConfig(BaseModel):

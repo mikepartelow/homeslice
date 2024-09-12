@@ -1,26 +1,18 @@
 """Resources for the homeslice/chime app."""
 
 import pulumi_kubernetes as kubernetes
+from pulumi_command import local
 import pulumi
 import homeslice
+import homeslice_config
 from homeslice_secrets import chime as CHIME_SECRET  # pylint: disable=no-name-in-module
-import pulumi
-from pulumi_command import local
 
 
 NAME = "chime"
 
 
-def app(config: pulumi.Config, k8s_context: str) -> None:
+def app(config: homeslice_config.ChimeConfig, k8s_context: str, namespace: str) -> None:
     """define resources for the homeslice/chime app"""
-    image = config["image"]
-    chimes = config["chimes"]
-    nginx = config["nginx"]
-    pvc_mount_path = config["pvc_mount_path"]
-    container_port = int(config["container_port"])
-    ingress_prefix = config.get("ingress_prefix")
-    namespace = config.get("namespace")
-
     # an nginx deployment serves up media from a persistent volume
     #
     # pylint: disable=R0801
@@ -52,7 +44,7 @@ def app(config: pulumi.Config, k8s_context: str) -> None:
     volume_mounts = [
         kubernetes.core.v1.VolumeMountArgs(
             name=NAME,
-            mount_path=pvc_mount_path,
+            mount_path=config.pvc_mount_path,
             read_only=True,
         ),
     ]
@@ -60,40 +52,39 @@ def app(config: pulumi.Config, k8s_context: str) -> None:
     ports = [
         kubernetes.core.v1.ContainerPortArgs(
             name="http",
-            container_port=container_port,
+            container_port=config.container_port,
         )
     ]
 
     nginx = homeslice.deployment(
-        NAME, nginx, ports=ports, volumes=volumes, volume_mounts=volume_mounts
+        NAME, config.nginx, ports=ports, volumes=volumes, volume_mounts=volume_mounts
     )
 
-    # volumeName=$(kubectl --context moe get pvc chime -n homeslice -o jsonpath='{.spec.volumeName}')
-    # kubectl --context moe get pv $volumeName -n homeslice -o jsonpath='{.spec.nodeAffinity.required.nodeSelectorTerms[0].matchExpressions[0].values[0]}:{.spec.local.path}'
-
-    # -> node:/path
-
-    # local.Command(scp swed.mp3 node:/path)
-    populate = local.Command(
+    # populate the hostPath PV with the chime mp3
+    # WARNING: makes heavy assumptions about the PVC's StorageClass!
+    # pylint: disable=line-too-long
+    local.Command(
         "populate",
         opts=pulumi.ResourceOptions(depends_on=[nginx]),
         create=f"""
-            kubectl --context {k8s_context} \
-                get pv \
+            scp {CHIME_SECRET.PATH_TO_CHIME_MP3} \
                 $(kubectl --context {k8s_context} \
-                    get pvc {NAME} -n {namespace} \
-                    -o jsonpath='{{.spec.volumeName}}') \
-                -o jsonpath='{{.spec.nodeAffinity.required.nodeSelectorTerms[0].matchExpressions[0].values[0]}}:{{.spec.local.path}}'
+                    get pv \
+                        $(kubectl --context {k8s_context} \
+                            get pvc {NAME} -n {namespace} \
+                            -o jsonpath='{{.spec.volumeName}}' \
+                        ) \
+                    -o jsonpath='{{.spec.nodeAffinity.required.nodeSelectorTerms[0].matchExpressions[0].values[0]}}:{{.spec.local.path}}' \
+                )
         """,
         triggers=[nginx],
     )
-    pulumi.export("populate", populate.stdout)
 
     homeslice.service(NAME)
 
     homeslice.ingress(
         NAME,
-        [ingress_prefix],
+        [config.ingress_prefix],
         path_type="ImplementationSpecific",
         metadata=homeslice.metadata(
             NAME,
@@ -105,7 +96,7 @@ def app(config: pulumi.Config, k8s_context: str) -> None:
     )
 
     # cronjobs schedule the chimes.
-    for chime in chimes:
+    for chime in config.chimes:
         for zone in CHIME_SECRET.ZONES:
             name = make_name(NAME, chime, zone)
             args = [
@@ -116,7 +107,7 @@ def app(config: pulumi.Config, k8s_context: str) -> None:
 
             homeslice.cronjob(
                 name,
-                image,
+                config.image,
                 chime["schedule"],
                 args=args,
                 metadata=homeslice.metadata(name),
