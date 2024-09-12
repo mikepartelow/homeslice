@@ -4,11 +4,14 @@ import pulumi_kubernetes as kubernetes
 import pulumi
 import homeslice
 from homeslice_secrets import chime as CHIME_SECRET  # pylint: disable=no-name-in-module
+import pulumi
+from pulumi_command import local
+
 
 NAME = "chime"
 
 
-def app(config: pulumi.Config) -> None:
+def app(config: pulumi.Config, k8s_context: str) -> None:
     """define resources for the homeslice/chime app"""
     image = config["image"]
     chimes = config["chimes"]
@@ -16,6 +19,7 @@ def app(config: pulumi.Config) -> None:
     pvc_mount_path = config["pvc_mount_path"]
     container_port = int(config["container_port"])
     ingress_prefix = config.get("ingress_prefix")
+    namespace = config.get("namespace")
 
     # an nginx deployment serves up media from a persistent volume
     #
@@ -60,9 +64,30 @@ def app(config: pulumi.Config) -> None:
         )
     ]
 
-    homeslice.deployment(
+    nginx = homeslice.deployment(
         NAME, nginx, ports=ports, volumes=volumes, volume_mounts=volume_mounts
     )
+
+    # volumeName=$(kubectl --context moe get pvc chime -n homeslice -o jsonpath='{.spec.volumeName}')
+    # kubectl --context moe get pv $volumeName -n homeslice -o jsonpath='{.spec.nodeAffinity.required.nodeSelectorTerms[0].matchExpressions[0].values[0]}:{.spec.local.path}'
+
+    # -> node:/path
+
+    # local.Command(scp swed.mp3 node:/path)
+    populate = local.Command(
+        "populate",
+        opts=pulumi.ResourceOptions(depends_on=[nginx]),
+        create=f"""
+            kubectl --context {k8s_context} \
+                get pv \
+                $(kubectl --context {k8s_context} \
+                    get pvc {NAME} -n {namespace} \
+                    -o jsonpath='{{.spec.volumeName}}') \
+                -o jsonpath='{{.spec.nodeAffinity.required.nodeSelectorTerms[0].matchExpressions[0].values[0]}}:{{.spec.local.path}}'
+        """,
+        triggers=[nginx],
+    )
+    pulumi.export("populate", populate.stdout)
 
     homeslice.service(NAME)
 

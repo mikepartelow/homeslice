@@ -35,7 +35,8 @@ if cfg := config.get_object("buttons"):
     buttons.app(cfg)
 
 if cfg := config.get_object("chime"):
-    chime.app(cfg)
+    cfg["namespace"] = config.require("namespace")
+    chime.app(cfg, pulumi.Config("kubernetes").get("context"))
 
 if cfg := config.get_object("clocktime"):
     clocktime.app(cfg)
