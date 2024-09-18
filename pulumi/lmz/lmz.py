@@ -2,7 +2,7 @@
 
 from pathlib import Path
 import pulumi_kubernetes as kubernetes
-import pulumi
+import homeslice_config
 import homeslice
 from homeslice_secrets import (  # pylint: disable=no-name-in-module
     lmz as LMZ_SECRETS,
@@ -11,13 +11,13 @@ from homeslice_secrets import (  # pylint: disable=no-name-in-module
 NAME = "lmz"
 
 
-def app(config: pulumi.Config) -> None:
+def app(config: homeslice_config.LmzConfig) -> None:
     """define resources for the homeslice/lmz app"""
 
-    image = config["image"]
-    container_port = int(config["container_port"])
-    ingress_prefix = config.get("ingress_prefix")
-    lmz_yaml_path = config["lmz_yaml_path"]
+    image = config.image
+    container_port = config.container_port
+    ingress_prefix = config.ingress_prefix
+    lmz_yaml_path = config.lmz_yaml_path
     volume_name = NAME
 
     homeslice.secret(

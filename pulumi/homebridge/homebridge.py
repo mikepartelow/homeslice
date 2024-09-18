@@ -1,18 +1,19 @@
 """Resources for the a Homebridge instance."""
 
 import pulumi_kubernetes as kubernetes
-import pulumi
 import homeslice
+import homeslice_config
 
 NAME = "homebridge"
 PORT = 8581
 
 
-def app(config: pulumi.Config) -> None:
+def app(config: homeslice_config.HomeBridgeConfig) -> None:
     """define resources for the homeslice/homebridge app"""
-    image = config["image"]
-    redirect_host = config["redirect_host"]
-    redirect_prefix = config["redirect_prefix"]
+    image = config.image
+    redirect_host = config.redirect_host
+    redirect_prefix = config.redirect_prefix
+    node_selector = config.node_selector
 
     ports = [
         kubernetes.core.v1.ContainerPortArgs(
@@ -57,12 +58,17 @@ def app(config: pulumi.Config) -> None:
     homeslice.deployment(
         NAME,
         image,
-        host_network=True,
+        host_network=True,  # NOTICE THIS
+        node_selector=node_selector,
         ports=ports,
+        strategy=kubernetes.apps.v1.DeploymentStrategyArgs(
+            rolling_update=None,
+            type="Recreate",  # because host_network=True, we have to Recreate to release the port
+        ),
         volumes=volumes,
         volume_mounts=volume_mounts,
     )
-    homeslice.service(NAME, port=PORT)
+    homeslice.service(NAME, port=PORT, type_="NodePort")
 
     homeslice.ingress(
         NAME,

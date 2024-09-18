@@ -1,15 +1,14 @@
 #!/venv/bin/python
-"""Fetch a Tidal playlist and write it to a JSON file."""
-from datetime import datetime
+"""Backup a Tidal playlist to GitHub"""
+
 from pathlib import Path
 import json
 import os
-import shutil
 import sys
 
 import tidalapi
 
-from lib import auth, git, playlist
+from lib import auth, github_backup, playlist
 
 
 def require_env(name: str) -> str:
@@ -22,16 +21,14 @@ def require_env(name: str) -> str:
 
 
 # Required
-BACKUP_REPO = require_env("BACKUP_REPO")
-CLONE_PATH = require_env("CLONE_PATH")
-GIT_AUTHOR = require_env("GIT_AUTHOR")
 PATH_TO_CONFIG = require_env("PATH_TO_CONFIG")
 PATH_TO_CREDS = require_env("PATH_TO_CREDS")
-PLAYLIST_PATH = require_env("PLAYLIST_PATH")
+
 
 # Optional
 # time to sleep between tracks() API calls to avoid rate limits
 RATE_LIMIT_SLEEP_SECONDS = os.environ.get("RATE_LIMIT_SLEEP_SECONDS", 8)
+PLAYLIST_PATH = os.environ.get("PLAYLIST_PATH", "/tmp")
 
 
 def main():
@@ -53,22 +50,8 @@ def main():
     )
     print(f"🎵 Wrote Tidal Playlist to {str(playlist_path)}")
 
-    repo_name = Path(BACKUP_REPO.split("/")[-1]).stem
-    clone_path = Path(CLONE_PATH) / Path(repo_name)
-
-    git.clone(BACKUP_REPO, clone_path)
-    print(f"👯 Cloned {BACKUP_REPO} to {clone_path}")
-
-    shutil.copy(playlist_path, clone_path)
-
-    git.add(clone_path, playlist_filename)
-
-    datestamp = datetime.now().strftime("%Y%m%d%H%M%S")
-    if git.commit(clone_path, GIT_AUTHOR, datestamp):
-        git.push(clone_path)
-        print(f"🚢 Pushed {clone_path} to {BACKUP_REPO}")
-    else:
-        print("🧘 Nothing to do, backup is up to date.")
+    ghb = github_backup.GithubBackup()
+    ghb.backup([playlist_path])
 
 
 if __name__ == "__main__":

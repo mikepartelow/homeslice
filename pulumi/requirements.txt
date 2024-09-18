@@ -1,3 +1,4 @@
+annotated-types==0.7.0
 Arpeggio==2.0.2
 attrs==24.2.0
 certifi==2024.7.4
@@ -8,9 +9,13 @@ idna==3.7
 parver==0.5
 protobuf==4.25.4
 pulumi==3.128.0
+pulumi_command==1.0.1
 pulumi_kubernetes==4.16.0
+pydantic==2.8.2
+pydantic_core==2.20.1
 PyYAML==6.0.2
 requests==2.32.3
 semver==2.13.0
 six==1.16.0
+typing_extensions==4.12.2
 urllib3==2.2.2

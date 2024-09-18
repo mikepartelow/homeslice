@@ -1,17 +1,15 @@
 encryptionsalt: v1:VKuGdX6V+cI=:v1:NjPNhDyrBhgOUzh7:ZORqZH2ALQT0/D+qYIhNJOAoCraRjw==
 config:
   homeslice:backup_tidal:
-    git_author: "Mike Partelow <github@mikepartelow.com>"
-    image: ghcr.io/mikepartelow/homeslice/backup-tidal:main.20240304-065313.1c0dfc7@sha256:89e2cfb7dd09b19f8920060bf33e8856801f78f4da64d21e296b62116c874790
-    known_hosts: |
-      github.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl
+    git_author_email: github@mikepartelow.com
+    git_author_name: Mike Partelow
+    image: ghcr.io/mikepartelow/homeslice/backup-tidal:main.20240907-042426.2f62757@sha256:c4707044888842ad5e24b3d4aec7dc7ae7be52621874c00b0871490cde62aa62
     schedule: 0 1 * * *
   homeslice:backup_todoist:
-    author_email: github@mikepartelow.com
-    author_name: Mike Partelow
-    image: ghcr.io/mikepartelow/homeslice/backup-todoist:main.20240211-180513.c7941cd@sha256:dea95f64a74a69cd2336d03ee8ffcca51590ec8e9d21fbcb460181bfa523ccd9
-    known_hosts: |
-      github.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl
+    git_author_email: github@mikepartelow.com
+    git_author_name: Mike Partelow
+    ssh_known_hosts_path_env_var_name: SSH_KNOWN_HOSTS
+    image: ghcr.io/mikepartelow/homeslice/backup-todoist:main.20240907-042454.2f62757@sha256:7fdac51625aec3470b061f72c511da517644c1f8132f1a252d37d407c0fec68b
     schedule: 0 0 * * *
   homeslice:buttons:
     clocktime_url: http://clocktime.homeslice.svc.cluster.local/api/v0/clocktime/
@@ -36,21 +34,21 @@ config:
     ingress_prefix: /api/v0/clocktime/
     location: America/Los_Angeles
   homeslice:lmz:
-    image: ghcr.io/mikepartelow/homeslice/lmz:main.20240811-170229.6402cf5@sha256:6a6b24e3fc408ec50b9c1ea636841c9297edb84e5e4e944af1df038c2761b457
+    image: ghcr.io/mikepartelow/homeslice/lmz:main.20240812-035613.298ef89@sha256:dd60eb2d93514c4fcd315376e767217da80c4b580d915156cea75444db9a22d4
     container_port: 8000
     ingress_prefix: /(api/v0/lmz)/(.*)$
     lmz_yaml_path: /home/nonroot/.config/lmz/config.yaml
   homeslice:observability:
-    hostname: nucnuc.local
+    hostname: moe.localdomain
     namespace: observability
     grafana_chart_version: "8.3.2"
     grafana_ingress_prefix: /grafana
     loki_chart_version: "6.6.5"
-    loki_datasource: http://loki:3100
-    loki_push_url: http://loki:3100/api/v1/push
+    loki_datasource: http://loki-gateway.observability.svc.cluster.local/
+    loki_push_url: http://loki-gateway.observability.svc.cluster.local/loki/api/v1/push
     prometheus_chart_version: "25.22.0"
     prometheus_ingress_prefix: /prometheus
-    prometheus_datasource: http://prometheus-server
+    prometheus_datasource: http://prometheus-server.observability.svc.cluster.local
     promtail_chart_version: "6.16.3"
   homeslice:namespace: homeslice
   homeslice:switches:
@@ -73,12 +71,23 @@ config:
         }
       ]
     switches_json_path: /var/run/switches.json
-  kubernetes:context: nucnuc
+  kubernetes:context: moe
   homeslice:homebridge:
     image: ghcr.io/homebridge/homebridge:2024-05-02@sha256:c13910618a3dbe6ed1afd01def54f800a10228ca1a6e540bb302ab56762fbd66
-    redirect_host: nucnuc
+    redirect_host: moe.localdomain
     redirect_prefix: /homebridge
   # homeslice:sonos:
   #   image: registry.localdomain:32000/sonos:20240827_183915
   #   container_port: 8000
   #   ingress_prefix: /(api/v0/sonos/)(.*)$
+    node_selector:
+      "homeslice/homebridge": "true"
+  homeslice:unifi:
+    image: ghcr.io/mikepartelow/homeslice/backup-unifi:main.20240907-042418.2f62757@sha256:0a18f8f137237bc8c64fe758ec4782459a466a0af27c91885423748bdf242f14
+    redirect_prefix: /unifi
+    redirect_url: https://moe.localdomain:8443
+    node_selector:
+      "homeslice/unifi": "true"
+    schedule: 0 0 * * *
+    git_author_email: github@mikepartelow.com
+    git_author_name: Mike Partelow
