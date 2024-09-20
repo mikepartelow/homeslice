@@ -17,7 +17,7 @@ platformdirs==3.11.0
 pylint==3.0.2
 requests==2.32.2
 setuptools==70.0.0
-soco==0.29.1
+soco==0.30.4
 tomlkit==0.12.1
 urllib3==2.2.2
 wheel==0.41.2

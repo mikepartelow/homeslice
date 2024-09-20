@@ -2,14 +2,18 @@
 """sonos.py controls Sonos Zones"""
 
 import os
-from dataclasses import dataclass
+import random
+from dataclasses import dataclass, field
 from collections import namedtuple
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import logging
-from typing import Literal
+from typing import Literal, Sequence
+from enum import Enum
 
 from soco import SoCo
+import soco.exceptions
+from soco.data_structures import DidlObject,DidlResource
 
 
 def getenv_or_raise(name: str) -> str:
@@ -23,6 +27,65 @@ def getenv_or_raise(name: str) -> str:
 LISTEN_HOST = "0.0.0.0"
 LISTEN_PORT = os.environ.get("LISTEN_PORT", 8000)
 SONOS_IPS = getenv_or_raise("SONOS_IPS").split(",")
+PLAYLIST_LENGTH = int(os.environ.get("PLAYLIST_LENGTH", 42))
+
+class MusicService(Enum):
+    TIDAL = 44551
+
+@dataclass
+class Playlist:
+    """An online music service playlist."""
+
+    service: MusicService
+    id: str
+    title: str
+
+    didl_desc: str = field(init=False)
+    track_ids: Sequence[str] = field(init=False)
+
+    def __post_init__(self):
+        # this is the secret sauce mising from soco, obtained via wireshark + sonos desktop app. without this, forget it (at least for Tidal).
+        self.didl_desc = f"SA_RINCON{self.service.value}_X_#Svc{self.service.value}-0-Token"
+
+        with open(f"./playlists/{self.id}") as f:
+            self.track_ids = f.read().splitlines()
+
+    def make_obj(self, track_id: int) -> DidlObject:
+        # obtained via wireshark
+        item_id=f"10036028track/{track_id}" # unclear if the item_id prefix code actually matters. it might!
+        uri = f"x-sonos-http:track%2f{track_id}.flac?sid=174&amp;flags=24616&amp;sn=34"
+
+        res = [DidlResource(uri=uri, protocol_info="x-rincon-playlist:*:*:*")]
+        return DidlObject(resources=res, title="", parent_id="", item_id=item_id, desc=self.didl_desc)
+
+    def play(self, sonos_ip: str):
+        """Play the Playlist on sonos_ip"""
+        random.shuffle(self.track_ids)
+
+        zone = SoCo(sonos_ip)
+        zone.clear_queue()
+
+        i = 0
+        for i, track_id in enumerate(self.track_ids):
+            obj = self.make_obj(track_id)
+
+            try:
+                zone.add_to_queue(obj)
+            except soco.exceptions.SoCoUPnPException:
+                pass
+            else:
+                zone.play_from_queue(index=0)
+                break
+
+        for track_id in self.track_ids[i+1:PLAYLIST_LENGTH]:
+            obj = self.make_obj(track_id)
+
+            try:
+                zone.add_to_queue(obj)
+            except soco.exceptions.SoCoUPnPException:
+                pass
+
+
 
 
 @dataclass
@@ -47,10 +110,19 @@ class Station:
                         print(e)
 
 
+# FIXME: make this a ConfigMap
 STATIONS = {
     "secret-agent": Station(
         url="https://somafm.com/m3u/secretagent130.m3u",
         title="SomaFM Secret Agent (Powered by Kubernetes)",
+    )
+}
+
+PLAYLISTS = {
+    "mega-playlist": Playlist(
+        service=MusicService.TIDAL,
+        id="8427c6cc-12cf-43c5-84ce-77fbc095e455",
+        title="Tidal Mega Playlist (Powered by Kubernetes)",
     )
 }
 
@@ -100,13 +172,17 @@ class SonosServer(BaseHTTPRequestHandler):
         if source.kind == "stations":
             if station := STATIONS.get(source.id, None):
                 for sonos_ip in SONOS_IPS:
+                    # FIXME: group all, or group most, but anyways, make it an env var
                     station.play(sonos_ip)
                 self.send_ok("ON")
                 return
 
         if source.kind == "playlists":
-            raise("NIY")
-            self.send_ok("ON")
+            if playlist := PLAYLISTS.get(source.id, None):
+                for sonos_ip in SONOS_IPS:
+                    # FIXME: group all, or group most, but anyways, make it an env var
+                    playlist.play(sonos_ip)
+                self.send_ok("ON")
             return
 
         self.send_not_found()
