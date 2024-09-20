@@ -30,7 +30,7 @@ SONOS_IPS = getenv_or_raise("SONOS_IPS").split(",")
 PLAYLIST_LENGTH = int(os.environ.get("PLAYLIST_LENGTH", 42))
 
 class MusicService(Enum):
-    TIDAL = 44551
+    TIDAL = 44551 # this value would normally get populated by SoCo, but only if discovery works, which it won't inside k8s
 
 @dataclass
 class Playlist:
@@ -65,10 +65,10 @@ class Playlist:
         zone = SoCo(sonos_ip)
         zone.clear_queue()
 
+        # first, enqueue a single song, and play it
         i = 0
         for i, track_id in enumerate(self.track_ids):
             obj = self.make_obj(track_id)
-
             try:
                 zone.add_to_queue(obj)
             except soco.exceptions.SoCoUPnPException:
@@ -77,15 +77,13 @@ class Playlist:
                 zone.play_from_queue(index=0)
                 break
 
+        # now that we're listening to some music, continue adding tracks
         for track_id in self.track_ids[i+1:PLAYLIST_LENGTH]:
             obj = self.make_obj(track_id)
-
             try:
                 zone.add_to_queue(obj)
             except soco.exceptions.SoCoUPnPException:
                 pass
-
-
 
 
 @dataclass
@@ -98,16 +96,10 @@ class Station:
     def play(self, sonos_ip: str):
         """Play the Station on sonos_ip"""
         zone = SoCo(sonos_ip)
-        if zone.group:
-            for member in zone.group.members:
-                if member.is_coordinator:
-                    try:
-                        logger.debug("[%s].play_uri(%s)", member.player_name, self.url)
-                        member.play_uri(
-                            uri=self.url, title=self.title, force_radio=True
-                        )
-                    except Exception as e:  # pylint:disable=[broad-exception-caught]
-                        print(e)
+        try:
+            zone.play_uri(uri=self.url, title=self.title, force_radio=True)
+        except Exception as e:  # pylint:disable=[broad-exception-caught]
+            print(e)
 
 
 # FIXME: make this a ConfigMap
@@ -125,8 +117,6 @@ PLAYLISTS = {
         title="Tidal Mega Playlist (Powered by Kubernetes)",
     )
 }
-
-logger = logging.getLogger(__name__)
 
 
 class SonosServer(BaseHTTPRequestHandler):
