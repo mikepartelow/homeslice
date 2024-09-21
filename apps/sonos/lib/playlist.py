@@ -1,6 +1,5 @@
 """"An online music service playlist."""
-import os
-import random
+
 from dataclasses import dataclass, field
 from typing import Sequence
 from enum import Enum
@@ -9,10 +8,13 @@ from soco import SoCo
 import soco.exceptions
 from soco.data_structures import DidlObject, DidlResource
 
-PLAYLIST_LENGTH = int(os.environ.get("PLAYLIST_LENGTH", 42))
 
 class MusicService(Enum):
-    TIDAL = 44551  # this value would normally get populated by SoCo, but only if discovery works, which it won't inside k8s
+    """Supported music services."""
+
+    # this value would normally get populated by SoCo, but only if discovery works,
+    # which it won't inside k8s
+    TIDAL = 44551
 
 
 @dataclass
@@ -22,25 +24,22 @@ class Playlist:
     service: MusicService
     id: str
     title: str
+    track_ids: Sequence[str]
 
     didl_desc: str = field(init=False)
-    track_ids: Sequence[str] = field(init=False)
 
-    def __post_init__(self, playlist_length: int = PLAYLIST_LENGTH):
-        # this is the secret sauce mising from soco, obtained via wireshark + sonos desktop app. without this, forget it (at least for Tidal).
+    def __post_init__(self):
+        # this is the secret sauce mising from soco, obtained via wireshark + sonos desktop app.
+        # without this, forget it (at least for Tidal).
         self.didl_desc = (
             f"SA_RINCON{self.service.value}_X_#Svc{self.service.value}-0-Token"
         )
 
-        with open(f"./playlists/{self.id}") as f:
-            self.track_ids = f.read().splitlines()
-
-            random.shuffle(self.track_ids)
-            self.track_ids = self.track_ids[:playlist_length]
-
     def make_obj(self, track_id: int) -> DidlObject:
+        """Returns a DidlObject for track_id."""
         # obtained via wireshark
-        item_id = f"10036028track/{track_id}"  # unclear if the item_id prefix code actually matters. it might!
+        # unclear if the item_id prefix code actually matters. it might!
+        item_id = f"10036028track/{track_id}"
         uri = f"x-sonos-http:track%2f{track_id}.flac?sid=174&amp;flags=24616&amp;sn=34"
 
         res = [DidlResource(uri=uri, protocol_info="x-rincon-playlist:*:*:*")]
@@ -66,7 +65,7 @@ class Playlist:
                 break
 
         # now that we're listening to some music, continue adding tracks
-        for track_id in self.track_ids[i+1:]:
+        for track_id in self.track_ids[i + 1 :]:
             obj = self.make_obj(track_id)
             try:
                 zone.add_to_queue(obj)

@@ -1,14 +1,9 @@
 """"An internet radio station."""
 
-import os
-import random
-from dataclasses import dataclass, field
-from typing import Sequence
-from enum import Enum
+from dataclasses import dataclass
 
 from soco import SoCo
-import soco.exceptions
-from soco.data_structures import DidlObject, DidlResource
+
 
 @dataclass
 class Station:

@@ -6,6 +6,9 @@
 import os
 from http.server import HTTPServer
 import logging
+from soco import SoCo
+from lib import MusicService, Playlist, SonosServer, Station
+
 
 def getenv_or_raise(name: str) -> str:
     """Return the value of an environment variable or raise RuntimeError."""
@@ -37,6 +40,7 @@ playlists = {
     )
 }
 
+
 def main():
     """ye olde main()"""
 
@@ -64,3 +68,11 @@ def main():
 
 
 main()
+
+# PLAYLIST_LENGTH = int(os.environ.get("PLAYLIST_LENGTH", 42))
+
+# with open(f"./playlists/{self.id}") as f:
+#     self.track_ids = f.read().splitlines()
+
+#     random.shuffle(self.track_ids)
+#     self.track_ids = self.track_ids[:playlist_length]

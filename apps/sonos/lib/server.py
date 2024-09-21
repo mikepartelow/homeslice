@@ -1,11 +1,16 @@
 """HTTP Server for this stuff."""
 
+from dataclasses import dataclass
+
 from collections import namedtuple
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler
 import logging
-from typing import Sequence, Mapping
+from typing import Literal, Mapping, Sequence
 from soco import SoCo
+from .playlist import Playlist
+from .station import Station
+
 
 @dataclass
 class SonosServer(BaseHTTPRequestHandler):
@@ -17,7 +22,8 @@ class SonosServer(BaseHTTPRequestHandler):
     playlists: Mapping[str, Playlist]
     stations: Mapping[str, Station]
 
-    def respond(self, status_code: Literal, message: str) -> None:
+    def respond(self, status_code: Literal, message) -> None:
+        """Send an HTTP response with an HTTP body"""
         self.send_response(status_code)
         self.send_header("Content-type", "text/plain")
         self.end_headers()
