@@ -4,9 +4,18 @@ from collections import namedtuple
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler
 import logging
+from typing import Sequence, Mapping
+from soco import SoCo
 
+@dataclass
 class SonosServer(BaseHTTPRequestHandler):
     """HTTP server for Sonos control"""
+
+    coordinator: SoCo
+    zones: Sequence[SoCo]
+    volume: int
+    playlists: Mapping[str, Playlist]
+    stations: Mapping[str, Station]
 
     def respond(self, status_code: Literal, message: str) -> None:
         self.send_response(status_code)
@@ -45,19 +54,22 @@ class SonosServer(BaseHTTPRequestHandler):
             self.send_bad_request()
             return
 
+        self.coordinator.unjoin()
+        self.coordinator.volume = self.volume
+
+        for zone in self.zones:
+            zone.join(self.coordinator)
+            zone.volume = self.volume
+
         if source.kind == "stations":
-            if station := STATIONS.get(source.id, None):
-                for sonos_ip in SONOS_IPS:
-                    # FIXME: group all, or group most, but anyways, make it an env var
-                    station.play(sonos_ip)
+            if station := self.stations.get(source.id, None):
+                station.play(self.coordinator)
                 self.send_ok("ON")
                 return
 
         if source.kind == "playlists":
-            if playlist := PLAYLISTS.get(source.id, None):
-                for sonos_ip in SONOS_IPS:
-                    # FIXME: group all, or group most, but anyways, make it an env var
-                    playlist.play(sonos_ip)
+            if playlist := self.playlists.get(source.id, None):
+                playlist.play(self.coordinator)
                 self.send_ok("ON")
             return
 

@@ -18,17 +18,18 @@ def getenv_or_raise(name: str) -> str:
 LISTEN_HOST = "0.0.0.0"
 LISTEN_PORT = os.environ.get("LISTEN_PORT", 8000)
 SONOS_IPS = getenv_or_raise("SONOS_IPS").split(",")
+VOLUME = os.environ.get("LISTEN_PORT", 20)
 
 # FIXME: make this a ConfigMap
-STATIONS = {
+stations = {
     "secret-agent": Station(
         url="https://somafm.com/m3u/secretagent130.m3u",
         title="SomaFM Secret Agent (Powered by Kubernetes)",
     )
 }
 
-# FIXME: make this a ConfigMap
-PLAYLISTS = {
+# FIXME: make this a ConfigMap, read it from filesystem
+playlists = {
     "mega-playlist": Playlist(
         service=MusicService.TIDAL,
         id="8427c6cc-12cf-43c5-84ce-77fbc095e455",
@@ -42,7 +43,15 @@ def main():
     logging.basicConfig()
     logging.getLogger(__name__).setLevel(logging.DEBUG)
 
-    server = HTTPServer((LISTEN_HOST, LISTEN_PORT), SonosServer)
+    sonos_server = SonosServer(
+        coordinator=SoCo(SONOS_IPS[0]),
+        zones=[SoCo(ip) for ip in SONOS_IPS[1:]],
+        volume=VOLUME,
+        playlists=playlists,
+        stations=stations,
+    )
+
+    server = HTTPServer((LISTEN_HOST, LISTEN_PORT), sonos_server)
     logging.warning("listening on http://%s:%s", LISTEN_HOST, LISTEN_PORT)
 
     try:
