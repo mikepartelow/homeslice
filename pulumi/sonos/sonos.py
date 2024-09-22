@@ -79,14 +79,15 @@ def app(config: homeslice_config.SonosConfig) -> None:
         ),
     )
 
+# avoid "name" that could confuse siri
+
 # {
 #     "accessory": "Http",
-#     "name": "playlist",
-#     "switchHandling": "yes",
+#     "name": "gabbagool",
+#     "switchHandling": "no",
 #     "http_method": "POST",
 #     "on_url": "http://moe.localdomain/api/v0/sonos/playlists/mega-playlist/on",
 #     "off_url": "http://moe.localdomain/api/v0/sonos/status",
-#     "status_url": "http://moe.localdomain/api/v0/sonos/status",
 #     "status_on": "ON",
 #     "status_off": "OFF",
 #     "service": "Switch",

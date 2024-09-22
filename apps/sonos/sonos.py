@@ -51,7 +51,7 @@ def make_station(config: StationConfig) -> Station:
 def main():
     """ye olde main()"""
 
-    logging.basicConfig(level=logging.DEBUG)
+    logging.basicConfig(level=logging.INFO)
 
     config = load_config()
 
@@ -88,3 +88,12 @@ def main():
 
 
 main()
+
+# FIXME:
+# - fixed IPs for sonoses in unifi (less necessary)
+# - new algo:
+#   - init coordinator
+#   - play one song on coordinator
+#   - spawn thread and return HTTP OK
+#     - group zones
+#     - enqueue the rest

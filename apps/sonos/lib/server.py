@@ -10,7 +10,7 @@ from typing import Literal, Mapping, Sequence
 from soco import SoCo
 from .playlist import Playlist
 from .station import Station
-
+import datetime
 
 def make_sonos_server(
     coordinator: SoCo,
@@ -20,13 +20,22 @@ def make_sonos_server(
     stations: Mapping[str, Station],
 ):
 
-    def prepare_group():
+    last_on = datetime.datetime.now() - datetime.timedelta(days=1)
+
+    def prepare_coordinator():
         coordinator.unjoin()
         coordinator.volume = volume
 
+    def group_zones():
         for zone in zones:
-            zone.join(coordinator)
-            zone.volume = volume
+            try:
+                zone.join(coordinator)
+            except Exception as e:
+                logging.warning(f"error {str(e)} while joining {zone} to coordinator")
+            try:
+                zone.volume = volume
+            except Exception as e:
+                logging.warning(f"error {str(e)} while setting {zone} volume")
 
     class SonosServer(BaseHTTPRequestHandler):
         """HTTP server for Sonos control"""
@@ -52,13 +61,9 @@ def make_sonos_server(
 
         def do_POST(self):  # pylint:disable=[invalid-name]
             """Process HTTP POST"""
-            logging.debug("do_POST: %s", self.path)
+            nonlocal last_on
+            logging.warning("do_POST: %s", self.path)
             parts = list(map(str.lower, self.path.split("/")))[1:]
-
-            # /status
-            if len(parts) == 1:
-                self.send_ok("OFF")
-                return
 
             # /playlists/foo/on
             # /stations/bar/on
@@ -74,18 +79,26 @@ def make_sonos_server(
                 self.send_bad_request()
                 return
 
+            if datetime.datetime.now() - last_on < datetime.timedelta(seconds=60):
+                self.send_ok("ON")
+                return
+
             if source.kind == "stations":
                 if station := stations.get(source.id, None):
-                    prepare_group()
+                    last_on = datetime.datetime.now() # homekit/homebridge/homebridge-http sends two ON requests
+                    self.send_ok("ON")  # homekit gets impatient, send OK ASAP
+                    prepare_coordinator()
                     station.play(coordinator)
-                    self.send_ok("ON")
+                    group_zones()
                     return
 
             if source.kind == "playlists":
                 if playlist := playlists.get(source.id, None):
-                    prepare_group()
+                    last_on = datetime.datetime.now() # homekit/homebridge/homebridge-http sends two ON requests
+                    self.send_ok("ON") # homekit gets impatient, send OK ASAP
+                    prepare_coordinator()
                     playlist.play(coordinator)
-                    self.send_ok("ON")
+                    group_zones()
                     return
 
             self.send_not_found()
