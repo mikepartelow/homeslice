@@ -12,9 +12,8 @@ class Station:
     url: str
     title: str
 
-    def play(self, sonos_ip: str):
-        """Play the Station on sonos_ip"""
-        zone = SoCo(sonos_ip)
+    def play(self, zone: SoCo):
+        """Play the Station on zone"""
         try:
             zone.play_uri(uri=self.url, title=self.title, force_radio=True)
         except Exception as e:  # pylint:disable=[broad-exception-caught]

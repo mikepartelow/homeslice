@@ -1,14 +1,13 @@
 #!/venv/bin/python
 """sonos.py controls Sonos Zones"""
 
-# - FIXME: sonos.group(SONOS_IPS), set all to volume == 20, then play on the controller. that's what this app does, by def. creates its own group.
-
 import os
+import random
 from http.server import HTTPServer
 import logging
 from soco import SoCo
-from lib import MusicService, Playlist, SonosServer, Station
-
+from lib import make_sonos_server, MusicService, Playlist, Station, StationConfig, SonosConfig, PlaylistConfig
+import yaml
 
 def getenv_or_raise(name: str) -> str:
     """Return the value of an environment variable or raise RuntimeError."""
@@ -18,38 +17,49 @@ def getenv_or_raise(name: str) -> str:
     return val
 
 
+CONFIG_PATH = getenv_or_raise("CONFIG_PATH")
 LISTEN_HOST = "0.0.0.0"
 LISTEN_PORT = os.environ.get("LISTEN_PORT", 8000)
+PLAYLIST_LENGTH = int(os.environ.get("PLAYLIST_LENGTH", 42))
 SONOS_IPS = getenv_or_raise("SONOS_IPS").split(",")
-VOLUME = os.environ.get("LISTEN_PORT", 20)
+VOLUME = os.environ.get("VOLUME", 20)
 
-# FIXME: make this a ConfigMap
-stations = {
-    "secret-agent": Station(
-        url="https://somafm.com/m3u/secretagent130.m3u",
-        title="SomaFM Secret Agent (Powered by Kubernetes)",
-    )
-}
+def load_config() -> SonosConfig:
+    with open(CONFIG_PATH, encoding="utf-8") as f:
+        config = yaml.safe_load(f)
+        return SonosConfig(**config)
 
-# FIXME: make this a ConfigMap, read it from filesystem
-playlists = {
-    "mega-playlist": Playlist(
-        service=MusicService.TIDAL,
-        id="8427c6cc-12cf-43c5-84ce-77fbc095e455",
-        title="Tidal Mega Playlist (Powered by Kubernetes)",
-    )
-}
+def make_playlist(config: PlaylistConfig) -> Playlist:
+    random.shuffle(config.track_ids)
 
+    service = getattr(MusicService, config.service)
+    return Playlist(service, config.title, config.track_ids[:PLAYLIST_LENGTH])
+
+def make_station(config: StationConfig) -> Station:
+    return Station(url=config.url, title=config.title)
 
 def main():
     """ye olde main()"""
 
-    logging.basicConfig()
-    logging.getLogger(__name__).setLevel(logging.DEBUG)
+    logging.basicConfig(level=logging.DEBUG)
 
-    sonos_server = SonosServer(
-        coordinator=SoCo(SONOS_IPS[0]),
-        zones=[SoCo(ip) for ip in SONOS_IPS[1:]],
+    config = load_config()
+
+    playlists = {k: make_playlist(v) for k, v in config.playlists.items()}
+    logging.info(f"playlists: {', '.join(playlists.keys())}")
+
+    stations = {k: make_station(v) for k, v in config.stations.items()}
+    logging.info(f"stations: {','.join(stations.keys())}")
+
+    coordinator = SONOS_IPS[0]
+    zones = SONOS_IPS[1:]
+    logging.info(f"coordinator: {coordinator} zones: {zones}")
+
+    logging.info(f"volume: {VOLUME}")
+
+    sonos_server = make_sonos_server(
+        coordinator=SoCo(coordinator),
+        zones=[SoCo(ip) for ip in zones],
         volume=VOLUME,
         playlists=playlists,
         stations=stations,
@@ -68,11 +78,3 @@ def main():
 
 
 main()
-
-# PLAYLIST_LENGTH = int(os.environ.get("PLAYLIST_LENGTH", 42))
-
-# with open(f"./playlists/{self.id}") as f:
-#     self.track_ids = f.read().splitlines()
-
-#     random.shuffle(self.track_ids)
-#     self.track_ids = self.track_ids[:playlist_length]

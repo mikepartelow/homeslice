@@ -22,7 +22,6 @@ class Playlist:
     """An online music service playlist."""
 
     service: MusicService
-    id: str
     title: str
     track_ids: Sequence[str]
 
@@ -47,9 +46,8 @@ class Playlist:
             resources=res, title="", parent_id="", item_id=item_id, desc=self.didl_desc
         )
 
-    def play(self, sonos_ip: str):
-        """Play the Playlist on sonos_ip"""
-        zone = SoCo(sonos_ip)
+    def play(self, zone: SoCo):
+        """Play the Playlist on zone"""
         zone.clear_queue()
 
         # first, enqueue a single song, and play it
