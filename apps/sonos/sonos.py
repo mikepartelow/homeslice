@@ -2,7 +2,6 @@
 """sonos.py controls Sonos Zones"""
 
 import os
-import random
 from http.server import HTTPServer
 import logging
 from soco import SoCo
@@ -41,10 +40,8 @@ def load_config() -> SonosConfig:
 
 
 def make_playlist(config: PlaylistConfig) -> Playlist:
-    random.shuffle(config.track_ids)
-
     service = getattr(MusicService, config.service)
-    return Playlist(service, config.title, config.track_ids[:PLAYLIST_LENGTH])
+    return Playlist(service, config.title, config.track_ids, PLAYLIST_LENGTH)
 
 
 def make_station(config: StationConfig) -> Station:

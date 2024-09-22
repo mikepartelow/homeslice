@@ -26,7 +26,7 @@ def app(config: homeslice_config.SonosConfig) -> None:
         {
             "CONFIG_PATH": config.config_path,
             "SONOS_IPS": ",".join(SONOS_SECRETS.ZONE_IPS),
-            "VOLUME": "20",
+            "VOLUME": str(config.volume),
         },
     )
 
@@ -78,3 +78,19 @@ def app(config: homeslice_config.SonosConfig) -> None:
             },
         ),
     )
+
+# {
+#     "accessory": "Http",
+#     "name": "playlist",
+#     "switchHandling": "yes",
+#     "http_method": "POST",
+#     "on_url": "http://moe.localdomain/api/v0/sonos/playlists/mega-playlist/on",
+#     "off_url": "http://moe.localdomain/api/v0/sonos/status",
+#     "status_url": "http://moe.localdomain/api/v0/sonos/status",
+#     "status_on": "ON",
+#     "status_off": "OFF",
+#     "service": "Switch",
+#     "sendimmediately": "",
+#     "username": "",
+#     "password": "",
+# }

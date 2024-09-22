@@ -55,6 +55,11 @@ def make_sonos_server(
             logging.debug("do_POST: %s", self.path)
             parts = list(map(str.lower, self.path.split("/")))[1:]
 
+            # /status
+            if len(parts) == 1:
+                self.send_ok("OFF")
+                return
+
             # /playlists/foo/on
             # /stations/bar/on
 

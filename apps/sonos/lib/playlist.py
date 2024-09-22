@@ -7,6 +7,7 @@ from enum import Enum
 from soco import SoCo
 import soco.exceptions
 from soco.data_structures import DidlObject, DidlResource
+import random
 
 
 class MusicService(Enum):
@@ -24,6 +25,7 @@ class Playlist:
     service: MusicService
     title: str
     track_ids: Sequence[str]
+    playlist_length: int
 
     didl_desc: str = field(init=False)
 
@@ -50,9 +52,13 @@ class Playlist:
         """Play the Playlist on zone"""
         zone.clear_queue()
 
+        random.shuffle(self.track_ids)
+        track_ids = self.track_ids[:self.playlist_length]
+
+
         # first, enqueue a single song, and play it
         i = 0
-        for i, track_id in enumerate(self.track_ids):
+        for i, track_id in enumerate(track_ids):
             obj = self.make_obj(track_id)
             try:
                 zone.add_to_queue(obj)
@@ -63,7 +69,7 @@ class Playlist:
                 break
 
         # now that we're listening to some music, continue adding tracks
-        for track_id in self.track_ids[i + 1 :]:
+        for track_id in track_ids[i + 1 :]:
             obj = self.make_obj(track_id)
             try:
                 zone.add_to_queue(obj)

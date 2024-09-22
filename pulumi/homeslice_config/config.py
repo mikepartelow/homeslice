@@ -78,6 +78,7 @@ class SonosConfig(BaseModel):
     container_port: int
     image: str
     ingress_prefix: Optional[str]
+    volume: int
 
 
 class UnifiConfig(GithubBackupConfig):
