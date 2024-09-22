@@ -12,6 +12,7 @@ COPY --from=venv /venv /venv
 
 WORKDIR /app
 COPY sonos.py sonos.py
+COPY lib lib
 
 ENV PATH=/venv/bin:$PATH
 

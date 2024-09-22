@@ -6,8 +6,17 @@ import random
 from http.server import HTTPServer
 import logging
 from soco import SoCo
-from lib import make_sonos_server, MusicService, Playlist, Station, StationConfig, SonosConfig, PlaylistConfig
+from lib import (
+    make_sonos_server,
+    MusicService,
+    Playlist,
+    Station,
+    StationConfig,
+    SonosConfig,
+    PlaylistConfig,
+)
 import yaml
+
 
 def getenv_or_raise(name: str) -> str:
     """Return the value of an environment variable or raise RuntimeError."""
@@ -24,10 +33,12 @@ PLAYLIST_LENGTH = int(os.environ.get("PLAYLIST_LENGTH", 42))
 SONOS_IPS = getenv_or_raise("SONOS_IPS").split(",")
 VOLUME = os.environ.get("VOLUME", 20)
 
+
 def load_config() -> SonosConfig:
     with open(CONFIG_PATH, encoding="utf-8") as f:
         config = yaml.safe_load(f)
         return SonosConfig(**config)
+
 
 def make_playlist(config: PlaylistConfig) -> Playlist:
     random.shuffle(config.track_ids)
@@ -35,8 +46,10 @@ def make_playlist(config: PlaylistConfig) -> Playlist:
     service = getattr(MusicService, config.service)
     return Playlist(service, config.title, config.track_ids[:PLAYLIST_LENGTH])
 
+
 def make_station(config: StationConfig) -> Station:
     return Station(url=config.url, title=config.title)
+
 
 def main():
     """ye olde main()"""

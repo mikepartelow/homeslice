@@ -51,6 +51,11 @@ config:
     prometheus_datasource: http://prometheus-server.observability.svc.cluster.local
     promtail_chart_version: "6.16.3"
   homeslice:namespace: homeslice
+  homeslice:sonos:
+    image: registry.localdomain:32000/sonos:20240921_213949
+    container_port: 8000
+    config_path: /etc/sonos/config.yaml
+    ingress_prefix: /(api/v0/sonos/)(.*)$
   homeslice:switches:
     container_port: 8000
     image: ghcr.io/mikepartelow/homeslice/switches:main.20240711-154205.c30ce35@sha256:89299b83ba6e82ffd19019f9bd701332c65d3be105165677ae8978db4260a65e
@@ -76,10 +81,6 @@ config:
     image: ghcr.io/homebridge/homebridge:2024-05-02@sha256:c13910618a3dbe6ed1afd01def54f800a10228ca1a6e540bb302ab56762fbd66
     redirect_host: moe.localdomain
     redirect_prefix: /homebridge
-  # homeslice:sonos:
-  #   image: registry.localdomain:32000/sonos:20240827_183915
-  #   container_port: 8000
-  #   ingress_prefix: /(api/v0/sonos/)(.*)$
     node_selector:
       "homeslice/homebridge": "true"
   homeslice:unifi:

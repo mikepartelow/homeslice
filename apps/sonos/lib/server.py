@@ -12,11 +12,13 @@ from .playlist import Playlist
 from .station import Station
 
 
-def make_sonos_server(coordinator: SoCo,
-                      zones: Sequence[SoCo],
-                      volume: int,
-                      playlists: Mapping[str, Playlist],
-                      stations: Mapping[str, Station]):
+def make_sonos_server(
+    coordinator: SoCo,
+    zones: Sequence[SoCo],
+    volume: int,
+    playlists: Mapping[str, Playlist],
+    stations: Mapping[str, Station],
+):
 
     def prepare_group():
         coordinator.unjoin()

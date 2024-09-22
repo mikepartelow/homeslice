@@ -71,6 +71,15 @@ class LmzConfig(BaseModel):
     ingress_prefix: Optional[str]
 
 
+class SonosConfig(BaseModel):
+    """Sonos Config"""
+
+    config_path: str
+    container_port: int
+    image: str
+    ingress_prefix: Optional[str]
+
+
 class UnifiConfig(GithubBackupConfig):
     """Unifi Config"""
 

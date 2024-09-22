@@ -18,6 +18,7 @@ from homeslice_config import (
     ChimeConfig,
     HomeBridgeConfig,
     LmzConfig,
+    SonosConfig,
     UnifiConfig,
 )
 from unifi import unifi
@@ -60,7 +61,7 @@ if cfg := config.get_object("observability"):
     promtail.app(cfg)
 
 if cfg := config.get_object("sonos"):
-    sonos.app(cfg)
+    sonos.app(SonosConfig(**dict(cfg)))
 
 if cfg := config.get_object("switches"):
     switches.app(cfg)

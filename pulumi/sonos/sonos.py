@@ -1,32 +1,74 @@
 """Resources for the homeslice/sonos app."""
 
 import pulumi_kubernetes as kubernetes
-import pulumi
+import homeslice_config
+from pathlib import Path
 import homeslice
+from homeslice_secrets import (  # pylint: disable=no-name-in-module
+    sonos as SONOS_SECRETS,
+)
 
 NAME = "sonos"
 
 
-def app(config: pulumi.Config) -> None:
+def app(config: homeslice_config.SonosConfig) -> None:
     """define resources for the homeslice/sonos app"""
-    image = config["image"]
-    container_port = int(config["container_port"])
-    ingress_prefix = config.get("ingress_prefix")
 
     ports = [
         kubernetes.core.v1.ContainerPortArgs(
             name="http",
-            container_port=container_port,
+            container_port=config.container_port,
         )
     ]
 
-    homeslice.deployment( NAME, image, ports=ports )
+    homeslice.configmap(
+        NAME,
+        {
+            "CONFIG_PATH": config.config_path,
+            "SONOS_IPS": ",".join(SONOS_SECRETS.ZONE_IPS),
+            "VOLUME": "20",
+        },
+    )
+
+    with open("../apps/sonos/config/config.yaml", encoding="utf-8") as f:
+        homeslice.configmap(
+            f"{NAME}-config",
+            {
+                Path(config.config_path).name: f.read(),
+            },
+        )
+
+    volume_mounts = [
+        kubernetes.core.v1.VolumeMountArgs(
+            name=f"{NAME}-config",
+            mount_path=str(Path(config.config_path).parent),
+            read_only=True,
+        )
+    ]
+
+    volumes = [
+        kubernetes.core.v1.VolumeArgs(
+            name=f"{NAME}-config",
+            config_map=kubernetes.core.v1.ConfigMapVolumeSourceArgs(
+                name=f"{NAME}-config",
+            ),
+        ),
+    ]
+
+    env_from = [homeslice.env_from_configmap(NAME)]
+
+    homeslice.deployment(NAME,
+                        config.image,
+                        env_from=env_from,
+                        ports=ports,
+                        volume_mounts=volume_mounts,
+                        volumes=volumes)
 
     homeslice.service(NAME)
 
     homeslice.ingress(
         NAME,
-        [ingress_prefix],
+        [config.ingress_prefix],
         path_type="ImplementationSpecific",
         metadata=homeslice.metadata(
             NAME,
