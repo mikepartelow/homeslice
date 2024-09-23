@@ -97,3 +97,4 @@ main()
 #   - spawn thread and return HTTP OK
 #     - group zones
 #     - enqueue the rest
+# - this thing seems to turn on crossfade, make that an option

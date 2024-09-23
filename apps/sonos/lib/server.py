@@ -11,6 +11,8 @@ from soco import SoCo
 from .playlist import Playlist
 from .station import Station
 import datetime
+from threading import Thread
+
 
 def make_sonos_server(
     coordinator: SoCo,
@@ -85,20 +87,24 @@ def make_sonos_server(
 
             if source.kind == "stations":
                 if station := stations.get(source.id, None):
-                    last_on = datetime.datetime.now() # homekit/homebridge/homebridge-http sends two ON requests
-                    self.send_ok("ON")  # homekit gets impatient, send OK ASAP
+                    last_on = (
+                        datetime.datetime.now()
+                    )  # homekit/homebridge/homebridge-http sends two ON requests
                     prepare_coordinator()
                     station.play(coordinator)
-                    group_zones()
+                    Thread(target=group_zones).start()
+                    self.send_ok("ON")  # homekit gets impatient, send OK ASAP
                     return
 
             if source.kind == "playlists":
                 if playlist := playlists.get(source.id, None):
-                    last_on = datetime.datetime.now() # homekit/homebridge/homebridge-http sends two ON requests
-                    self.send_ok("ON") # homekit gets impatient, send OK ASAP
+                    last_on = (
+                        datetime.datetime.now()
+                    )  # homekit/homebridge/homebridge-http sends two ON requests
                     prepare_coordinator()
                     playlist.play(coordinator)
-                    group_zones()
+                    Thread(target=group_zones).start()
+                    self.send_ok("ON")  # homekit gets impatient, send OK ASAP
                     return
 
             self.send_not_found()

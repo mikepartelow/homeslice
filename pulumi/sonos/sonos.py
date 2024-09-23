@@ -57,6 +57,8 @@ def app(config: homeslice_config.SonosConfig) -> None:
 
     env_from = [homeslice.env_from_configmap(NAME)]
 
+    # FIXME: set memory limit
+
     homeslice.deployment(NAME,
                         config.image,
                         env_from=env_from,

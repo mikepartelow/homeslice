@@ -3,6 +3,7 @@
 from dataclasses import dataclass, field
 from typing import Sequence
 from enum import Enum
+from threading import Thread
 
 from soco import SoCo
 import soco.exceptions
@@ -53,8 +54,7 @@ class Playlist:
         zone.clear_queue()
 
         random.shuffle(self.track_ids)
-        track_ids = self.track_ids[:self.playlist_length]
-
+        track_ids = self.track_ids[: self.playlist_length]
 
         # first, enqueue a single song, and play it
         i = 0
@@ -68,8 +68,17 @@ class Playlist:
                 zone.play_from_queue(index=0)
                 break
 
+        Thread(
+            target=self.play_the_rest,
+            args=(
+                zone,
+                track_ids[i + 1 :],
+            ),
+        ).start()
+
+    def play_the_rest(self, zone: SoCo, track_ids: Sequence[str]):
         # now that we're listening to some music, continue adding tracks
-        for track_id in track_ids[i + 1 :]:
+        for track_id in track_ids:
             obj = self.make_obj(track_id)
             try:
                 zone.add_to_queue(obj)
