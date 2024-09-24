@@ -1,8 +1,9 @@
 """Resources for the homeslice/sonos app."""
 
+from pathlib import Path
+
 import pulumi_kubernetes as kubernetes
 import homeslice_config
-from pathlib import Path
 import homeslice
 from homeslice_secrets import (  # pylint: disable=no-name-in-module
     sonos as SONOS_SECRETS,
@@ -57,17 +58,18 @@ def app(config: homeslice_config.SonosConfig) -> None:
 
     env_from = [homeslice.env_from_configmap(NAME)]
 
-    # FIXME: set memory limit
-
-    homeslice.deployment(NAME,
-                        config.image,
-                        env_from=env_from,
-                        ports=ports,
-                        volume_mounts=volume_mounts,
-                        volumes=volumes)
+    homeslice.deployment(
+        NAME,
+        config.image,
+        env_from=env_from,
+        ports=ports,
+        volume_mounts=volume_mounts,
+        volumes=volumes,
+    )
 
     homeslice.service(NAME)
 
+    # pylint: disable=R0801
     homeslice.ingress(
         NAME,
         [config.ingress_prefix],
@@ -81,6 +83,7 @@ def app(config: homeslice_config.SonosConfig) -> None:
         ),
     )
 
+
 # avoid "name" that could confuse siri
 
 # {
@@ -89,6 +92,21 @@ def app(config: homeslice_config.SonosConfig) -> None:
 #     "switchHandling": "no",
 #     "http_method": "POST",
 #     "on_url": "http://moe.localdomain/api/v0/sonos/playlists/mega-playlist/on",
+#     "off_url": "http://moe.localdomain/api/v0/sonos/status",
+#     "status_on": "ON",
+#     "status_off": "OFF",
+#     "service": "Switch",
+#     "sendimmediately": "",
+#     "username": "",
+#     "password": "",
+# }
+
+# {
+#     "accessory": "Http",
+#     "name": "dog nap",
+#     "switchHandling": "no",
+#     "http_method": "POST",
+#     "on_url": "http://moe.localdomain/api/v0/sonos/playlists/dog-nap/on",
 #     "off_url": "http://moe.localdomain/api/v0/sonos/status",
 #     "status_on": "ON",
 #     "status_off": "OFF",
