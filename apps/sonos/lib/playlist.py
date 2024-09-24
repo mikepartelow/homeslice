@@ -5,10 +5,11 @@ from typing import Sequence
 from enum import Enum
 from threading import Thread
 
+import random
+
 from soco import SoCo
 import soco.exceptions
 from soco.data_structures import DidlObject, DidlResource
-import random
 
 
 class MusicService(Enum):
@@ -59,28 +60,35 @@ class Playlist:
         # first, enqueue a single song, and play it
         i = 0
         for i, track_id in enumerate(track_ids):
-            obj = self.make_obj(track_id)
-            try:
-                zone.add_to_queue(obj)
-            except soco.exceptions.SoCoUPnPException:
-                pass
-            else:
-                zone.play_from_queue(index=0)
+            if self.play_track_ids(
+                zone,
+                [
+                    track_id,
+                ],
+            ):
                 break
 
+        zone.play_from_queue(index=0)
+
+        # now that we're listening to some music, continue adding tracks
         Thread(
-            target=self.play_the_rest,
+            target=self.play_track_ids,
             args=(
                 zone,
                 track_ids[i + 1 :],
             ),
         ).start()
 
-    def play_the_rest(self, zone: SoCo, track_ids: Sequence[str]):
-        # now that we're listening to some music, continue adding tracks
+    def play_track_ids(self, zone: SoCo, track_ids: Sequence[str]) -> bool:
+        """Play track ids on a zone. Returns True if any tracks were added."""
+        tracks_added = False
+
         for track_id in track_ids:
             obj = self.make_obj(track_id)
             try:
                 zone.add_to_queue(obj)
+                tracks_added = True
             except soco.exceptions.SoCoUPnPException:
                 pass
+
+        return tracks_added
