@@ -1,17 +1,15 @@
 """HTTP Server for this stuff."""
 
-from dataclasses import dataclass
-
+from threading import Thread
 from collections import namedtuple
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler
+import datetime
 import logging
 from typing import Literal, Mapping, Sequence
 from soco import SoCo
 from .playlist import Playlist
 from .station import Station
-import datetime
-from threading import Thread
 
 
 def make_sonos_server(
@@ -20,7 +18,8 @@ def make_sonos_server(
     volume: int,
     playlists: Mapping[str, Playlist],
     stations: Mapping[str, Station],
-):
+) -> BaseHTTPRequestHandler:
+    """Construct and return a BaseHTTPRequestHandler subclass that implements the magic."""
 
     last_on = datetime.datetime.now() - datetime.timedelta(days=1)
 
@@ -32,12 +31,14 @@ def make_sonos_server(
         for zone in zones:
             try:
                 zone.join(coordinator)
-            except Exception as e:
-                logging.warning(f"error {str(e)} while joining {zone} to coordinator")
+            except Exception as e:  # pylint: disable=broad-exception-caught
+                logging.warning(
+                    "error %s while joining %s to coordinator", str(e), zone
+                )
             try:
                 zone.volume = volume
-            except Exception as e:
-                logging.warning(f"error {str(e)} while setting {zone} volume")
+            except Exception as e:  # pylint: disable=broad-exception-caught
+                logging.warning("error %s while setting %s volume", str(e), zone)
 
     class SonosServer(BaseHTTPRequestHandler):
         """HTTP server for Sonos control"""

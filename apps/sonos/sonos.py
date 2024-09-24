@@ -5,6 +5,7 @@ import os
 from http.server import HTTPServer
 import logging
 from soco import SoCo
+import yaml
 from lib import (
     make_sonos_server,
     MusicService,
@@ -14,7 +15,6 @@ from lib import (
     SonosConfig,
     PlaylistConfig,
 )
-import yaml
 
 
 def getenv_or_raise(name: str) -> str:
@@ -34,17 +34,20 @@ VOLUME = os.environ.get("VOLUME", 20)
 
 
 def load_config() -> SonosConfig:
+    """Load config and validate it with Pydantic."""
     with open(CONFIG_PATH, encoding="utf-8") as f:
         config = yaml.safe_load(f)
-        return SonosConfig(**config)
+        return SonosConfig.model_validate(config)
 
 
 def make_playlist(config: PlaylistConfig) -> Playlist:
+    """Construct a playlist from config."""
     service = getattr(MusicService, config.service)
     return Playlist(service, config.title, config.track_ids, PLAYLIST_LENGTH)
 
 
 def make_station(config: StationConfig) -> Station:
+    """Construct a Station from config"""
     return Station(url=config.url, title=config.title)
 
 
@@ -56,16 +59,16 @@ def main():
     config = load_config()
 
     playlists = {k: make_playlist(v) for k, v in config.playlists.items()}
-    logging.info(f"playlists: {', '.join(playlists.keys())}")
+    logging.info("playlists: %s", ", ".join(playlists.keys()))
 
     stations = {k: make_station(v) for k, v in config.stations.items()}
-    logging.info(f"stations: {','.join(stations.keys())}")
+    logging.info("stations: %s", ", ".join(stations.keys()))
 
     coordinator = SONOS_IPS[0]
     zones = SONOS_IPS[1:]
-    logging.info(f"coordinator: {coordinator} zones: {zones}")
+    logging.info("coordinator: %s zones: %s", coordinator, zones)
 
-    logging.info(f"volume: {VOLUME}")
+    logging.info("volume: %s", VOLUME)
 
     sonos_server = make_sonos_server(
         coordinator=SoCo(coordinator),
@@ -88,13 +91,3 @@ def main():
 
 
 main()
-
-# FIXME:
-# - fixed IPs for sonoses in unifi (less necessary)
-# - new algo:
-#   - init coordinator
-#   - play one song on coordinator
-#   - spawn thread and return HTTP OK
-#     - group zones
-#     - enqueue the rest
-# - this thing seems to turn on crossfade, make that an option
