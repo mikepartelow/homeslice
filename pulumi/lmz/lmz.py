@@ -57,6 +57,7 @@ def app(config: homeslice_config.LmzConfig) -> None:
 
     homeslice.service(NAME)
 
+    # pylint: disable=R0801
     homeslice.ingress(
         NAME,
         [ingress_prefix],
