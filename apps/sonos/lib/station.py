@@ -18,3 +18,5 @@ class Station:
             zone.play_uri(uri=self.url, title=self.title, force_radio=True)
         except Exception as e:  # pylint:disable=[broad-exception-caught]
             print(e)
+
+    # FIXME: def status

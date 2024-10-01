@@ -62,6 +62,38 @@ def make_sonos_server(
             """Send an HTTP 404 Not Found with an optional HTTP body"""
             self.respond(HTTPStatus.NOT_FOUND, message)
 
+        def do_GET(self):  # pylint:disable=[invalid-name]
+            """Process HTTP GET"""
+            logging.warning("do_GET: %s", self.path)
+            parts = list(map(str.lower, self.path.split("/")))[1:]
+
+            # /playlists/foo/status
+            # /stations/bar/status
+
+            if len(parts) != 3:
+                self.send_not_found()
+                return
+
+            Source = namedtuple("Source", ["kind", "id", "operation"])
+            source = Source(*parts)
+
+            if source.operation.lower() != "status":
+                self.send_bad_request()
+                return
+
+            music_source = None
+
+            if source.kind == "playlists":
+                music_source = playlists.get(source.id, None)
+
+            if source.kind == "stations":
+                music_source = stations.get(source.id, None)
+
+            if music_source is None:
+                self.send_not_found()
+
+            self.send_ok(music_source.status(coordinator).value)
+
         def do_POST(self):  # pylint:disable=[invalid-name]
             """Process HTTP POST"""
             nonlocal last_on
@@ -78,7 +110,7 @@ def make_sonos_server(
             Source = namedtuple("Source", ["kind", "id", "state"])
             source = Source(*parts)
 
-            if source.state != "on":
+            if source.state.lower() != "on":
                 self.send_bad_request()
                 return
 
@@ -86,28 +118,22 @@ def make_sonos_server(
                 self.send_ok("ON")
                 return
 
-            if source.kind == "stations":
-                if station := stations.get(source.id, None):
-                    last_on = (
-                        datetime.datetime.now()
-                    )  # homekit/homebridge/homebridge-http sends two ON requests
-                    prepare_coordinator()
-                    station.play(coordinator)
-                    Thread(target=group_zones).start()
-                    self.send_ok("ON")  # homekit gets impatient, send OK ASAP
-                    return
+            music_source = None
 
             if source.kind == "playlists":
-                if playlist := playlists.get(source.id, None):
-                    last_on = (
-                        datetime.datetime.now()
-                    )  # homekit/homebridge/homebridge-http sends two ON requests
-                    prepare_coordinator()
-                    playlist.play(coordinator)
-                    Thread(target=group_zones).start()
-                    self.send_ok("ON")  # homekit gets impatient, send OK ASAP
-                    return
+                music_source = playlists.get(source.id, None)
 
-            self.send_not_found()
+            if source.kind == "stations":
+                music_source = stations.get(source.id, None)
+
+            if music_source is None:
+                self.send_not_found()
+
+            # homekit/homebridge/homebridge-http sends two ON requests
+            last_on = datetime.datetime.now()
+            prepare_coordinator()
+            music_source.play(coordinator)
+            Thread(target=group_zones).start()
+            self.send_ok("ON")  # homekit gets impatient, send OK ASAP
 
     return SonosServer
