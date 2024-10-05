@@ -52,8 +52,7 @@ config:
     promtail_chart_version: "6.16.3"
   homeslice:namespace: homeslice
   homeslice:sonos:
-    image: ghcr.io/mikepartelow/homeslice/sonos:main.20240924-045052.a619742@sha256:178ab19d37597392b741699cc4cefa9b8f90bbe6ef5697713ea73b177a414ab1
-
+    image: registry.localdomain:32000/sonos:20241005_101910
     container_port: 8000
     config_path: /etc/sonos/config.yaml
     ingress_prefix: /(api/v0/sonos/)(.*)$

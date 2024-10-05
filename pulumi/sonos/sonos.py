@@ -89,10 +89,11 @@ def app(config: homeslice_config.SonosConfig) -> None:
 # {
 #     "accessory": "Http",
 #     "name": "gabbagool",
-#     "switchHandling": "no",
+#     "switchHandling": "yes",
 #     "http_method": "POST",
 #     "on_url": "http://moe.localdomain/api/v0/sonos/playlists/mega-playlist/on",
-#     "off_url": "http://moe.localdomain/api/v0/sonos/status",
+#     "off_url": "http://moe.localdomain/api/v0/sonos/playlists/mega-playlist/off",
+#     "status_url": "http://moe.localdomain/api/v0/sonos/playlists/mega-playlist/status"
 #     "status_on": "ON",
 #     "status_off": "OFF",
 #     "service": "Switch",
@@ -104,10 +105,11 @@ def app(config: homeslice_config.SonosConfig) -> None:
 # {
 #     "accessory": "Http",
 #     "name": "dog nap",
-#     "switchHandling": "no",
+#     "switchHandling": "yes",
 #     "http_method": "POST",
 #     "on_url": "http://moe.localdomain/api/v0/sonos/playlists/dog-nap/on",
-#     "off_url": "http://moe.localdomain/api/v0/sonos/status",
+#     "off_url": "http://moe.localdomain/api/v0/sonos/playlists/dog-nap/off",
+#     "status_url": "http://moe.localdomain/api/v0/sonos/playlists/dog-nap/status",
 #     "status_on": "ON",
 #     "status_off": "OFF",
 #     "service": "Switch",
