@@ -100,18 +100,13 @@ class Playlist:
         return tracks_added
 
     def status(self, zone: SoCo) -> Status:
-        # ON if:
-        # NOTE: potential false negative if this app crashes between play() and status()
-        # - self.playing_track_ids is not None
-        # - zone is coordinator
-        # - zone is playing
-        # - queue len == len(self.playing_track_ids)
-        # - sorted(queue) == sorted(self.playing_track_ids)
-        # - zone.group == self.group
+        """Status returns ON if the given playlist is more-or-less playing on the controller. Does not consider grouping."""
         if self.playing_track_ids is None:
             return Status.OFF
+
         if not zone.is_coordinator:
             return Status.OFF
+
         if zone.get_current_transport_info()["current_transport_state"] != "PLAYING":
             return Status.OFF
 
@@ -121,13 +116,13 @@ class Playlist:
 
         queue_track_ids = [
             # 'x-sonos-http:track%2f337718679.flac?sid=174&flags=8232&sn=34'
-            int(track.get_uri().split("%2f")[1].split(".flac")[0]) for track in queue
+            int(track.get_uri().split("%2f")[1].split(".")[0]) for track in queue
         ]
 
         if list(sorted(queue_track_ids)) != list(sorted(self.playing_track_ids)):
-            print(sorted(queue_track_ids))
-            print("----")
-            print(sorted(self.playing_track_ids))
             return Status.OFF
+
+        # Here we could check if the group remains the same as when we turned the playlist ON, but that makes
+        # a problematic method even more problematic.
 
         return Status.ON

@@ -10,7 +10,9 @@ from typing import Literal, Mapping, Sequence
 from soco import SoCo
 from .playlist import Playlist
 from .station import Station
+from .timing import timing
 
+LastOn = namedtuple("LastOn", ["kind", "id", "time"])
 
 def make_sonos_server(
     coordinator: SoCo,
@@ -21,7 +23,7 @@ def make_sonos_server(
 ) -> BaseHTTPRequestHandler:
     """Construct and return a BaseHTTPRequestHandler subclass that implements the magic."""
 
-    last_on = datetime.datetime.now() - datetime.timedelta(days=1)
+    last_on = LastOn(kind=None, id=None, time=datetime.datetime.now() - datetime.timedelta(days=1))
 
     def prepare_coordinator():
         coordinator.unjoin()
@@ -81,6 +83,10 @@ def make_sonos_server(
                 self.send_bad_request()
                 return
 
+            if datetime.datetime.now() - last_on.time < datetime.timedelta(seconds=60) and last_on.kind == source.kind and last_on.id == source.id:
+                self.send_ok("ON")
+                return
+
             music_source = None
 
             if source.kind == "playlists":
@@ -92,7 +98,10 @@ def make_sonos_server(
             if music_source is None:
                 self.send_not_found()
 
-            self.send_ok(music_source.status(coordinator).value)
+            with timing("music_source.status", logging.WARNING):
+                status = music_source.status(coordinator)
+
+            self.send_ok(status.value)
 
         def do_POST(self):  # pylint:disable=[invalid-name]
             """Process HTTP POST"""
@@ -114,7 +123,7 @@ def make_sonos_server(
                 self.send_bad_request()
                 return
 
-            if datetime.datetime.now() - last_on < datetime.timedelta(seconds=60):
+            if datetime.datetime.now() - last_on.time < datetime.timedelta(seconds=60):
                 self.send_ok("ON")
                 return
 
@@ -130,10 +139,12 @@ def make_sonos_server(
                 self.send_not_found()
 
             # homekit/homebridge/homebridge-http sends two ON requests
-            last_on = datetime.datetime.now()
-            prepare_coordinator()
-            music_source.play(coordinator)
-            Thread(target=group_zones).start()
+            with timing("music_source.on"):
+                last_on = LastOn(kind=source.kind, id=source.id, time=datetime.datetime.now())
+                prepare_coordinator()
+                music_source.play(coordinator)
+                Thread(target=group_zones).start()
+
             self.send_ok("ON")  # homekit gets impatient, send OK ASAP
 
     return SonosServer
