@@ -4,7 +4,7 @@ from threading import Thread
 from collections import namedtuple
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler
-import datetime
+import time
 import logging
 from typing import Literal, Mapping, Sequence
 from soco import SoCo
@@ -23,11 +23,7 @@ def make_sonos_server(
 ) -> BaseHTTPRequestHandler:
     """Construct and return a BaseHTTPRequestHandler subclass that implements the magic."""
 
-    last_on = LastOn(kind=None, id=None, time=datetime.datetime.now() - datetime.timedelta(days=1))
-
-    def prepare_coordinator():
-        coordinator.unjoin()
-        coordinator.volume = volume
+    last_on = LastOn(kind=None, id=None, time=time.time() - 60*60*24)
 
     def group_zones():
         for zone in zones:
@@ -41,6 +37,14 @@ def make_sonos_server(
                 zone.volume = volume
             except Exception as e:  # pylint: disable=broad-exception-caught
                 logging.warning("error %s while setting %s volume", str(e), zone)
+
+    def prepare_coordinator():
+        coordinator.unjoin()
+        coordinator.volume = volume
+
+    def recently_on(kind:any, id:any):
+        nonlocal last_on
+        return time.time() - last_on.time < 60 and kind == last_on.kind and id == last_on.id
 
     class SonosServer(BaseHTTPRequestHandler):
         """HTTP server for Sonos control"""
@@ -83,7 +87,7 @@ def make_sonos_server(
                 self.send_bad_request()
                 return
 
-            if datetime.datetime.now() - last_on.time < datetime.timedelta(seconds=60) and last_on.kind == source.kind and last_on.id == source.id:
+            if recently_on(source.kind, source.id):
                 self.send_ok("ON")
                 return
 
@@ -105,7 +109,6 @@ def make_sonos_server(
 
         def do_POST(self):  # pylint:disable=[invalid-name]
             """Process HTTP POST"""
-            nonlocal last_on
             logging.warning("do_POST: %s", self.path)
             parts = list(map(str.lower, self.path.split("/")))[1:]
 
@@ -123,7 +126,7 @@ def make_sonos_server(
                 self.send_bad_request()
                 return
 
-            if datetime.datetime.now() - last_on.time < datetime.timedelta(seconds=60):
+            if recently_on(source.kind, source.id):
                 self.send_ok("ON")
                 return
 
@@ -140,7 +143,8 @@ def make_sonos_server(
 
             # homekit/homebridge/homebridge-http sends two ON requests
             with timing("music_source.on"):
-                last_on = LastOn(kind=source.kind, id=source.id, time=datetime.datetime.now())
+                nonlocal last_on
+                last_on = LastOn(kind=source.kind, id=source.id, time=time.time())
                 prepare_coordinator()
                 music_source.play(coordinator)
                 Thread(target=group_zones).start()
