@@ -6,5 +6,5 @@ from enum import Enum
 class Status(Enum):
     """ON, or OFF"""
 
-    ON = "ON"
-    OFF = "OFF"
+    ON = "1"
+    OFF = "0"

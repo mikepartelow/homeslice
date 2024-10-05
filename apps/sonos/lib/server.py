@@ -10,6 +10,7 @@ from typing import Literal, Mapping, Sequence
 from soco import SoCo
 from .playlist import Playlist
 from .station import Station
+from .status import Status
 from .timing import timing
 
 LastOn = namedtuple("LastOn", ["kind", "id", "time"])
@@ -55,7 +56,7 @@ def make_sonos_server(
     class SonosServer(BaseHTTPRequestHandler):
         """HTTP server for Sonos control"""
 
-        def respond(self, status_code: Literal, message) -> None:
+        def respond(self, status_code: Literal, message: str) -> None:
             """Send an HTTP response with an HTTP body"""
             self.send_response(status_code)
             self.send_header("Content-type", "text/plain")
@@ -94,7 +95,7 @@ def make_sonos_server(
                 return
 
             if recently_on(source.kind, source.id):
-                self.send_ok("ON")
+                self.send_ok(Status.ON.value)
                 return
 
             music_source = None
@@ -133,7 +134,7 @@ def make_sonos_server(
             if source.state.lower() == "off":
                 coordinator.stop()
                 last_on = LastOn(kind=None, id=None, time=0)
-                self.send_ok("OFF")
+                self.send_ok(Status.OFF.value)
                 return
 
             if source.state.lower() != "on":
@@ -141,7 +142,7 @@ def make_sonos_server(
                 return
 
             if recently_on(source.kind, source.id):
-                self.send_ok("ON")
+                self.send_ok(Status.ON.value)
                 return
 
             music_source = None
@@ -162,6 +163,6 @@ def make_sonos_server(
                 music_source.play(coordinator)
                 Thread(target=group_zones).start()
 
-            self.send_ok("ON")  # homekit gets impatient, send OK ASAP
+            self.send_ok(Status.ON.value)  # homekit gets impatient, send OK ASAP
 
     return SonosServer
