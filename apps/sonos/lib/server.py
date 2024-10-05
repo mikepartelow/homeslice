@@ -14,6 +14,8 @@ from .timing import timing
 
 LastOn = namedtuple("LastOn", ["kind", "id", "time"])
 
+
+# pylint: disable=too-many-statements
 def make_sonos_server(
     coordinator: SoCo,
     zones: Sequence[SoCo],
@@ -23,7 +25,7 @@ def make_sonos_server(
 ) -> BaseHTTPRequestHandler:
     """Construct and return a BaseHTTPRequestHandler subclass that implements the magic."""
 
-    last_on = LastOn(kind=None, id=None, time=time.time() - 60*60*24)
+    last_on = LastOn(kind=None, id=None, time=time.time() - 60 * 60 * 24)
 
     def group_zones():
         for zone in zones:
@@ -42,9 +44,13 @@ def make_sonos_server(
         coordinator.unjoin()
         coordinator.volume = volume
 
-    def recently_on(kind:any, id:any):
+    def recently_on(kind: any, id_: any):
         nonlocal last_on
-        return time.time() - last_on.time < 60 and kind == last_on.kind and id == last_on.id
+        return (
+            time.time() - last_on.time < 60
+            and kind == last_on.kind
+            and id_ == last_on.id
+        )
 
     class SonosServer(BaseHTTPRequestHandler):
         """HTTP server for Sonos control"""
