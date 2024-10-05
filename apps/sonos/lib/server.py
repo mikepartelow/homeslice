@@ -25,7 +25,7 @@ def make_sonos_server(
 ) -> BaseHTTPRequestHandler:
     """Construct and return a BaseHTTPRequestHandler subclass that implements the magic."""
 
-    last_on = LastOn(kind=None, id=None, time=time.time() - 60 * 60 * 24)
+    last_on = LastOn(kind=None, id=None, time=0)
 
     def group_zones():
         for zone in zones:
@@ -115,6 +115,8 @@ def make_sonos_server(
 
         def do_POST(self):  # pylint:disable=[invalid-name]
             """Process HTTP POST"""
+            nonlocal last_on
+
             logging.warning("do_POST: %s", self.path)
             parts = list(map(str.lower, self.path.split("/")))[1:]
 
@@ -127,6 +129,12 @@ def make_sonos_server(
 
             Source = namedtuple("Source", ["kind", "id", "state"])
             source = Source(*parts)
+
+            if source.state.lower() == "off":
+                coordinator.stop()
+                last_on = LastOn(kind=None, id=None, time=0)
+                self.send_ok("OFF")
+                return
 
             if source.state.lower() != "on":
                 self.send_bad_request()
@@ -149,7 +157,6 @@ def make_sonos_server(
 
             # homekit/homebridge/homebridge-http sends two ON requests
             with timing("music_source.on"):
-                nonlocal last_on
                 last_on = LastOn(kind=source.kind, id=source.id, time=time.time())
                 prepare_coordinator()
                 music_source.play(coordinator)

@@ -29,7 +29,8 @@ class Station:
         if zone.get_current_transport_info()["current_transport_state"] != "PLAYING":
             return Status.OFF
 
-        # could also mangle then check ["uri"]: 'uri': 'x-rincon-mp3radio://somafm.com/m3u/groovesalad130.m3u'
+        # could also mangle then check ["uri"]:
+        # 'uri': 'x-rincon-mp3radio://somafm.com/m3u/groovesalad130.m3u'
         # but the x-rincon prefix may vary depending on who-knows-what, so this is simpler
         if zone.get_current_media_info()["channel"] != self.title:
             return Status.OFF
