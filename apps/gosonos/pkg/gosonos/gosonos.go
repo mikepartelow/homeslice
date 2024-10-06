@@ -1,6 +1,7 @@
 package gosonos
 
 import (
+	"bytes"
 	_ "embed"
 	"fmt"
 	"io"
@@ -9,6 +10,7 @@ import (
 	"net"
 	"net/http"
 	"strings"
+	"text/template"
 )
 
 const (
@@ -18,6 +20,8 @@ const (
 type Player struct {
 	Address net.Addr
 	Logger  *slog.Logger
+
+	queueXmlTemplate *template.Template
 }
 
 type TidalTrack struct {
@@ -36,8 +40,8 @@ func (t *Track) Id() string {
 	return t.TidalTrack.Id
 }
 
-//go:embed requests/queue.xml
-var queueXml string
+//go:embed requests/queue.xml.tmpl
+var queueXmlTemplate string
 
 // FIXME: iterator: have this return (error, func() Iter) so that we can stop panicking on error
 // FIXME: queue.xml expects pagination, so paginate. test with large queue.
@@ -47,11 +51,17 @@ func (p *Player) Queue() ([]Track, error) {
 	endpoint := "MediaServer/ContentDirectory/Control"
 	action := "urn:schemas-upnp-org:service:ContentDirectory:1#Browse"
 
+	var queueXML bytes.Buffer
+	err := p.queueXmlTemplate.Execute(&queueXML, struct{ StartingIndex int }{0})
+	if err != nil {
+		return nil, fmt.Errorf("error executing queue XML template: %w", err)
+	}
+
 	logger := p.Logger.With("method", "Queue")
 	logger.Info("", "endpoint", endpoint)
 
 	var dl soap.DidlLite
-	err := p.get(endpoint, action, queueXml, func(r io.Reader) error {
+	err = p.get(endpoint, action, queueXML.String(), func(r io.Reader) error {
 		return dl.Decode(r)
 	})
 	if err != nil {
@@ -105,6 +115,13 @@ func (p *Player) get(endpoint, action, body string, callback func(io.Reader) err
 func (p *Player) init() {
 	if p.Logger == nil {
 		p.Logger = slog.Default() // FIXME: use the fancy console/structured logging thing
+	}
+	if p.queueXmlTemplate == nil {
+		t, err := template.New("queueXML").Parse(queueXmlTemplate)
+		if err != nil {
+			panic(fmt.Errorf("error parsing queue XML template: %w", err))
+		}
+		p.queueXmlTemplate = t
 	}
 }
 
