@@ -3,6 +3,7 @@ package soap
 import (
 	"encoding/xml"
 	"fmt"
+	"io"
 )
 
 type Envelope struct {
@@ -35,9 +36,9 @@ type Res struct {
 	Value   string   `xml:",chardata"`
 }
 
-func (d *DidlLite) Unmarshal(bytes []byte) error {
+func (d *DidlLite) Decode(r io.Reader) error {
 	e := Envelope{}
-	if err := xml.Unmarshal(bytes, &e); err != nil {
+	if err := xml.NewDecoder(r).Decode(&e); err != nil {
 		return fmt.Errorf("error unmarshaling Envelope: %w", err)
 	}
 

@@ -44,27 +44,19 @@ var queueXml string
 func (p *Player) Queue() ([]Track, error) {
 	p.init()
 
-	endpoint := fmt.Sprintf("http://%s/MediaServer/ContentDirectory/Control", p.Address.String())
+	endpoint := "MediaServer/ContentDirectory/Control"
+	action := "urn:schemas-upnp-org:service:ContentDirectory:1#Browse"
+
 	logger := p.Logger.With("method", "Queue")
 	logger.Info("", "endpoint", endpoint)
 
-	req, err := http.NewRequest("POST", endpoint, strings.NewReader(queueXml))
-	check(err)
-
-	req.Header.Add("Content-Type", `text/xml; charset="utf-8"`)
-	req.Header.Add("SOAPACTION", "urn:schemas-upnp-org:service:ContentDirectory:1#Browse")
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	check(err)
-
-	fmt.Println(resp.Status)
-	body, err := io.ReadAll(resp.Body)
-	check(err)
-
-	dl := soap.DidlLite{}
-	err = dl.Unmarshal(body)
-	check(err)
+	var dl soap.DidlLite
+	err := p.get(endpoint, action, queueXml, func(r io.Reader) error {
+		return dl.Decode(r)
+	})
+	if err != nil {
+		return nil, fmt.Errorf("error decoding Sonos response: %w", err)
+	}
 
 	tracks := make([]Track, len(dl.Items))
 	for i, item := range dl.Items {
@@ -81,6 +73,33 @@ func (p *Player) Queue() ([]Track, error) {
 	}
 
 	return tracks, nil
+}
+
+func (p *Player) get(endpoint, action, body string, callback func(io.Reader) error) error {
+	endpoint = fmt.Sprintf("http://%s/%s", p.Address.String(), endpoint)
+	logger := p.Logger.With("method", "get")
+	logger.Info("", "endpoint", endpoint)
+
+	req, err := http.NewRequest("POST", endpoint, strings.NewReader(body))
+	if err != nil {
+		return fmt.Errorf("error creating HTTP Request: %w", err)
+	}
+
+	req.Header.Add("Content-Type", `text/xml; charset="utf-8"`)
+	req.Header.Add("SOAPACTION", action)
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return fmt.Errorf("error doing HTTP Request: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("HTTP error %d: %s", resp.StatusCode, resp.Status)
+	}
+
+	return callback(resp.Body)
 }
 
 func (p *Player) init() {
