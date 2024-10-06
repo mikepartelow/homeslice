@@ -9,8 +9,11 @@ import (
 	"mp/gosonos/pkg/soap"
 	"net"
 	"net/http"
+	"os"
 	"strings"
 	"text/template"
+
+	"github.com/phsym/console-slog"
 )
 
 const (
@@ -70,7 +73,7 @@ func (p *Player) Queue() ([]Track, error) {
 		}
 
 		var dl soap.DidlLite
-		err = p.get(endpoint, action, queueXML.String(), func(r io.Reader) error {
+		err = p.post(endpoint, action, queueXML.String(), func(r io.Reader) error {
 			return dl.Decode(r)
 		})
 		if err != nil {
@@ -99,9 +102,9 @@ func (p *Player) Queue() ([]Track, error) {
 	return tracks, nil
 }
 
-func (p *Player) get(endpoint, action, body string, callback func(io.Reader) error) error {
+func (p *Player) post(endpoint, action, body string, callback func(io.Reader) error) error {
 	endpoint = fmt.Sprintf("http://%s/%s", p.Address.String(), endpoint)
-	logger := p.Logger.With("method", "get")
+	logger := p.Logger.With("method", "post")
 	logger.Debug("", "endpoint", endpoint)
 
 	req, err := http.NewRequest("POST", endpoint, strings.NewReader(body))
@@ -128,7 +131,9 @@ func (p *Player) get(endpoint, action, body string, callback func(io.Reader) err
 
 func (p *Player) init() {
 	if p.Logger == nil {
-		p.Logger = slog.Default() // FIXME: use the fancy console/structured logging thing
+		p.Logger = slog.New(
+			console.NewHandler(os.Stderr, &console.HandlerOptions{Level: slog.LevelInfo}),
+		)
 	}
 	if p.queueXmlTemplate == nil {
 		t, err := template.New("queueXML").Parse(queueXmlTemplate)
