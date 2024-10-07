@@ -24,11 +24,15 @@ type Player struct {
 	Address net.Addr
 	Logger  *slog.Logger
 
-	queueXmlTemplate *template.Template
+	addTracksXmlTemplate        *template.Template
+	addTrackDidlLiteXmlTemplate *template.Template
+	queueXmlTemplate            *template.Template
 }
 
+type TrackId string
+
 type TidalTrack struct {
-	Id string
+	Id TrackId
 }
 
 type Track struct {
@@ -36,15 +40,64 @@ type Track struct {
 	*TidalTrack
 }
 
-func (t *Track) Id() string {
+func (t *Track) Id() TrackId {
 	if t.TidalTrack == nil {
 		panic("NIH")
 	}
 	return t.TidalTrack.Id
 }
 
-//go:embed requests/queue.xml.tmpl
-var queueXmlTemplate string
+func (p *Player) AddTracks(trackIds []TrackId) error {
+	p.init()
+
+	endpoint := "MediaRenderer/AVTransport/Control"
+	action := "urn:schemas-upnp-org:service:AVTransport:1#AddMultipleURIsToQueue"
+
+	logger := p.Logger.With("method", "AddTracks")
+	logger.Info("", "endpoint", endpoint)
+
+	var uris string
+	var didls string
+
+	for _, tid := range trackIds {
+		// x-sonos-http:track%2f16334233.flac?sid=174&amp;flags=24616&amp;sn=34
+		uri := "x-sonos-http:track%2f" + string(tid) + ".flac?sid=174&amp;flags=24616&amp;sn=34 "
+		uris = uris + uri
+
+		// in this template, whitespace is extremely significant. make sure there isn't any!
+		var addTrackDidlLiteXML bytes.Buffer
+		err := p.addTrackDidlLiteXmlTemplate.Execute(&addTrackDidlLiteXML, struct {
+			TrackId string
+		}{
+			TrackId: string(tid),
+		})
+		if err != nil {
+			return fmt.Errorf("error executing addTracks XML template: %w", err)
+		}
+
+		didls += addTrackDidlLiteXML.String()
+	}
+
+	didls = strings.TrimSpace(didls)
+
+	var addTracksXML bytes.Buffer
+	err := p.addTracksXmlTemplate.Execute(&addTracksXML, struct {
+		Count    int
+		URIs     string
+		Metadata string
+	}{
+		Count:    len(trackIds),
+		URIs:     uris,
+		Metadata: didls,
+	})
+	if err != nil {
+		return fmt.Errorf("error executing addTracks XML template: %w", err)
+	}
+
+	return p.post(endpoint, action, addTracksXML.String(), func(r io.Reader) error {
+		return nil
+	})
+}
 
 // FIXME: iterator: have this return (error, func() Iter) so that we can stop panicking on error
 // FIXME: queue.xml expects pagination, so paginate. test with large queue.
@@ -91,7 +144,7 @@ func (p *Player) Queue() ([]Track, error) {
 			id := strings.Split(strings.Split(uri, "%2f")[1], ".")[0]
 			track := Track{
 				TidalTrack: &TidalTrack{
-					Id: id,
+					Id: TrackId(id),
 				},
 				URI: uri,
 			}
@@ -129,6 +182,15 @@ func (p *Player) post(endpoint, action, body string, callback func(io.Reader) er
 	return callback(resp.Body)
 }
 
+//go:embed requests/queue.xml.tmpl
+var queueXmlTemplate string
+
+//go:embed requests/add_track_didl_lite.xml.tmpl
+var addTrackDidlLiteXmlTemplate string
+
+//go:embed requests/add_tracks.xml.tmpl
+var addTracksXmlTemplate string
+
 func (p *Player) init() {
 	if p.Logger == nil {
 		p.Logger = slog.New(
@@ -142,6 +204,22 @@ func (p *Player) init() {
 		}
 		p.queueXmlTemplate = t
 	}
+	if p.addTrackDidlLiteXmlTemplate == nil {
+		t, err := template.New("addTrackDidlLiteXML").Parse(addTrackDidlLiteXmlTemplate)
+		if err != nil {
+			panic(fmt.Errorf("error parsing addTrackDidlLite XML template: %w", err))
+		}
+		p.addTrackDidlLiteXmlTemplate = t
+	}
+
+	if p.addTracksXmlTemplate == nil {
+		t, err := template.New("addTracksXML").Parse(addTracksXmlTemplate)
+		if err != nil {
+			panic(fmt.Errorf("error parsing addTracks XML template: %w", err))
+		}
+		p.addTracksXmlTemplate = t
+	}
+
 }
 
 func check(err error) {

@@ -15,11 +15,21 @@ func main() {
 	}
 	fmt.Println(p)
 
-	tracks, err := p.Queue()
-	check(err)
-	for _, track := range tracks {
-		fmt.Println(track.Id())
+	trackIds := []gosonos.TrackId{
+		gosonos.TrackId("73569259"),
+		gosonos.TrackId("16334233"),
+		gosonos.TrackId("21702638"),
+		gosonos.TrackId("97874177"),
 	}
+
+	err = p.AddTracks(trackIds)
+	check(err)
+
+	// tracks, err := p.Queue()
+	// check(err)
+	// for _, track := range tracks {
+	// 	fmt.Println(track.Id())
+	// }
 
 	// bytes, err := os.ReadFile("ff.xml")
 	// check(err)
@@ -31,7 +41,7 @@ func main() {
 	// 	fmt.Println(strings.TrimSpace(item.Res.Value))
 	// }
 
-	fmt.Printf("%d tracks\n", len(tracks))
+	// fmt.Printf("%d tracks\n", len(tracks))
 }
 
 func check(err error) {

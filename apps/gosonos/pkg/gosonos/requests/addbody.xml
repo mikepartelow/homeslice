@@ -1,0 +1,97 @@
+<DIDL-Lite
+    xmlns:dc="http://purl.org/dc/elements/1.1/"
+    xmlns:upnp="urn:schemas-upnp-org:metadata-1-0/upnp/"
+    xmlns:r="urn:schemas-rinconnetworks-com:metadata-1-0/"
+    xmlns="urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/">
+    <item
+        id="10036028track%2f73569259"
+        parentID="10062a6cplaylist%2f8427c6cc-12cf-43c5-84ce-77fbc095e455"
+        restricted="true">
+        <dc:title>Paranoimia (feat. Max Headroom)
+            [7&quot; Mix] [2017
+            Remaster]</dc:title>
+        <upnp:class>object.item.audioItem.musicTrack.#tidalList</upnp:class>
+        <upnp:album>In
+            Visible Silence (Deluxe Edition)</upnp:album>
+        <dc:creator>Art Of
+            Noise</dc:creator>
+        <upnp:albumArtURI>
+            https://resources.tidal.com/images/6fee1e44/8868/421f/a913/b7dfda891a2f/640x640.jpg</upnp:albumArtURI>
+        <r:albumArtist>Art
+            Of Noise</r:albumArtist>
+        <desc id="cdudn"
+            nameSpace="urn:schemas-rinconnetworks-com:metadata-1-0/">
+            SA_RINCON44551_X_#Svc44551-0-Token</desc>
+    </item>
+</DIDL-Lite>
+<DIDL-Lite xmlns:dc="http://purl.org/dc/elements/1.1/"
+    xmlns:upnp="urn:schemas-upnp-org:metadata-1-0/upnp/"
+    xmlns:r="urn:schemas-rinconnetworks-com:metadata-1-0/"
+    xmlns="urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/">
+    <item
+        id="10036028track%2f16334233"
+        parentID="10062a6cplaylist%2f8427c6cc-12cf-43c5-84ce-77fbc095e455"
+        restricted="true">
+        <dc:title>D.R.O.M.P (Special 12&quot;
+            Mix)</dc:title>
+        <upnp:class>object.item.audioItem.musicTrack.#tidalList</upnp:class>
+        <upnp:album>D.R.O.M.P</upnp:album>
+        <dc:creator>Chicken
+            Lips</dc:creator>
+        <upnp:albumArtURI>
+            https://resources.tidal.com/images/3e8e36b6/8a42/48fa/bacd/103455382973/640x640.jpg</upnp:albumArtURI>
+        <r:albumArtist>Chicken
+            Lips</r:albumArtist>
+        <desc id="cdudn"
+            nameSpace="urn:schemas-rinconnetworks-com:metadata-1-0/">
+            SA_RINCON44551_X_#Svc44551-0-Token</desc>
+    </item>
+</DIDL-Lite>
+<DIDL-Lite xmlns:dc="http://purl.org/dc/elements/1.1/"
+    xmlns:upnp="urn:schemas-upnp-org:metadata-1-0/upnp/"
+    xmlns:r="urn:schemas-rinconnetworks-com:metadata-1-0/"
+    xmlns="urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/">
+    <item
+        id="10036028track%2f21702638"
+        parentID="10062a6cplaylist%2f8427c6cc-12cf-43c5-84ce-77fbc095e455"
+        restricted="true">
+        <dc:title>Have Love Will
+            Travel</dc:title>
+        <upnp:class>object.item.audioItem.musicTrack.#tidalList</upnp:class>
+        <upnp:album>Here
+            Are the Sonics</upnp:album>
+        <dc:creator>The
+            Sonics</dc:creator>
+        <upnp:albumArtURI>
+            https://resources.tidal.com/images/8075ed1b/9292/4272/bc1e/17dc28f5ffd7/640x640.jpg</upnp:albumArtURI>
+        <r:albumArtist>The
+            Sonics</r:albumArtist>
+        <desc id="cdudn"
+            nameSpace="urn:schemas-rinconnetworks-com:metadata-1-0/">
+            SA_RINCON44551_X_#Svc44551-0-Token</desc>
+    </item>
+</DIDL-Lite>
+<DIDL-Lite xmlns:dc="http://purl.org/dc/elements/1.1/"
+    xmlns:upnp="urn:schemas-upnp-org:metadata-1-0/upnp/"
+    xmlns:r="urn:schemas-rinconnetworks-com:metadata-1-0/"
+    xmlns="urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/">
+    <item
+        id="10036028track%2f97874177"
+        parentID="10062a6cplaylist%2f8427c6cc-12cf-43c5-84ce-77fbc095e455"
+        restricted="true">
+        <dc:title>Elephant (Canyons Wooly Mammoth
+            Extension)</dc:title>
+        <upnp:class>object.item.audioItem.musicTrack.#tidalList</upnp:class>
+        <upnp:album>Lonerism
+            B-Sides &amp; Remixes</upnp:album>
+        <dc:creator>Tame
+            Impala</dc:creator>
+        <upnp:albumArtURI>
+            https://resources.tidal.com/images/a29afbe9/9904/4d97/bdd9/6e5ae2f75c18/640x640.jpg</upnp:albumArtURI>
+        <r:albumArtist>Tame
+            Impala</r:albumArtist>
+        <desc id="cdudn"
+            nameSpace="urn:schemas-rinconnetworks-com:metadata-1-0/">
+            SA_RINCON44551_X_#Svc44551-0-Token</desc>
+    </item>
+</DIDL-Lite>
