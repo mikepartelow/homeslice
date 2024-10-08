@@ -59,6 +59,8 @@ type Res struct {
 	Value   string   `xml:",chardata"`
 }
 
+// FIXME: remove unused bits here (both fields and structs)
+
 func (d *DidlLite) Decode(r io.Reader) error {
 	return xml.NewDecoder(r).Decode(d)
 

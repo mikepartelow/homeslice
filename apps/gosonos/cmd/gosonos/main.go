@@ -7,23 +7,34 @@ import (
 )
 
 func main() {
-	a, err := net.ResolveTCPAddr("tcp", fmt.Sprintf("192.168.1.204:%d", gosonos.PlayerPort)) // FIXME: awkward
+	// DR
+	caddress, err := net.ResolveTCPAddr("tcp", fmt.Sprintf("192.168.1.204:%d", gosonos.PlayerPort)) // FIXME: awkward
+	check(err)
+
+	controller := gosonos.Player{
+		Address: caddress,
+	}
+
+	// KCH
+	paddress, err := net.ResolveTCPAddr("tcp", fmt.Sprintf("192.168.1.169:%d", gosonos.PlayerPort)) // FIXME: awkward
 	check(err)
 
 	p := gosonos.Player{
-		Address: a,
-	}
-	fmt.Println(p)
-
-	trackIds := []gosonos.TrackId{
-		gosonos.TrackId("73569259"),
-		gosonos.TrackId("16334233"),
-		gosonos.TrackId("21702638"),
-		gosonos.TrackId("97874177"),
+		Address: paddress,
 	}
 
-	err = p.AddTracks(trackIds)
+	err = p.Join(&controller)
 	check(err)
+
+	// trackIds := []gosonos.TrackId{
+	// 	gosonos.TrackId("73569259"),
+	// 	gosonos.TrackId("16334233"),
+	// 	gosonos.TrackId("21702638"),
+	// 	gosonos.TrackId("97874177"),
+	// }
+
+	// err = p.AddTracks(trackIds)
+	// check(err)
 
 	// tracks, err := p.Queue()
 	// check(err)

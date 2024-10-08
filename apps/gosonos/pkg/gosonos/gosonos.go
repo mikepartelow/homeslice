@@ -10,6 +10,7 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"regexp"
 	"strings"
 	"text/template"
 
@@ -26,7 +27,10 @@ type Player struct {
 
 	addTracksXmlTemplate        *template.Template
 	addTrackDidlLiteXmlTemplate *template.Template
+	joinXmlTemplate             *template.Template
 	queueXmlTemplate            *template.Template
+
+	uid string
 }
 
 type TrackId string
@@ -53,7 +57,7 @@ func (p *Player) AddTracks(trackIds []TrackId) error {
 	endpoint := "MediaRenderer/AVTransport/Control"
 	action := "urn:schemas-upnp-org:service:AVTransport:1#AddMultipleURIsToQueue"
 
-	logger := p.Logger.With("method", "AddTracks")
+	logger := p.Logger.With("method", "AddTracks", "player", p.Address.String())
 	logger.Info("", "endpoint", endpoint)
 
 	var uris string
@@ -99,6 +103,35 @@ func (p *Player) AddTracks(trackIds []TrackId) error {
 	})
 }
 
+func (p *Player) Join(other *Player) error {
+	p.init()
+	endpoint := "MediaRenderer/AVTransport/Control"
+	action := "urn:schemas-upnp-org:service:AVTransport:1#SetAVTransportURI"
+
+	// This is how soco.py does it, but it is not how the Sonos desktop app does it.
+	// The Sonos desktop app's method is not obvious in Wireshark and does not appear to involve SOAP/POST.
+	// Instead, there may be an encrypted persistent channel over which the grouping command is sent.
+
+	logger := p.Logger.With("method", "Join", "player", p.Address.String(), "other", other.Address.String())
+	logger.Info("", "endpoint", endpoint)
+
+	var joinXML bytes.Buffer
+	err := p.joinXmlTemplate.Execute(&joinXML, struct {
+		Uid string
+	}{
+		Uid: other.Uid(),
+	})
+	if err != nil {
+		return fmt.Errorf("error executing join XML template: %w", err)
+	}
+
+	fmt.Println(joinXML.String())
+
+	return p.post(endpoint, action, joinXML.String(), func(r io.Reader) error {
+		return nil
+	})
+}
+
 // FIXME: iterator: have this return (error, func() Iter) so that we can stop panicking on error
 // FIXME: queue.xml expects pagination, so paginate. test with large queue.
 func (p *Player) Queue() ([]Track, error) {
@@ -107,7 +140,7 @@ func (p *Player) Queue() ([]Track, error) {
 	endpoint := "MediaServer/ContentDirectory/Control"
 	action := "urn:schemas-upnp-org:service:ContentDirectory:1#Browse"
 
-	logger := p.Logger.With("method", "Queue")
+	logger := p.Logger.With("method", "Queue", "player", p.Address.String())
 	logger.Info("", "endpoint", endpoint)
 
 	var tracks []Track
@@ -155,9 +188,15 @@ func (p *Player) Queue() ([]Track, error) {
 	return tracks, nil
 }
 
+func (p *Player) Uid() string {
+	p.init()
+
+	return p.uid
+}
+
 func (p *Player) post(endpoint, action, body string, callback func(io.Reader) error) error {
 	endpoint = fmt.Sprintf("http://%s/%s", p.Address.String(), endpoint)
-	logger := p.Logger.With("method", "post")
+	logger := p.Logger.With("method", "post", "player", p.Address.String())
 	logger.Debug("", "endpoint", endpoint)
 
 	req, err := http.NewRequest("POST", endpoint, strings.NewReader(body))
@@ -182,27 +221,23 @@ func (p *Player) post(endpoint, action, body string, callback func(io.Reader) er
 	return callback(resp.Body)
 }
 
-//go:embed requests/queue.xml.tmpl
-var queueXmlTemplate string
-
 //go:embed requests/add_track_didl_lite.xml.tmpl
 var addTrackDidlLiteXmlTemplate string
 
 //go:embed requests/add_tracks.xml.tmpl
 var addTracksXmlTemplate string
 
+//go:embed requests/join.xml.tmpl
+var joinXmlTemplate string
+
+//go:embed requests/queue.xml.tmpl
+var queueXmlTemplate string
+
 func (p *Player) init() {
 	if p.Logger == nil {
 		p.Logger = slog.New(
 			console.NewHandler(os.Stderr, &console.HandlerOptions{Level: slog.LevelInfo}),
 		)
-	}
-	if p.queueXmlTemplate == nil {
-		t, err := template.New("queueXML").Parse(queueXmlTemplate)
-		if err != nil {
-			panic(fmt.Errorf("error parsing queue XML template: %w", err))
-		}
-		p.queueXmlTemplate = t
 	}
 	if p.addTrackDidlLiteXmlTemplate == nil {
 		t, err := template.New("addTrackDidlLiteXML").Parse(addTrackDidlLiteXmlTemplate)
@@ -211,7 +246,6 @@ func (p *Player) init() {
 		}
 		p.addTrackDidlLiteXmlTemplate = t
 	}
-
 	if p.addTracksXmlTemplate == nil {
 		t, err := template.New("addTracksXML").Parse(addTracksXmlTemplate)
 		if err != nil {
@@ -219,7 +253,42 @@ func (p *Player) init() {
 		}
 		p.addTracksXmlTemplate = t
 	}
+	if p.joinXmlTemplate == nil {
+		t, err := template.New("joinXML").Parse(joinXmlTemplate)
+		if err != nil {
+			panic(fmt.Errorf("error parsing join XML template: %w", err))
+		}
+		p.joinXmlTemplate = t
+	}
+	if p.queueXmlTemplate == nil {
+		t, err := template.New("queueXML").Parse(queueXmlTemplate)
+		if err != nil {
+			panic(fmt.Errorf("error parsing queue XML template: %w", err))
+		}
+		p.queueXmlTemplate = t
+	}
 
+	if p.uid == "" {
+		endpoint := fmt.Sprintf("http://%s/xml/device_description.xml", p.Address.String())
+		resp, err := http.Get(endpoint)
+		if err != nil {
+			panic(fmt.Errorf("error fetching device info for %s: %w", p.Address.String(), err))
+		}
+		defer resp.Body.Close()
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			panic(fmt.Errorf("error fetching device info for %s: %w", p.Address.String(), err))
+		}
+
+		r, err := regexp.Compile("<UDN>uuid:(.*?)</UDN>")
+		if err != nil {
+			panic(fmt.Errorf("error fetching device info for %s: %w", p.Address.String(), err))
+		}
+		matches := r.FindSubmatch(body)
+		if len(matches) > 1 {
+			p.uid = string(matches[1])
+		}
+	}
 }
 
 func check(err error) {

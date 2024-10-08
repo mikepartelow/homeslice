@@ -1,2 +1,4 @@
+github.com/fdurand/arp v0.0.0-20180807174648-27b38d3af1be h1:44e5trFpGDfqFWKpYUtcXTAPWrL6y19WITtYLNKupjU=
+github.com/fdurand/arp v0.0.0-20180807174648-27b38d3af1be/go.mod h1:XLQwuRqf7f3RjNreAmdPASlBU6/juBaoMzI93a7De1s=
 github.com/phsym/console-slog v0.3.1 h1:Fuzcrjr40xTc004S9Kni8XfNsk+qrptQmyR+wZw9/7A=
 github.com/phsym/console-slog v0.3.1/go.mod h1:oJskjp/X6e6c0mGpfP8ELkfKUsrkDifYRAqJQgmdDS0=
