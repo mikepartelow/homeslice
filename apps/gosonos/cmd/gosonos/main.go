@@ -2,26 +2,29 @@ package main
 
 import (
 	"fmt"
-	"mp/gosonos/pkg/gosonos"
+	"mp/gosonos/pkg/sonos"
 	"net"
 )
 
 func main() {
 	// DR
-	caddress, err := net.ResolveTCPAddr("tcp", fmt.Sprintf("192.168.1.204:%d", gosonos.PlayerPort)) // FIXME: awkward
+	caddress, err := net.ResolveTCPAddr("tcp", fmt.Sprintf("192.168.1.204:%d", sonos.PlayerPort)) // FIXME: awkward
 	check(err)
 
-	controller := gosonos.Player{
-		Address: caddress,
+	controller := sonos.Player{
+		Addr: caddress,
 	}
 
 	// KCH
-	paddress, err := net.ResolveTCPAddr("tcp", fmt.Sprintf("192.168.1.169:%d", gosonos.PlayerPort)) // FIXME: awkward
+	paddress, err := net.ResolveTCPAddr("tcp", fmt.Sprintf("192.168.1.169:%d", sonos.PlayerPort)) // FIXME: awkward
 	check(err)
 
-	p := gosonos.Player{
-		Address: paddress,
+	p := sonos.Player{
+		Addr: paddress,
 	}
+
+	err = controller.Play()
+	check(err)
 
 	err = p.Join(&controller)
 	check(err)

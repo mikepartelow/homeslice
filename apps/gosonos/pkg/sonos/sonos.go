@@ -99,7 +99,8 @@ func (p *Player) AddTracks(tracks []track.Track) error {
 }
 
 func (p *Player) ClearQueue() error {
-	panic("NIY")
+	fmt.Println("NIY")
+	return nil
 }
 
 func (p *Player) Join(other player.Player) error {
@@ -184,12 +185,23 @@ func (p *Player) Queue() ([]track.Track, error) {
 	return tracks, nil
 }
 
+// Play operation has no variables, and so is not a template
+//
+//go:embed requests/play.xml
+var playXml string
+
 func (p *Player) Play() error {
-	panic("what")
+	p.init()
+
+	endpoint := "MediaRenderer/AVTransport/Control"
+	action := "urn:schemas-upnp-org:service:AVTransport:1#Play"
+
+	return p.post(endpoint, action, playXml, nil)
 }
 
 func (p *Player) SetVolume(volume int) error {
-	panic("what")
+	fmt.Println("NIY")
+	return nil
 }
 
 func (p *Player) post(endpoint, action, body string, callback func(io.Reader) error) error {
@@ -216,7 +228,10 @@ func (p *Player) post(endpoint, action, body string, callback func(io.Reader) er
 		return fmt.Errorf("HTTP error %d: %s", resp.StatusCode, resp.Status)
 	}
 
-	return callback(resp.Body)
+	if callback != nil {
+		return callback(resp.Body)
+	}
+	return nil
 }
 
 //go:embed requests/add_track_didl_lite.xml.tmpl
@@ -286,12 +301,5 @@ func (p *Player) init() {
 		if len(matches) > 1 {
 			p.uid = string(matches[1])
 		}
-	}
-}
-
-func check(err error) {
-	fmt.Println("FIXME")
-	if err != nil {
-		panic(err)
 	}
 }
