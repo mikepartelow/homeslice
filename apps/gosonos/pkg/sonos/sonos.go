@@ -1,4 +1,4 @@
-package gosonos
+package sonos
 
 import (
 	"bytes"
@@ -6,7 +6,10 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
+	"mp/gosonos/pkg/player"
+	"mp/gosonos/pkg/playlist"
 	"mp/gosonos/pkg/soap"
+	"mp/gosonos/pkg/track"
 	"net"
 	"net/http"
 	"os"
@@ -22,8 +25,8 @@ const (
 )
 
 type Player struct {
-	Address net.Addr
-	Logger  *slog.Logger
+	Addr   net.Addr
+	Logger *slog.Logger
 
 	addTracksXmlTemplate        *template.Template
 	addTrackDidlLiteXmlTemplate *template.Template
@@ -33,40 +36,32 @@ type Player struct {
 	uid string
 }
 
-type TrackId string
+var _ player.Player = &Player{}
 
-type TidalTrack struct {
-	Id TrackId
+func (p *Player) Address() net.Addr {
+	return p.Addr
 }
 
-type Track struct {
-	URI string
-	*TidalTrack
+func (p *Player) UID() string {
+	p.init()
+	return p.uid
 }
 
-func (t *Track) Id() TrackId {
-	if t.TidalTrack == nil {
-		panic("NIH")
-	}
-	return t.TidalTrack.Id
-}
-
-func (p *Player) AddTracks(trackIds []TrackId) error {
+func (p *Player) AddTracks(tracks []track.Track) error {
 	p.init()
 
 	endpoint := "MediaRenderer/AVTransport/Control"
 	action := "urn:schemas-upnp-org:service:AVTransport:1#AddMultipleURIsToQueue"
 
-	logger := p.Logger.With("method", "AddTracks", "player", p.Address.String())
+	logger := p.Logger.With("method", "AddTracks", "player", p.Address().String())
 	logger.Info("", "endpoint", endpoint)
 
 	var uris string
 	var didls string
 
-	for _, tid := range trackIds {
-		// x-sonos-http:track%2f16334233.flac?sid=174&amp;flags=24616&amp;sn=34
-		uri := "x-sonos-http:track%2f" + string(tid) + ".flac?sid=174&amp;flags=24616&amp;sn=34 "
-		uris = uris + uri
+	for _, t := range tracks {
+		tid := t.TrackID()
+		uris = uris + string(t.URI())
 
 		// in this template, whitespace is extremely significant. make sure there isn't any!
 		var addTrackDidlLiteXML bytes.Buffer
@@ -90,7 +85,7 @@ func (p *Player) AddTracks(trackIds []TrackId) error {
 		URIs     string
 		Metadata string
 	}{
-		Count:    len(trackIds),
+		Count:    len(tracks),
 		URIs:     uris,
 		Metadata: didls,
 	})
@@ -103,7 +98,11 @@ func (p *Player) AddTracks(trackIds []TrackId) error {
 	})
 }
 
-func (p *Player) Join(other *Player) error {
+func (p *Player) ClearQueue() error {
+	panic("NIY")
+}
+
+func (p *Player) Join(other player.Player) error {
 	p.init()
 	endpoint := "MediaRenderer/AVTransport/Control"
 	action := "urn:schemas-upnp-org:service:AVTransport:1#SetAVTransportURI"
@@ -112,14 +111,14 @@ func (p *Player) Join(other *Player) error {
 	// The Sonos desktop app's method is not obvious in Wireshark and does not appear to involve SOAP/POST.
 	// Instead, there may be an encrypted persistent channel over which the grouping command is sent.
 
-	logger := p.Logger.With("method", "Join", "player", p.Address.String(), "other", other.Address.String())
+	logger := p.Logger.With("method", "Join", "player", p.Address().String(), "other", other.Address().String())
 	logger.Info("", "endpoint", endpoint)
 
 	var joinXML bytes.Buffer
 	err := p.joinXmlTemplate.Execute(&joinXML, struct {
 		Uid string
 	}{
-		Uid: other.Uid(),
+		Uid: other.UID(),
 	})
 	if err != nil {
 		return fmt.Errorf("error executing join XML template: %w", err)
@@ -134,16 +133,16 @@ func (p *Player) Join(other *Player) error {
 
 // FIXME: iterator: have this return (error, func() Iter) so that we can stop panicking on error
 // FIXME: queue.xml expects pagination, so paginate. test with large queue.
-func (p *Player) Queue() ([]Track, error) {
+func (p *Player) Queue() ([]track.Track, error) {
 	p.init()
 
 	endpoint := "MediaServer/ContentDirectory/Control"
 	action := "urn:schemas-upnp-org:service:ContentDirectory:1#Browse"
 
-	logger := p.Logger.With("method", "Queue", "player", p.Address.String())
+	logger := p.Logger.With("method", "Queue", "player", p.Address().String())
 	logger.Info("", "endpoint", endpoint)
 
-	var tracks []Track
+	var tracks []track.Track
 	const pageSize = 100
 	for page := 0; ; page += pageSize {
 		var queueXML bytes.Buffer
@@ -175,28 +174,27 @@ func (p *Player) Queue() ([]Track, error) {
 			// FIXME: some if statement to determine this is actually a tidal track
 			uri := item.Res.Value
 			id := strings.Split(strings.Split(uri, "%2f")[1], ".")[0]
-			track := Track{
-				TidalTrack: &TidalTrack{
-					Id: TrackId(id),
-				},
-				URI: uri,
+			track := playlist.TidalTrack{
+				ID: track.TrackID(id),
 			}
-			tracks = append(tracks, track)
+			tracks = append(tracks, &track)
 		}
 	}
 
 	return tracks, nil
 }
 
-func (p *Player) Uid() string {
-	p.init()
+func (p *Player) Play() error {
+	panic("what")
+}
 
-	return p.uid
+func (p *Player) SetVolume(volume int) error {
+	panic("what")
 }
 
 func (p *Player) post(endpoint, action, body string, callback func(io.Reader) error) error {
-	endpoint = fmt.Sprintf("http://%s/%s", p.Address.String(), endpoint)
-	logger := p.Logger.With("method", "post", "player", p.Address.String())
+	endpoint = fmt.Sprintf("http://%s/%s", p.Address().String(), endpoint)
+	logger := p.Logger.With("method", "post", "player", p.Address().String())
 	logger.Debug("", "endpoint", endpoint)
 
 	req, err := http.NewRequest("POST", endpoint, strings.NewReader(body))
@@ -269,20 +267,20 @@ func (p *Player) init() {
 	}
 
 	if p.uid == "" {
-		endpoint := fmt.Sprintf("http://%s/xml/device_description.xml", p.Address.String())
+		endpoint := fmt.Sprintf("http://%s/xml/device_description.xml", p.Address().String())
 		resp, err := http.Get(endpoint)
 		if err != nil {
-			panic(fmt.Errorf("error fetching device info for %s: %w", p.Address.String(), err))
+			panic(fmt.Errorf("error fetching device info for %s: %w", p.Address().String(), err))
 		}
 		defer resp.Body.Close()
 		body, err := io.ReadAll(resp.Body)
 		if err != nil {
-			panic(fmt.Errorf("error fetching device info for %s: %w", p.Address.String(), err))
+			panic(fmt.Errorf("error fetching device info for %s: %w", p.Address().String(), err))
 		}
 
 		r, err := regexp.Compile("<UDN>uuid:(.*?)</UDN>")
 		if err != nil {
-			panic(fmt.Errorf("error fetching device info for %s: %w", p.Address.String(), err))
+			panic(fmt.Errorf("error fetching device info for %s: %w", p.Address().String(), err))
 		}
 		matches := r.FindSubmatch(body)
 		if len(matches) > 1 {
