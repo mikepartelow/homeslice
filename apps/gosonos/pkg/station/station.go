@@ -24,6 +24,6 @@ func (s *Station) IsPlayingOn(player player.Player) (bool, error) {
 	return false, nil
 }
 
-func (p *Station) Name() string {
+func (p *Station) GetName() string {
 	panic("NIY")
 }

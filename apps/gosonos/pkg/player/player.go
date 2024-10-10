@@ -13,7 +13,8 @@ type Player interface {
 	Join(Player) error
 	Logger() *slog.Logger
 	Play() error
-	SetVolume(volume int) error
 	Queue() ([]track.Track, error)
+	SetVolume(volume int) error
 	UID() string
+	Ungroup() error
 }

@@ -65,7 +65,7 @@ func (p *Player) AddTracks(tracks []track.Track) error {
 
 	for _, t := range tracks {
 		tid := t.TrackID()
-		uris = uris + string(t.URI())
+		uris = uris + string(t.URI()) + " " // the " " is required!
 
 		// in this template, whitespace is extremely significant. make sure there isn't any!
 		var addTrackDidlLiteXML bytes.Buffer
@@ -136,6 +136,20 @@ func (p *Player) Join(other player.Player) error {
 	})
 }
 
+// Play operation has no variables, and so is not a template
+//
+//go:embed requests/play.xml
+var playXml string
+
+func (p *Player) Play() error {
+	p.init()
+
+	endpoint := "MediaRenderer/AVTransport/Control"
+	action := "urn:schemas-upnp-org:service:AVTransport:1#Play"
+
+	return p.post(endpoint, action, playXml, nil)
+}
+
 // FIXME: iterator: have this return (error, func() Iter) so that we can stop panicking on error
 // FIXME: queue.xml expects pagination, so paginate. test with large queue.
 func (p *Player) Queue() ([]track.Track, error) {
@@ -189,21 +203,12 @@ func (p *Player) Queue() ([]track.Track, error) {
 	return tracks, nil
 }
 
-// Play operation has no variables, and so is not a template
-//
-//go:embed requests/play.xml
-var playXml string
-
-func (p *Player) Play() error {
-	p.init()
-
-	endpoint := "MediaRenderer/AVTransport/Control"
-	action := "urn:schemas-upnp-org:service:AVTransport:1#Play"
-
-	return p.post(endpoint, action, playXml, nil)
+func (p *Player) SetVolume(volume int) error {
+	fmt.Println("NIY")
+	return nil
 }
 
-func (p *Player) SetVolume(volume int) error {
+func (p *Player) Ungroup() error {
 	fmt.Println("NIY")
 	return nil
 }

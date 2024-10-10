@@ -25,15 +25,15 @@ func (t *TidalTrack) URI() track.URI {
 }
 
 type Playlist struct {
-	PlaylistName string
-	Tracks       []track.Track
+	Name   string
+	Tracks []track.Track
 }
 
 var _ curation.Curation = &Playlist{}
 
 func (p *Playlist) Enqueue(player player.Player) error {
 	if err := player.AddTracks(p.Tracks); err != nil {
-		return fmt.Errorf("error adding tracks from playlist %q to player %q", p.Name, player.Address().String())
+		return fmt.Errorf("error adding tracks from playlist %q to player %q: %w", p.Name, player.Address().String(), err)
 	}
 	return nil
 }
@@ -41,7 +41,7 @@ func (p *Playlist) Enqueue(player player.Player) error {
 func (p *Playlist) IsPlayingOn(player player.Player) (bool, error) {
 	tracks, err := player.Queue()
 	if err != nil {
-		return false, fmt.Errorf("error adding tracks from playlist %q to player %q", p.Name, player.Address().String())
+		return false, fmt.Errorf("error adding tracks from playlist %q to player %q: %w", p.Name, player.Address().String(), err)
 	}
 
 	if len(tracks) != len(p.Tracks) {
@@ -64,6 +64,6 @@ func (p *Playlist) IsPlayingOn(player player.Player) (bool, error) {
 	return true, nil
 }
 
-func (p *Playlist) Name() string {
-	return p.PlaylistName
+func (p *Playlist) GetName() string {
+	return p.Name
 }
