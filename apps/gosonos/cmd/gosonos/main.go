@@ -1,35 +1,37 @@
 package main
 
 import (
-	"fmt"
+	"log/slog"
 	"mp/gosonos/pkg/config"
-	"mp/gosonos/pkg/curation"
+	"mp/gosonos/pkg/server"
 	"os"
-	"sync"
+
+	"github.com/phsym/console-slog"
 )
 
 func main() {
+	logger := slog.New(console.NewHandler(os.Stderr, &console.HandlerOptions{Level: slog.LevelDebug}))
+
 	file, err := os.Open("config.yaml")
 	check(err)
 
 	var cfg config.Config
-	err = cfg.Parse(file)
+	err = cfg.Parse(file, logger)
 	check(err)
 
-	coordinator := cfg.Coordinator
-	players := cfg.Players
+	for _, c := range cfg.Curations {
+		logger.Debug("config", "got curation", c.GetID())
+	}
 
-	playlist := cfg.Curations[0]
+	server := server.Server{
+		Config: &cfg,
+		Logger: logger,
+	}
 
-	var wg sync.WaitGroup
-	err = curation.Play(playlist, coordinator, players, 0, &wg)
-	check(err)
-
-	wg.Wait()
+	panic(server.Serve())
 }
 
 func check(err error) {
-	fmt.Println("FIXME")
 	if err != nil {
 		panic(err)
 	}

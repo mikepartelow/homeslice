@@ -8,12 +8,16 @@ import (
 
 type Volume int
 
+const (
+	DefaultVolume = 0
+)
+
 type Player interface {
 	Address() net.Addr
 	AddTracks([]track.Track) error
 	ClearQueue() error
+	GetLogger() *slog.Logger
 	Join(Player) error
-	Logger() *slog.Logger
 	Play() error
 	Queue() ([]track.Track, error)
 	SetVolume(volume Volume) error

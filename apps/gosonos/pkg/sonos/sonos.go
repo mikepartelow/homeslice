@@ -25,8 +25,8 @@ const (
 )
 
 type Player struct {
-	Addr    net.Addr
-	Slogger *slog.Logger
+	Addr   net.Addr
+	Logger *slog.Logger
 
 	addTracksXmlTemplate        *template.Template
 	addTrackDidlLiteXmlTemplate *template.Template
@@ -47,8 +47,8 @@ func (p *Player) UID() string {
 	return p.uid
 }
 
-func (p *Player) Logger() *slog.Logger {
-	return p.Slogger
+func (p *Player) GetLogger() *slog.Logger {
+	return p.Logger
 }
 
 func (p *Player) AddTracks(tracks []track.Track) error {
@@ -57,7 +57,7 @@ func (p *Player) AddTracks(tracks []track.Track) error {
 	endpoint := "MediaRenderer/AVTransport/Control"
 	action := "urn:schemas-upnp-org:service:AVTransport:1#AddMultipleURIsToQueue"
 
-	logger := p.Slogger.With("method", "AddTracks", "player", p.Address().String())
+	logger := p.Logger.With("method", "AddTracks", "player", p.Address().String())
 	logger.Info("", "endpoint", endpoint)
 
 	var uris string
@@ -116,7 +116,7 @@ func (p *Player) Join(other player.Player) error {
 	// The Sonos desktop app's method is not obvious in Wireshark and does not appear to involve SOAP/POST.
 	// Instead, there may be an encrypted persistent channel over which the grouping command is sent.
 
-	logger := p.Slogger.With("method", "Join", "player", p.Address().String(), "other", other.Address().String())
+	logger := p.Logger.With("method", "Join", "player", p.Address().String(), "other", other.Address().String())
 	logger.Info("", "endpoint", endpoint)
 
 	var joinXML bytes.Buffer
@@ -158,7 +158,7 @@ func (p *Player) Queue() ([]track.Track, error) {
 	endpoint := "MediaServer/ContentDirectory/Control"
 	action := "urn:schemas-upnp-org:service:ContentDirectory:1#Browse"
 
-	logger := p.Slogger.With("method", "Queue", "player", p.Address().String())
+	logger := p.Logger.With("method", "Queue", "player", p.Address().String())
 	logger.Info("", "endpoint", endpoint)
 
 	var tracks []track.Track
@@ -215,7 +215,7 @@ func (p *Player) Ungroup() error {
 
 func (p *Player) post(endpoint, action, body string, callback func(io.Reader) error) error {
 	endpoint = fmt.Sprintf("http://%s/%s", p.Address().String(), endpoint)
-	logger := p.Slogger.With("method", "post", "player", p.Address().String())
+	logger := p.Logger.With("method", "post", "player", p.Address().String())
 	logger.Debug("", "endpoint", endpoint)
 
 	req, err := http.NewRequest("POST", endpoint, strings.NewReader(body))
@@ -256,9 +256,9 @@ var joinXmlTemplate string
 var queueXmlTemplate string
 
 func (p *Player) init() {
-	if p.Slogger == nil {
-		p.Slogger = slog.New(
-			console.NewHandler(os.Stderr, &console.HandlerOptions{Level: slog.LevelInfo}),
+	if p.Logger == nil {
+		p.Logger = slog.New(
+			console.NewHandler(os.Stderr, &console.HandlerOptions{Level: slog.LevelError}),
 		)
 	}
 	if p.addTrackDidlLiteXmlTemplate == nil {

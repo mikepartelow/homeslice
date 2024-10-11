@@ -29,6 +29,7 @@ type Playlist struct {
 	ID     curation.ID
 	Name   string
 	Tracks []track.Track
+	Volume player.Volume
 }
 
 var _ curation.Curation = &Playlist{}
@@ -40,8 +41,8 @@ func (p *Playlist) Enqueue(player player.Player) error {
 	return nil
 }
 
-func (p *Playlist) Do(op curation.Op) error {
-	return curation.Do(p, op)
+func (p *Playlist) Do(op curation.Op, coordiator player.Player, players []player.Player) error {
+	return curation.Do(op, p, coordiator, players)
 }
 
 func (p *Playlist) GetID() curation.ID {
@@ -50,6 +51,10 @@ func (p *Playlist) GetID() curation.ID {
 
 func (p *Playlist) GetName() string {
 	return p.Name
+}
+
+func (p *Playlist) GetVolume() player.Volume {
+	return p.Volume
 }
 
 func (p *Playlist) IsPlayingOn(player player.Player) (bool, error) {
@@ -79,5 +84,5 @@ func (p *Playlist) IsPlayingOn(player player.Player) (bool, error) {
 }
 
 func (p *Playlist) PlayOn(coordinator player.Player, players []player.Player, volume player.Volume, wg *sync.WaitGroup) error {
-	return curation.Play(p, coordinator, players, volume, wg)
+	return curation.Play(p, coordinator, players, wg)
 }

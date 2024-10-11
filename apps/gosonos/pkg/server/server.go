@@ -3,9 +3,13 @@ package server
 import (
 	"fmt"
 	"log/slog"
+	"mp/gosonos/pkg/config"
 	"mp/gosonos/pkg/curation"
 	"net/http"
+	"os"
 	"strconv"
+
+	"github.com/phsym/console-slog"
 )
 
 const (
@@ -13,12 +17,19 @@ const (
 )
 
 type Server struct {
-	Curations map[curation.ID]curation.Curation
-	Logger    *slog.Logger
-	Port      int
+	*config.Config
+
+	Logger *slog.Logger
+	Port   int
 }
 
 func (s *Server) init() {
+	if s.Logger == nil {
+		s.Logger = slog.New(
+			console.NewHandler(os.Stderr, &console.HandlerOptions{Level: slog.LevelError}),
+		)
+	}
+
 	if s.Port == 0 {
 		s.Port = DefaultPort
 	}
@@ -52,7 +63,7 @@ func (s *Server) HandleCurations(w http.ResponseWriter, r *http.Request) {
 	logger = logger.With("id", c.GetID(), "op", op)
 	s.Logger.Debug("curation")
 
-	err = c.Do(op)
+	err = c.Do(op, s.Coordinator, s.Players)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		logger.Error("error doing op", "error", err)
@@ -63,17 +74,17 @@ func (s *Server) HandleCurations(w http.ResponseWriter, r *http.Request) {
 func (s *Server) parseCurationsRequest(r *http.Request) (curation.Curation, curation.Op, error) {
 	id, err := curation.ParseID(r.PathValue("id"))
 	if err != nil {
-		return nil, curation.InvalidOp, fmt.Errorf("couldn't parse id: %q", r.PathValue("id"))
+		return nil, curation.InvalidOp, fmt.Errorf("couldn't parse id %q: %w", r.PathValue("id"), err)
 	}
 
 	c, ok := s.Curations[id]
 	if !ok {
-		return nil, curation.InvalidOp, fmt.Errorf("invalid id: %q", id)
+		return nil, curation.InvalidOp, fmt.Errorf("invalid id %q: %w", id, err)
 	}
 
 	op, err := curation.ParseOp(r.PathValue("op"))
 	if err != nil {
-		return nil, curation.InvalidOp, fmt.Errorf("couldn't parse op: %q", r.PathValue("op"))
+		return nil, curation.InvalidOp, fmt.Errorf("couldn't parse op %q: %w", r.PathValue("op"), err)
 	}
 
 	return c, op, nil
