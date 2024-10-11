@@ -1,0 +1,20 @@
+kind: gosonos/v1
+
+coordinator: 192.168.1.204
+players:
+  - 192.168.1.169
+  - 192.168.1.185
+  - 192.168.1.188
+
+playlists:
+  - kind: tidalplaylist/v1
+    name: Fancy Pants
+    track_ids:
+      - "73569259"
+      - "16334233"
+      - "21702638"
+      - "97874177"
+stations:
+  - kind: somafm/v1
+    name: Soma Fancy
+    uri: somafm://what/ever.m3u
