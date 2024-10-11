@@ -54,24 +54,44 @@ func (c *Config) Parse(r io.Reader, logger *slog.Logger) error {
 	}
 
 	// FIXME: validations
-	// FIXME: too long, subroutines
 
-	a, err := net.ResolveTCPAddr("tcp", fmt.Sprintf("%s:%d", cfg.Coordinator, sonos.PlayerPort))
+	coordinator, players, err := makePlayers(cfg, logger)
 	if err != nil {
-		return fmt.Errorf("couldn't resolve coordinator IP address %q: %w", cfg.Coordinator, err)
+		return fmt.Errorf("couldn't parse players: %w", err)
 	}
-	(*c).Coordinator = &sonos.Player{Addr: a, Logger: logger}
-
-	for _, pl := range cfg.Players {
-		a, err := net.ResolveTCPAddr("tcp", fmt.Sprintf("%s:%d", pl, sonos.PlayerPort))
-		if err != nil {
-			return fmt.Errorf("couldn't resolve player IP address %q: %w", pl, err)
-		}
-		(*c).Players = append((*c).Players, &sonos.Player{Addr: a})
-	}
+	(*c).Coordinator = coordinator
+	(*c).Players = players
 
 	(*c).Curations = make(map[curation.ID]curation.Curation)
 
+	err = makePlaylists(cfg, c.Curations)
+	if err != nil {
+		return fmt.Errorf("couldn't parse playlists: %w", err)
+	}
+
+	return nil
+}
+
+func makePlayers(cfg config, logger *slog.Logger) (player.Player, []player.Player, error) {
+	a, err := net.ResolveTCPAddr("tcp", fmt.Sprintf("%s:%d", cfg.Coordinator, sonos.PlayerPort))
+	if err != nil {
+		return nil, nil, fmt.Errorf("couldn't resolve coordinator IP address %q: %w", cfg.Coordinator, err)
+	}
+	coordinator := &sonos.Player{Addr: a, Logger: logger}
+
+	var players []player.Player
+	for _, pl := range cfg.Players {
+		a, err := net.ResolveTCPAddr("tcp", fmt.Sprintf("%s:%d", pl, sonos.PlayerPort))
+		if err != nil {
+			return nil, nil, fmt.Errorf("couldn't resolve player IP address %q: %w", pl, err)
+		}
+		players = append(players, &sonos.Player{Addr: a, Logger: logger})
+	}
+
+	return coordinator, players, nil
+}
+
+func makePlaylists(cfg config, m map[curation.ID]curation.Curation) error {
 	for _, pl := range cfg.Playlists {
 		if !regexp.MustCompile(`^[\w-]+$`).Match([]byte(pl.ID)) {
 			return fmt.Errorf("playlist %q has invalid id %q", pl.Name, pl.ID)
@@ -91,7 +111,7 @@ func (c *Config) Parse(r io.Reader, logger *slog.Logger) error {
 			pl.Volume = &n
 		}
 
-		(*c).Curations[cid] = &playlist.Playlist{
+		m[cid] = &playlist.Playlist{
 			ID:     cid,
 			Name:   pl.Name,
 			Tracks: tracks,
