@@ -6,6 +6,8 @@ import (
 	"net"
 )
 
+type Volume int
+
 type Player interface {
 	Address() net.Addr
 	AddTracks([]track.Track) error
@@ -14,7 +16,7 @@ type Player interface {
 	Logger() *slog.Logger
 	Play() error
 	Queue() ([]track.Track, error)
-	SetVolume(volume int) error
+	SetVolume(volume Volume) error
 	UID() string
 	Ungroup() error
 }

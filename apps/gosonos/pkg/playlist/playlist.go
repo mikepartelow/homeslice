@@ -7,6 +7,7 @@ import (
 	"mp/gosonos/pkg/player"
 	"mp/gosonos/pkg/track"
 	"slices"
+	"sync"
 )
 
 type TidalTrack struct {
@@ -25,6 +26,7 @@ func (t *TidalTrack) URI() track.URI {
 }
 
 type Playlist struct {
+	ID     curation.ID
 	Name   string
 	Tracks []track.Track
 }
@@ -36,6 +38,18 @@ func (p *Playlist) Enqueue(player player.Player) error {
 		return fmt.Errorf("error adding tracks from playlist %q to player %q: %w", p.Name, player.Address().String(), err)
 	}
 	return nil
+}
+
+func (p *Playlist) Do(op curation.Op) error {
+	return curation.Do(p, op)
+}
+
+func (p *Playlist) GetID() curation.ID {
+	return p.ID
+}
+
+func (p *Playlist) GetName() string {
+	return p.Name
 }
 
 func (p *Playlist) IsPlayingOn(player player.Player) (bool, error) {
@@ -64,6 +78,6 @@ func (p *Playlist) IsPlayingOn(player player.Player) (bool, error) {
 	return true, nil
 }
 
-func (p *Playlist) GetName() string {
-	return p.Name
+func (p *Playlist) PlayOn(coordinator player.Player, players []player.Player, volume player.Volume, wg *sync.WaitGroup) error {
+	return curation.Play(p, coordinator, players, volume, wg)
 }

@@ -28,12 +28,14 @@ type config struct {
 }
 
 type playlist struct {
+	ID       string   `yaml:"id"`
 	Kind     string   `yaml:"kind"`
 	Name     string   `yaml:"name"`
 	TrackIDs []string `yaml:"track_ids"`
 }
 
 type station struct {
+	ID   string `yaml:"id"`
 	Kind string `yaml:"kind"`
 	Name string `yaml:"name"`
 	URI  string `yaml:"uri"`

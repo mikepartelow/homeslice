@@ -3,16 +3,51 @@ package curation
 import (
 	"fmt"
 	"mp/gosonos/pkg/player"
+	"strconv"
+	"strings"
 	"sync"
 )
 
+type ID string
+
+func ParseID(s string) (ID, error) {
+	return ID(strings.ToLower(s)), nil
+}
+
+type Op int
+
+const (
+	InvalidOp = iota
+	PlayOp
+)
+
+func ParseOp(s string) (Op, error) {
+	n, err := strconv.Atoi(strings.ToLower(s))
+	if err != nil {
+		return InvalidOp, fmt.Errorf("error parsing op string %q: %w", s, err)
+	}
+	if n != PlayOp {
+		return InvalidOp, fmt.Errorf("invalid op %q: %w", s, err)
+	}
+	return Op(n), nil
+}
+
 type Curation interface {
+	Do(Op) error
+
 	Enqueue(player.Player) error
 	IsPlayingOn(player.Player) (bool, error)
+	PlayOn(player.Player, []player.Player, player.Volume, *sync.WaitGroup) error
+
+	GetID() ID
 	GetName() string
 }
 
-func Play(c Curation, coordinator player.Player, players []player.Player, volume int, wg *sync.WaitGroup) error {
+func Do(c Curation, op Op) error {
+	panic("NIY")
+}
+
+func Play(c Curation, coordinator player.Player, players []player.Player, volume player.Volume, wg *sync.WaitGroup) error {
 	if err := coordinator.Ungroup(); err != nil {
 		return fmt.Errorf("couldn't ungroup on coordinator %q: %w", coordinator.Address().String(), err)
 	}

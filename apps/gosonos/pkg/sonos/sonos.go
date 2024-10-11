@@ -203,7 +203,7 @@ func (p *Player) Queue() ([]track.Track, error) {
 	return tracks, nil
 }
 
-func (p *Player) SetVolume(volume int) error {
+func (p *Player) SetVolume(volume player.Volume) error {
 	fmt.Println("NIY")
 	return nil
 }
