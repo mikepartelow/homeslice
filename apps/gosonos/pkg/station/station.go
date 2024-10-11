@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"mp/gosonos/pkg/curation"
 	"mp/gosonos/pkg/player"
-	"sync"
 )
 
 type Station struct {
@@ -41,8 +40,4 @@ func (s *Station) GetVolume() player.Volume {
 func (s *Station) IsPlayingOn(player player.Player) (bool, error) {
 	panic("NIY")
 	return false, nil
-}
-
-func (s *Station) PlayOn(coordinator player.Player, players []player.Player, volume player.Volume, wg *sync.WaitGroup) error {
-	return curation.Play(s, coordinator, players, wg)
 }

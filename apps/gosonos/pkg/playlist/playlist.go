@@ -7,7 +7,6 @@ import (
 	"mp/gosonos/pkg/player"
 	"mp/gosonos/pkg/track"
 	"slices"
-	"sync"
 )
 
 type TidalTrack struct {
@@ -81,8 +80,4 @@ func (p *Playlist) IsPlayingOn(player player.Player) (bool, error) {
 	}
 
 	return true, nil
-}
-
-func (p *Playlist) PlayOn(coordinator player.Player, players []player.Player, volume player.Volume, wg *sync.WaitGroup) error {
-	return curation.Play(p, coordinator, players, wg)
 }

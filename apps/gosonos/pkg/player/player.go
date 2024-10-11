@@ -18,6 +18,7 @@ type Player interface {
 	ClearQueue() error
 	GetLogger() *slog.Logger
 	Join(Player) error
+	Pause() error
 	Play() error
 	Queue() ([]track.Track, error)
 	SetVolume(volume Volume) error

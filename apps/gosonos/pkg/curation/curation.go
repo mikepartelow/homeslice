@@ -17,12 +17,15 @@ type Op int
 
 const (
 	InvalidOp = iota
+	PauseOp
 	PlayOp
 )
 
 func ParseOp(s string) (Op, error) {
 	s = strings.ToLower(s)
 	switch s {
+	case "pause":
+		return PauseOp, nil
 	case "play":
 		return PlayOp, nil
 	}
@@ -34,7 +37,6 @@ type Curation interface {
 
 	Enqueue(player.Player) error
 	IsPlayingOn(player.Player) (bool, error)
-	PlayOn(player.Player, []player.Player, player.Volume, *sync.WaitGroup) error
 
 	GetID() ID
 	GetName() string
@@ -43,11 +45,20 @@ type Curation interface {
 
 func Do(op Op, curation Curation, coordiator player.Player, players []player.Player) error {
 	switch op {
+	case PauseOp:
+		return Pause(coordiator)
 	case PlayOp:
-		return curation.PlayOn(coordiator, players, curation.GetVolume(), nil)
+		return Play(curation, coordiator, players, nil)
 	}
 
 	return fmt.Errorf("undoable op %d", op)
+}
+
+func Pause(coordinator player.Player) error {
+	if err := coordinator.Pause(); err != nil {
+		return fmt.Errorf("couldn't pause coordinator %q: %w", coordinator.Address().String(), err)
+	}
+	return nil
 }
 
 func Play(c Curation, coordinator player.Player, players []player.Player, wg *sync.WaitGroup) error {

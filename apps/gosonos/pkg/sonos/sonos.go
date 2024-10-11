@@ -136,6 +136,11 @@ func (p *Player) Join(other player.Player) error {
 	})
 }
 
+func (p *Player) Pause() error {
+	p.init()
+	panic("NIY")
+}
+
 // Play operation has no variables, and so is not a template
 //
 //go:embed requests/play.xml
