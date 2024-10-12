@@ -317,3 +317,11 @@ func (p *Player) init() {
 		}
 	}
 }
+
+func New(ip string, logger *slog.Logger) (*Player, error) {
+	a, err := net.ResolveTCPAddr("tcp", fmt.Sprintf("%s:%d", ip, PlayerPort))
+	if err != nil {
+		return nil, fmt.Errorf("couldn't resolve coordinator IP address %q: %w", ip, err)
+	}
+	return &Player{Addr: a, Logger: logger}, nil
+}

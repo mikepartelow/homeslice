@@ -3,34 +3,8 @@ package curation
 import (
 	"fmt"
 	"mp/gosonos/pkg/player"
-	"strings"
 	"sync"
 )
-
-type ID string
-
-func ParseID(s string) (ID, error) {
-	return ID(strings.ToLower(s)), nil
-}
-
-type Op int
-
-const (
-	InvalidOp = iota
-	PauseOp
-	PlayOp
-)
-
-func ParseOp(s string) (Op, error) {
-	s = strings.ToLower(s)
-	switch s {
-	case "pause":
-		return PauseOp, nil
-	case "play":
-		return PlayOp, nil
-	}
-	return InvalidOp, fmt.Errorf("invalid op %q", s)
-}
 
 type Curation interface {
 	Do(Op, player.Player, []player.Player) error

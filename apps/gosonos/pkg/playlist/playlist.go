@@ -6,6 +6,7 @@ import (
 	"mp/gosonos/pkg/curation"
 	"mp/gosonos/pkg/player"
 	"mp/gosonos/pkg/track"
+	"regexp"
 	"slices"
 )
 
@@ -80,4 +81,21 @@ func (p *Playlist) IsPlayingOn(player player.Player) (bool, error) {
 	}
 
 	return true, nil
+}
+
+func New(id curation.ID, name string, tracks []track.Track, volume player.Volume) (*Playlist, error) {
+	if len(tracks) == 0 {
+		return nil, fmt.Errorf("no tracks")
+	}
+
+	if !regexp.MustCompile(`^[\w-]+$`).MatchString(string(id)) {
+		return nil, fmt.Errorf("invalid id %q", id)
+	}
+
+	return &Playlist{
+		ID:     id,
+		Name:   name,
+		Tracks: tracks,
+		Volume: volume,
+	}, nil
 }

@@ -9,8 +9,6 @@ import (
 	"mp/gosonos/pkg/playlist"
 	"mp/gosonos/pkg/sonos"
 	"mp/gosonos/pkg/track"
-	"net"
-	"regexp"
 
 	"gopkg.in/yaml.v3"
 )
@@ -53,8 +51,6 @@ func (c *Config) Parse(r io.Reader, logger *slog.Logger) error {
 		return fmt.Errorf("error parsing config YAML: %w", err)
 	}
 
-	// FIXME: validations
-
 	coordinator, players, err := makePlayers(cfg, logger)
 	if err != nil {
 		return fmt.Errorf("couldn't parse players: %w", err)
@@ -73,19 +69,18 @@ func (c *Config) Parse(r io.Reader, logger *slog.Logger) error {
 }
 
 func makePlayers(cfg config, logger *slog.Logger) (player.Player, []player.Player, error) {
-	a, err := net.ResolveTCPAddr("tcp", fmt.Sprintf("%s:%d", cfg.Coordinator, sonos.PlayerPort))
+	coordinator, err := sonos.New(cfg.Coordinator, logger)
 	if err != nil {
-		return nil, nil, fmt.Errorf("couldn't resolve coordinator IP address %q: %w", cfg.Coordinator, err)
+		return nil, nil, fmt.Errorf("error creating Sonos Player %q: %w", cfg.Coordinator, err)
 	}
-	coordinator := &sonos.Player{Addr: a, Logger: logger}
 
 	var players []player.Player
 	for _, pl := range cfg.Players {
-		a, err := net.ResolveTCPAddr("tcp", fmt.Sprintf("%s:%d", pl, sonos.PlayerPort))
+		player, err := sonos.New(pl, logger)
 		if err != nil {
-			return nil, nil, fmt.Errorf("couldn't resolve player IP address %q: %w", pl, err)
+			return nil, nil, fmt.Errorf("error creating Sonos Player %q: %w", pl, err)
 		}
-		players = append(players, &sonos.Player{Addr: a, Logger: logger})
+		players = append(players, player)
 	}
 
 	return coordinator, players, nil
@@ -93,30 +88,22 @@ func makePlayers(cfg config, logger *slog.Logger) (player.Player, []player.Playe
 
 func makePlaylists(cfg config, m map[curation.ID]curation.Curation) error {
 	for _, pl := range cfg.Playlists {
-		if !regexp.MustCompile(`^[\w-]+$`).Match([]byte(pl.ID)) {
-			return fmt.Errorf("playlist %q has invalid id %q", pl.Name, pl.ID)
-		}
-		cid := curation.ID(pl.ID)
-
-		var tracks []track.Track
-		for _, t := range pl.TrackIDs {
-			tracks = append(tracks, &playlist.TidalTrack{ID: track.TrackID(t)})
-		}
-		if len(tracks) == 0 {
-			return fmt.Errorf("playlist %q/%q has 0 tracks", pl.Name, pl.ID)
-		}
-
 		if pl.Volume == nil {
 			n := player.DefaultVolume
 			pl.Volume = &n
 		}
 
-		m[cid] = &playlist.Playlist{
-			ID:     cid,
-			Name:   pl.Name,
-			Tracks: tracks,
-			Volume: player.Volume(*pl.Volume),
+		var tracks []track.Track
+		for _, t := range pl.TrackIDs {
+			tracks = append(tracks, &playlist.TidalTrack{ID: track.TrackID(t)})
 		}
+
+		p, err := playlist.New(curation.ID(pl.ID), pl.Name, tracks, player.Volume(*pl.Volume))
+		if err != nil {
+			return fmt.Errorf("error creating Playlist: %w", err)
+		}
+
+		m[p.GetID()] = p
 	}
 
 	return nil
