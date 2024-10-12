@@ -22,6 +22,10 @@ func Do(op Op, curation Curation, coordiator player.Player, players []player.Pla
 	case PauseOp:
 		return Pause(coordiator)
 	case PlayOp:
+		isPlaying, err := curation.IsPlayingOn(coordiator)
+		if err == nil && isPlaying {
+			return nil
+		}
 		return Play(curation, coordiator, players, nil)
 	}
 

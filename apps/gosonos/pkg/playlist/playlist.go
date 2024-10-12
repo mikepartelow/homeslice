@@ -3,11 +3,14 @@ package playlist
 import (
 	"cmp"
 	"fmt"
+	"math/rand"
 	"mp/gosonos/pkg/curation"
 	"mp/gosonos/pkg/player"
 	"mp/gosonos/pkg/track"
+	"mp/gosonos/pkg/ttlt"
 	"regexp"
 	"slices"
+	"time"
 )
 
 type TidalTrack struct {
@@ -25,17 +28,33 @@ func (t *TidalTrack) URI() track.URI {
 	return track.URI("x-sonos-http:track%2f" + string(t.ID) + ".flac?sid=174&amp;flags=24616&amp;sn=34")
 }
 
+const (
+	DefaultMaxPlayingTracks = 42
+	IsPlayingOnCacheTTL     = time.Duration(1 * time.Minute)
+)
+
 type Playlist struct {
-	ID     curation.ID
-	Name   string
-	Tracks []track.Track
-	Volume player.Volume
+	ID               curation.ID
+	Name             string
+	MaxPlayingTracks int
+	Tracks           []track.Track
+	Volume           player.Volume
+
+	playingTracks []track.Track
+	isPlayingOn   *ttlt.TTLT[bool]
 }
 
 var _ curation.Curation = &Playlist{}
 
+// Enqueue enqueues a shuffled subset of maximum length Playlist.MaxPlayingTracks to player.
 func (p *Playlist) Enqueue(player player.Player) error {
-	if err := player.AddTracks(p.Tracks); err != nil {
+	rand.Shuffle(len(p.Tracks), func(i, j int) {
+		p.Tracks[i], p.Tracks[j] = p.Tracks[j], p.Tracks[i]
+	})
+
+	p.playingTracks = p.Tracks[0:p.MaxPlayingTracks]
+
+	if err := player.AddTracks(p.playingTracks); err != nil {
 		return fmt.Errorf("error adding tracks from playlist %q to player %q: %w", p.Name, player.Address().String(), err)
 	}
 	return nil
@@ -58,29 +77,33 @@ func (p *Playlist) GetVolume() player.Volume {
 }
 
 func (p *Playlist) IsPlayingOn(player player.Player) (bool, error) {
-	tracks, err := player.Queue()
+	if is, ok := p.isPlayingOn.GetValue(); ok {
+		return is, nil
+	}
+	queueTracks, err := player.Queue()
 	if err != nil {
-		return false, fmt.Errorf("error adding tracks from playlist %q to player %q: %w", p.Name, player.Address().String(), err)
+		// don't set p.isPlayingOn because we didn't answer the question one way or the other
+		return false, fmt.Errorf("error fetching queue from player %q: %w", player.Address().String(), err)
 	}
 
-	if len(tracks) != len(p.Tracks) {
-		return false, nil
+	if len(queueTracks) != len(p.playingTracks) {
+		return p.isPlayingOn.SetValue(false), nil
 	}
 
-	slices.SortFunc(tracks, func(a, b track.Track) int {
+	slices.SortFunc(queueTracks, func(a, b track.Track) int {
 		return cmp.Compare(a.TrackID(), b.TrackID())
 	})
-	slices.SortFunc(p.Tracks, func(a, b track.Track) int {
+	slices.SortFunc(p.playingTracks, func(a, b track.Track) int {
 		return cmp.Compare(a.TrackID(), b.TrackID())
 	})
 
-	for i, t := range tracks {
-		if p.Tracks[i].TrackID() != t.TrackID() {
-			return false, nil
+	for i, t := range queueTracks {
+		if p.playingTracks[i].TrackID() != t.TrackID() {
+			return p.isPlayingOn.SetValue(false), nil
 		}
 	}
 
-	return true, nil
+	return p.isPlayingOn.SetValue(true), nil
 }
 
 func New(id curation.ID, name string, tracks []track.Track, volume player.Volume) (*Playlist, error) {
@@ -92,10 +115,22 @@ func New(id curation.ID, name string, tracks []track.Track, volume player.Volume
 		return nil, fmt.Errorf("invalid id %q", id)
 	}
 
-	return &Playlist{
+	p := Playlist{
 		ID:     id,
 		Name:   name,
 		Tracks: tracks,
 		Volume: volume,
-	}, nil
+	}
+	p.init()
+
+	return &p, nil
+}
+
+func (p *Playlist) init() {
+	if p.MaxPlayingTracks == 0 {
+		p.MaxPlayingTracks = DefaultMaxPlayingTracks
+	}
+	if p.isPlayingOn == nil {
+		p.isPlayingOn = ttlt.New[bool](IsPlayingOnCacheTTL)
+	}
 }
