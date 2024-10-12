@@ -7,8 +7,6 @@ import (
 )
 
 type Curation interface {
-	Do(Op, player.Player, []player.Player) error
-
 	Enqueue(player.Player) error
 	IsPlayingOn(player.Player) (bool, error)
 
@@ -17,19 +15,21 @@ type Curation interface {
 	GetVolume() player.Volume
 }
 
-func Do(op Op, curation Curation, coordiator player.Player, players []player.Player) error {
+func Do(op Op, curation Curation, coordiator player.Player, players []player.Player) (bool, error) {
 	switch op {
 	case PauseOp:
-		return Pause(coordiator)
+		return true, Pause(coordiator)
 	case PlayOp:
 		isPlaying, err := curation.IsPlayingOn(coordiator)
 		if err == nil && isPlaying {
-			return nil
+			return true, nil
 		}
-		return Play(curation, coordiator, players, nil)
+		return true, Play(curation, coordiator, players, nil)
+	case StatusOp:
+		return curation.IsPlayingOn(coordiator)
 	}
 
-	return fmt.Errorf("undoable op %d", op)
+	return false, fmt.Errorf("undoable op %d", op)
 }
 
 func Pause(coordinator player.Player) error {

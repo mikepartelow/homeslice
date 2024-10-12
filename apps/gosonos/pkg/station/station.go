@@ -15,10 +15,6 @@ func (p *Station) Play(player player.Player) error {
 
 var _ curation.Curation = &Station{}
 
-func (s *Station) Do(op curation.Op, coordiator player.Player, players []player.Player) error {
-	return curation.Do(op, s, coordiator, players)
-}
-
 func (s *Station) Enqueue(player player.Player) error {
 	panic("NIY")
 	return nil

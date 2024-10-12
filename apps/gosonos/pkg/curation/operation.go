@@ -11,6 +11,7 @@ const (
 	InvalidOp = iota
 	PauseOp
 	PlayOp
+	StatusOp
 )
 
 func ParseOp(s string) (Op, error) {
@@ -20,6 +21,8 @@ func ParseOp(s string) (Op, error) {
 		return PauseOp, nil
 	case "play":
 		return PlayOp, nil
+	case "status":
+		return StatusOp, nil
 	}
 	return InvalidOp, fmt.Errorf("invalid op %q", s)
 }

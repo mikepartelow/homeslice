@@ -60,10 +60,6 @@ func (p *Playlist) Enqueue(player player.Player) error {
 	return nil
 }
 
-func (p *Playlist) Do(op curation.Op, coordiator player.Player, players []player.Player) error {
-	return curation.Do(op, p, coordiator, players)
-}
-
 func (p *Playlist) GetID() curation.ID {
 	return p.ID
 }
