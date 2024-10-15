@@ -10,7 +10,7 @@ playlists:
   - kind: tidalplaylist/v1
     id: fancy-pants
     name: Fancy Pants
-    volume: 10
+    volume: 0
     track_ids:
       - "73569259"
       - "16334233"
@@ -19,5 +19,6 @@ playlists:
 
 stations:
   - kind: somafm/v1
+    id: soma-fancy
     name: Soma Fancy
     uri: somafm://what/ever.m3u

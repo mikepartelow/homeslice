@@ -1,0 +1,427 @@
+<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/"
+    s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+    <s:Body>
+        <u:BrowseResponse xmlns:u="urn:schemas-upnp-org:service:ContentDirectory:1">
+            <Result>
+                <DIDL-Lite xmlns:dc="http://purl.org/dc/elements/1.1/"
+                    xmlns:upnp="urn:schemas-upnp-org:metadata-1-0/upnp/"
+                    xmlns:r="urn:schemas-rinconnetworks-com:metadata-1-0/"
+                    xmlns="urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/">
+                    <item id="Q:0/1" parentID="Q:0" restricted="true">
+                        <res protocolInfo="sonos.com-http:*:audio/flac:*" duration="0:03:36">
+                            x-sonos-http:track%2f64978115.flac?sid=174&amp;flags=8232&amp;sn=34</res>
+                        <upnp:albumArtURI>
+                            /getaa?s=1&amp;u=x-sonos-http%3atrack%252f64978115.flac%3fsid%3d174%26flags%3d8232%26sn%3d34</upnp:albumArtURI>
+                        <dc:title>In the Summer (Original Mix)</dc:title>
+                        <upnp:class>object.item.audioItem.musicTrack</upnp:class>
+                        <dc:creator>Mob Device</dc:creator>
+                        <upnp:album>Chill Out 2016 (Deluxe Edition)</upnp:album>
+                    </item>
+                    <item id="Q:0/2" parentID="Q:0" restricted="true">
+                        <res protocolInfo="sonos.com-http:*:audio/flac:*" duration="0:05:18">
+                            x-sonos-http:track%2f16024112.flac?sid=174&amp;flags=8232&amp;sn=34</res>
+                        <upnp:albumArtURI>
+                            /getaa?s=1&amp;u=x-sonos-http%3atrack%252f16024112.flac%3fsid%3d174%26flags%3d8232%26sn%3d34</upnp:albumArtURI>
+                        <dc:title>Sixtyniner</dc:title>
+                        <upnp:class>object.item.audioItem.musicTrack</upnp:class>
+                        <dc:creator>Boards of Canada</dc:creator>
+                        <upnp:album>Twoism</upnp:album>
+                    </item>
+                    <item id="Q:0/3" parentID="Q:0" restricted="true">
+                        <res protocolInfo="sonos.com-http:*:audio/flac:*" duration="0:04:53">
+                            x-sonos-http:track%2f16024662.flac?sid=174&amp;flags=8232&amp;sn=34</res>
+                        <upnp:albumArtURI>
+                            /getaa?s=1&amp;u=x-sonos-http%3atrack%252f16024662.flac%3fsid%3d174%26flags%3d8232%26sn%3d34</upnp:albumArtURI>
+                        <dc:title>Girl/Boy Song</dc:title>
+                        <upnp:class>object.item.audioItem.musicTrack</upnp:class>
+                        <dc:creator>Aphex Twin</dc:creator>
+                        <upnp:album>Richard D. James Album</upnp:album>
+                    </item>
+                    <item id="Q:0/4" parentID="Q:0" restricted="true">
+                        <res protocolInfo="sonos.com-http:*:audio/flac:*" duration="0:09:05">
+                            x-sonos-http:track%2f17981370.flac?sid=174&amp;flags=8232&amp;sn=34</res>
+                        <upnp:albumArtURI>
+                            /getaa?s=1&amp;u=x-sonos-http%3atrack%252f17981370.flac%3fsid%3d174%26flags%3d8232%26sn%3d34</upnp:albumArtURI>
+                        <dc:title>Narayan</dc:title>
+                        <upnp:class>object.item.audioItem.musicTrack</upnp:class>
+                        <dc:creator>The Prodigy</dc:creator>
+                        <upnp:album>The Fat of the Land - Expanded Edition</upnp:album>
+                    </item>
+                    <item id="Q:0/5" parentID="Q:0" restricted="true">
+                        <res protocolInfo="sonos.com-http:*:audio/flac:*" duration="0:04:02">
+                            x-sonos-http:track%2f68637711.flac?sid=174&amp;flags=8232&amp;sn=34</res>
+                        <upnp:albumArtURI>
+                            /getaa?s=1&amp;u=x-sonos-http%3atrack%252f68637711.flac%3fsid%3d174%26flags%3d8232%26sn%3d34</upnp:albumArtURI>
+                        <dc:title>M1 A1</dc:title>
+                        <upnp:class>object.item.audioItem.musicTrack</upnp:class>
+                        <dc:creator>Gorillaz</dc:creator>
+                        <upnp:album>Gorillaz</upnp:album>
+                    </item>
+                    <item id="Q:0/6" parentID="Q:0" restricted="true">
+                        <res protocolInfo="sonos.com-http:*:audio/flac:*" duration="0:08:22">
+                            x-sonos-http:track%2f151364128.flac?sid=174&amp;flags=8232&amp;sn=34</res>
+                        <upnp:albumArtURI>
+                            /getaa?s=1&amp;u=x-sonos-http%3atrack%252f151364128.flac%3fsid%3d174%26flags%3d8232%26sn%3d34</upnp:albumArtURI>
+                        <dc:title>So Far, So Close</dc:title>
+                        <upnp:class>object.item.audioItem.musicTrack</upnp:class>
+                        <dc:creator>Zymosis</dc:creator>
+                        <upnp:album>Between Two Points</upnp:album>
+                    </item>
+                    <item id="Q:0/7" parentID="Q:0" restricted="true">
+                        <res protocolInfo="sonos.com-http:*:audio/mp4:*" duration="0:03:24">
+                            x-sonos-http:track%2f15733391.mp4?sid=174&amp;flags=8232&amp;sn=34</res>
+                        <upnp:albumArtURI>
+                            /getaa?s=1&amp;u=x-sonos-http%3atrack%252f15733391.mp4%3fsid%3d174%26flags%3d8232%26sn%3d34</upnp:albumArtURI>
+                        <dc:title>Bass Junkie</dc:title>
+                        <upnp:class>object.item.audioItem.musicTrack</upnp:class>
+                        <dc:creator>Michele Adamson featuring J.Viewz</dc:creator>
+                        <upnp:album>Fallen Angel</upnp:album>
+                    </item>
+                    <item id="Q:0/8" parentID="Q:0" restricted="true">
+                        <res protocolInfo="sonos.com-http:*:audio/flac:*" duration="0:07:00">
+                            x-sonos-http:track%2f116476792.flac?sid=174&amp;flags=8232&amp;sn=34</res>
+                        <upnp:albumArtURI>
+                            /getaa?s=1&amp;u=x-sonos-http%3atrack%252f116476792.flac%3fsid%3d174%26flags%3d8232%26sn%3d34</upnp:albumArtURI>
+                        <dc:title>Begin To Dissapear</dc:title>
+                        <upnp:class>object.item.audioItem.musicTrack</upnp:class>
+                        <dc:creator>Digital Drop</dc:creator>
+                        <upnp:album>Psybient Compilation: Chill With Stars</upnp:album>
+                    </item>
+                    <item id="Q:0/9" parentID="Q:0" restricted="true">
+                        <res protocolInfo="sonos.com-http:*:audio/flac:*" duration="0:09:07">
+                            x-sonos-http:track%2f2917052.flac?sid=174&amp;flags=8232&amp;sn=34</res>
+                        <upnp:albumArtURI>
+                            /getaa?s=1&amp;u=x-sonos-http%3atrack%252f2917052.flac%3fsid%3d174%26flags%3d8232%26sn%3d34</upnp:albumArtURI>
+                        <dc:title>The Eve of the War (feat. Richard Burton &amp; Justin Hayward)</dc:title>
+                        <upnp:class>object.item.audioItem.musicTrack</upnp:class>
+                        <dc:creator>Jeff Wayne</dc:creator>
+                        <upnp:album>Jeff Wayne&apos;s Musical Version of The War of The Worlds</upnp:album>
+                    </item>
+                    <item id="Q:0/10" parentID="Q:0" restricted="true">
+                        <res protocolInfo="sonos.com-http:*:audio/flac:*" duration="0:04:40">
+                            x-sonos-http:track%2f156956.flac?sid=174&amp;flags=8232&amp;sn=34</res>
+                        <upnp:albumArtURI>
+                            /getaa?s=1&amp;u=x-sonos-http%3atrack%252f156956.flac%3fsid%3d174%26flags%3d8232%26sn%3d34</upnp:albumArtURI>
+                        <dc:title>Alpha Beta Gaga</dc:title>
+                        <upnp:class>object.item.audioItem.musicTrack</upnp:class>
+                        <dc:creator>Air</dc:creator>
+                        <upnp:album>Talkie Walkie</upnp:album>
+                    </item>
+                    <item id="Q:0/11" parentID="Q:0" restricted="true">
+                        <res protocolInfo="sonos.com-http:*:audio/flac:*" duration="0:11:39">
+                            x-sonos-http:track%2f143660531.flac?sid=174&amp;flags=8232&amp;sn=34</res>
+                        <upnp:albumArtURI>
+                            /getaa?s=1&amp;u=x-sonos-http%3atrack%252f143660531.flac%3fsid%3d174%26flags%3d8232%26sn%3d34</upnp:albumArtURI>
+                        <dc:title>Nothing But Sunshine</dc:title>
+                        <upnp:class>object.item.audioItem.musicTrack</upnp:class>
+                        <dc:creator>Atmosphere</dc:creator>
+                        <upnp:album>Lucy Ford: The Atmosphere EP&apos;s</upnp:album>
+                    </item>
+                    <item id="Q:0/12" parentID="Q:0" restricted="true">
+                        <res protocolInfo="sonos.com-http:*:audio/flac:*" duration="0:04:15">
+                            x-sonos-http:track%2f34919685.flac?sid=174&amp;flags=8232&amp;sn=34</res>
+                        <upnp:albumArtURI>
+                            /getaa?s=1&amp;u=x-sonos-http%3atrack%252f34919685.flac%3fsid%3d174%26flags%3d8232%26sn%3d34</upnp:albumArtURI>
+                        <dc:title>(Rap) Superstar</dc:title>
+                        <upnp:class>object.item.audioItem.musicTrack</upnp:class>
+                        <dc:creator>Cypress Hill</dc:creator>
+                        <upnp:album>The Essential Cypress Hill</upnp:album>
+                    </item>
+                    <item id="Q:0/13" parentID="Q:0" restricted="true">
+                        <res protocolInfo="sonos.com-http:*:audio/flac:*" duration="0:04:44">
+                            x-sonos-http:track%2f6631966.flac?sid=174&amp;flags=8232&amp;sn=34</res>
+                        <upnp:albumArtURI>
+                            /getaa?s=1&amp;u=x-sonos-http%3atrack%252f6631966.flac%3fsid%3d174%26flags%3d8232%26sn%3d34</upnp:albumArtURI>
+                        <dc:title>Nakt</dc:title>
+                        <upnp:class>object.item.audioItem.musicTrack</upnp:class>
+                        <dc:creator>Rone</dc:creator>
+                        <upnp:album>So So So - EP</upnp:album>
+                    </item>
+                    <item id="Q:0/14" parentID="Q:0" restricted="true">
+                        <res protocolInfo="sonos.com-http:*:audio/flac:*" duration="0:08:14">
+                            x-sonos-http:track%2f4076915.flac?sid=174&amp;flags=8232&amp;sn=34</res>
+                        <upnp:albumArtURI>
+                            /getaa?s=1&amp;u=x-sonos-http%3atrack%252f4076915.flac%3fsid%3d174%26flags%3d8232%26sn%3d34</upnp:albumArtURI>
+                        <dc:title>So What</dc:title>
+                        <upnp:class>object.item.audioItem.musicTrack</upnp:class>
+                        <dc:creator>Ministry</dc:creator>
+                        <upnp:album>The Mind Is a Terrible Thing to Taste</upnp:album>
+                    </item>
+                    <item id="Q:0/15" parentID="Q:0" restricted="true">
+                        <res protocolInfo="sonos.com-http:*:audio/flac:*" duration="0:04:20">
+                            x-sonos-http:track%2f6757107.flac?sid=174&amp;flags=8232&amp;sn=34</res>
+                        <upnp:albumArtURI>
+                            /getaa?s=1&amp;u=x-sonos-http%3atrack%252f6757107.flac%3fsid%3d174%26flags%3d8232%26sn%3d34</upnp:albumArtURI>
+                        <dc:title>Salvador</dc:title>
+                        <upnp:class>object.item.audioItem.musicTrack</upnp:class>
+                        <dc:creator>Hexstatic</dc:creator>
+                        <upnp:album>Master-View</upnp:album>
+                    </item>
+                    <item id="Q:0/16" parentID="Q:0" restricted="true">
+                        <res protocolInfo="sonos.com-http:*:audio/flac:*" duration="0:02:04">
+                            x-sonos-http:track%2f55163275.flac?sid=174&amp;flags=8232&amp;sn=34</res>
+                        <upnp:albumArtURI>
+                            /getaa?s=1&amp;u=x-sonos-http%3atrack%252f55163275.flac%3fsid%3d174%26flags%3d8232%26sn%3d34</upnp:albumArtURI>
+                        <dc:title>Norwegian Wood (This Bird Has Flown) (Remastered 2009)</dc:title>
+                        <upnp:class>object.item.audioItem.musicTrack</upnp:class>
+                        <dc:creator>The Beatles</dc:creator>
+                        <upnp:album>Rubber Soul (Remastered)</upnp:album>
+                    </item>
+                    <item id="Q:0/17" parentID="Q:0" restricted="true">
+                        <res protocolInfo="sonos.com-http:*:audio/flac:*" duration="0:07:33">
+                            x-sonos-http:track%2f59454660.flac?sid=174&amp;flags=8232&amp;sn=34</res>
+                        <upnp:albumArtURI>
+                            /getaa?s=1&amp;u=x-sonos-http%3atrack%252f59454660.flac%3fsid%3d174%26flags%3d8232%26sn%3d34</upnp:albumArtURI>
+                        <dc:title>Day Dreaming (Original Mix)</dc:title>
+                        <upnp:class>object.item.audioItem.musicTrack</upnp:class>
+                        <dc:creator>Talamasca</dc:creator>
+                        <upnp:album>Psychedelic Trance</upnp:album>
+                    </item>
+                    <item id="Q:0/18" parentID="Q:0" restricted="true">
+                        <res protocolInfo="sonos.com-http:*:audio/flac:*" duration="0:02:31">
+                            x-sonos-http:track%2f35233542.flac?sid=174&amp;flags=8232&amp;sn=34</res>
+                        <upnp:albumArtURI>
+                            /getaa?s=1&amp;u=x-sonos-http%3atrack%252f35233542.flac%3fsid%3d174%26flags%3d8232%26sn%3d34</upnp:albumArtURI>
+                        <dc:title>Promenade</dc:title>
+                        <upnp:class>object.item.audioItem.musicTrack</upnp:class>
+                        <dc:creator>Street Sweeper Social Club</dc:creator>
+                        <upnp:album>Street Sweeper Social Club</upnp:album>
+                    </item>
+                    <item id="Q:0/19" parentID="Q:0" restricted="true">
+                        <res protocolInfo="sonos.com-http:*:audio/mp4:*" duration="0:03:46">
+                            x-sonos-http:track%2f9385699.mp4?sid=174&amp;flags=8232&amp;sn=34</res>
+                        <upnp:albumArtURI>
+                            /getaa?s=1&amp;u=x-sonos-http%3atrack%252f9385699.mp4%3fsid%3d174%26flags%3d8232%26sn%3d34</upnp:albumArtURI>
+                        <dc:title>Stewardess In Red</dc:title>
+                        <upnp:class>object.item.audioItem.musicTrack</upnp:class>
+                        <dc:creator>Zeerok, Zhenya Rock</dc:creator>
+                        <upnp:album>KompoZtor: The Golden American Years (Re-mastered)</upnp:album>
+                    </item>
+                    <item id="Q:0/20" parentID="Q:0" restricted="true">
+                        <res protocolInfo="sonos.com-http:*:audio/flac:*" duration="0:06:10">
+                            x-sonos-http:track%2f63622508.flac?sid=174&amp;flags=8232&amp;sn=34</res>
+                        <upnp:albumArtURI>
+                            /getaa?s=1&amp;u=x-sonos-http%3atrack%252f63622508.flac%3fsid%3d174%26flags%3d8232%26sn%3d34</upnp:albumArtURI>
+                        <dc:title>Manuaalit Hukassa</dc:title>
+                        <upnp:class>object.item.audioItem.musicTrack</upnp:class>
+                        <dc:creator>Jukka Nousiainen</dc:creator>
+                        <upnp:album>Jukka Nousiainen</upnp:album>
+                    </item>
+                    <item id="Q:0/21" parentID="Q:0" restricted="true">
+                        <res protocolInfo="sonos.com-http:*:audio/flac:*" duration="0:03:21">
+                            x-sonos-http:track%2f45194.flac?sid=174&amp;flags=8232&amp;sn=34</res>
+                        <upnp:albumArtURI>
+                            /getaa?s=1&amp;u=x-sonos-http%3atrack%252f45194.flac%3fsid%3d174%26flags%3d8232%26sn%3d34</upnp:albumArtURI>
+                        <dc:title>Living With a Hernia</dc:title>
+                        <upnp:class>object.item.audioItem.musicTrack</upnp:class>
+                        <dc:creator>Weird Al Yankovic</dc:creator>
+                        <upnp:album>Polka Party</upnp:album>
+                    </item>
+                    <item id="Q:0/22" parentID="Q:0" restricted="true">
+                        <res protocolInfo="sonos.com-http:*:audio/flac:*" duration="0:03:26">
+                            x-sonos-http:track%2f2849330.flac?sid=174&amp;flags=8232&amp;sn=34</res>
+                        <upnp:albumArtURI>
+                            /getaa?s=1&amp;u=x-sonos-http%3atrack%252f2849330.flac%3fsid%3d174%26flags%3d8232%26sn%3d34</upnp:albumArtURI>
+                        <dc:title>Dare to Be Stupid</dc:title>
+                        <upnp:class>object.item.audioItem.musicTrack</upnp:class>
+                        <dc:creator>Weird Al Yankovic</dc:creator>
+                        <upnp:album>Dare To Be Stupid</upnp:album>
+                    </item>
+                    <item id="Q:0/23" parentID="Q:0" restricted="true">
+                        <res protocolInfo="sonos.com-http:*:audio/flac:*" duration="0:06:54">
+                            x-sonos-http:track%2f2215996.flac?sid=174&amp;flags=8232&amp;sn=34</res>
+                        <upnp:albumArtURI>
+                            /getaa?s=1&amp;u=x-sonos-http%3atrack%252f2215996.flac%3fsid%3d174%26flags%3d8232%26sn%3d34</upnp:albumArtURI>
+                        <dc:title>Shining Through</dc:title>
+                        <upnp:class>object.item.audioItem.musicTrack</upnp:class>
+                        <dc:creator>Layo &amp; Bushwacka</dc:creator>
+                        <upnp:album>Night Works</upnp:album>
+                    </item>
+                    <item id="Q:0/24" parentID="Q:0" restricted="true">
+                        <res protocolInfo="sonos.com-http:*:audio/flac:*" duration="0:02:28">
+                            x-sonos-http:track%2f31154149.flac?sid=174&amp;flags=8232&amp;sn=34</res>
+                        <upnp:albumArtURI>
+                            /getaa?s=1&amp;u=x-sonos-http%3atrack%252f31154149.flac%3fsid%3d174%26flags%3d8232%26sn%3d34</upnp:albumArtURI>
+                        <dc:title>Space Worms</dc:title>
+                        <upnp:class>object.item.audioItem.musicTrack</upnp:class>
+                        <dc:creator>Future Folk</dc:creator>
+                        <upnp:album>Future Folk, Vol. 1</upnp:album>
+                    </item>
+                    <item id="Q:0/25" parentID="Q:0" restricted="true">
+                        <res protocolInfo="sonos.com-http:*:audio/flac:*" duration="0:04:07">
+                            x-sonos-http:track%2f119950795.flac?sid=174&amp;flags=8232&amp;sn=34</res>
+                        <upnp:albumArtURI>
+                            /getaa?s=1&amp;u=x-sonos-http%3atrack%252f119950795.flac%3fsid%3d174%26flags%3d8232%26sn%3d34</upnp:albumArtURI>
+                        <dc:title>Walkin&apos; Through Barbwire</dc:title>
+                        <upnp:class>object.item.audioItem.musicTrack</upnp:class>
+                        <dc:creator>Hot Ice</dc:creator>
+                        <upnp:album>Walkin&apos; Through Barbwire</upnp:album>
+                    </item>
+                    <item id="Q:0/26" parentID="Q:0" restricted="true">
+                        <res protocolInfo="sonos.com-http:*:audio/flac:*" duration="0:07:53">
+                            x-sonos-http:track%2f285850463.flac?sid=174&amp;flags=8232&amp;sn=34</res>
+                        <upnp:albumArtURI>
+                            /getaa?s=1&amp;u=x-sonos-http%3atrack%252f285850463.flac%3fsid%3d174%26flags%3d8232%26sn%3d34</upnp:albumArtURI>
+                        <dc:title>Revolution Deathsquad</dc:title>
+                        <upnp:class>object.item.audioItem.musicTrack</upnp:class>
+                        <dc:creator>DragonForce</dc:creator>
+                        <upnp:album>Killer Elite</upnp:album>
+                    </item>
+                    <item id="Q:0/27" parentID="Q:0" restricted="true">
+                        <res protocolInfo="sonos.com-http:*:audio/flac:*" duration="0:03:34">
+                            x-sonos-http:track%2f2798957.flac?sid=174&amp;flags=8232&amp;sn=34</res>
+                        <upnp:albumArtURI>
+                            /getaa?s=1&amp;u=x-sonos-http%3atrack%252f2798957.flac%3fsid%3d174%26flags%3d8232%26sn%3d34</upnp:albumArtURI>
+                        <dc:title>Rehab</dc:title>
+                        <upnp:class>object.item.audioItem.musicTrack</upnp:class>
+                        <dc:creator>Amy Winehouse</dc:creator>
+                        <upnp:album>Back To Black</upnp:album>
+                    </item>
+                    <item id="Q:0/28" parentID="Q:0" restricted="true">
+                        <res protocolInfo="sonos.com-http:*:audio/flac:*" duration="0:05:22">
+                            x-sonos-http:track%2f109100969.flac?sid=174&amp;flags=8232&amp;sn=34</res>
+                        <upnp:albumArtURI>
+                            /getaa?s=1&amp;u=x-sonos-http%3atrack%252f109100969.flac%3fsid%3d174%26flags%3d8232%26sn%3d34</upnp:albumArtURI>
+                        <dc:title>Deutschland</dc:title>
+                        <upnp:class>object.item.audioItem.musicTrack</upnp:class>
+                        <dc:creator>Rammstein</dc:creator>
+                        <upnp:album>Rammstein</upnp:album>
+                    </item>
+                    <item id="Q:0/29" parentID="Q:0" restricted="true">
+                        <res protocolInfo="sonos.com-http:*:audio/flac:*" duration="0:04:48">
+                            x-sonos-http:track%2f13203396.flac?sid=174&amp;flags=8232&amp;sn=34</res>
+                        <upnp:albumArtURI>
+                            /getaa?s=1&amp;u=x-sonos-http%3atrack%252f13203396.flac%3fsid%3d174%26flags%3d8232%26sn%3d34</upnp:albumArtURI>
+                        <dc:title>Shoot You Down (The Soul Hooligan Remix)</dc:title>
+                        <upnp:class>object.item.audioItem.musicTrack</upnp:class>
+                        <dc:creator>The Stone Roses</dc:creator>
+                        <upnp:album>The Remixes</upnp:album>
+                    </item>
+                    <item id="Q:0/30" parentID="Q:0" restricted="true">
+                        <res protocolInfo="sonos.com-http:*:audio/flac:*" duration="0:04:44">
+                            x-sonos-http:track%2f241446519.flac?sid=174&amp;flags=8232&amp;sn=34</res>
+                        <upnp:albumArtURI>
+                            /getaa?s=1&amp;u=x-sonos-http%3atrack%252f241446519.flac%3fsid%3d174%26flags%3d8232%26sn%3d34</upnp:albumArtURI>
+                        <dc:title>Moonpeople</dc:title>
+                        <upnp:class>object.item.audioItem.musicTrack</upnp:class>
+                        <dc:creator>Devin Townsend</dc:creator>
+                        <upnp:album>Lightwork (Deluxe Edition)</upnp:album>
+                    </item>
+                    <item id="Q:0/31" parentID="Q:0" restricted="true">
+                        <res protocolInfo="sonos.com-http:*:audio/flac:*" duration="0:09:25">
+                            x-sonos-http:track%2f86741140.flac?sid=174&amp;flags=8232&amp;sn=34</res>
+                        <upnp:albumArtURI>
+                            /getaa?s=1&amp;u=x-sonos-http%3atrack%252f86741140.flac%3fsid%3d174%26flags%3d8232%26sn%3d34</upnp:albumArtURI>
+                        <dc:title>Afg</dc:title>
+                        <upnp:class>object.item.audioItem.musicTrack</upnp:class>
+                        <dc:creator>Sensible Soccers</dc:creator>
+                        <upnp:album>8</upnp:album>
+                    </item>
+                    <item id="Q:0/32" parentID="Q:0" restricted="true">
+                        <res protocolInfo="sonos.com-http:*:audio/flac:*" duration="0:05:06">
+                            x-sonos-http:track%2f66421283.flac?sid=174&amp;flags=8232&amp;sn=34</res>
+                        <upnp:albumArtURI>
+                            /getaa?s=1&amp;u=x-sonos-http%3atrack%252f66421283.flac%3fsid%3d174%26flags%3d8232%26sn%3d34</upnp:albumArtURI>
+                        <dc:title>The Man in You</dc:title>
+                        <upnp:class>object.item.audioItem.musicTrack</upnp:class>
+                        <dc:creator>Faithless</dc:creator>
+                        <upnp:album>To All New Arrivals</upnp:album>
+                    </item>
+                    <item id="Q:0/33" parentID="Q:0" restricted="true">
+                        <res protocolInfo="sonos.com-http:*:audio/flac:*" duration="0:04:29">
+                            x-sonos-http:track%2f88245058.flac?sid=174&amp;flags=8232&amp;sn=34</res>
+                        <upnp:albumArtURI>
+                            /getaa?s=1&amp;u=x-sonos-http%3atrack%252f88245058.flac%3fsid%3d174%26flags%3d8232%26sn%3d34</upnp:albumArtURI>
+                        <dc:title>Ari Ari</dc:title>
+                        <upnp:class>object.item.audioItem.musicTrack</upnp:class>
+                        <dc:creator>Bloodywood</dc:creator>
+                        <upnp:album>Ari Ari</upnp:album>
+                    </item>
+                    <item id="Q:0/34" parentID="Q:0" restricted="true">
+                        <res protocolInfo="sonos.com-http:*:audio/flac:*" duration="0:04:29">
+                            x-sonos-http:track%2f88801433.flac?sid=174&amp;flags=8232&amp;sn=34</res>
+                        <upnp:albumArtURI>
+                            /getaa?s=1&amp;u=x-sonos-http%3atrack%252f88801433.flac%3fsid%3d174%26flags%3d8232%26sn%3d34</upnp:albumArtURI>
+                        <dc:title>Big Time (2012 Remaster)</dc:title>
+                        <upnp:class>object.item.audioItem.musicTrack</upnp:class>
+                        <dc:creator>Peter Gabriel</dc:creator>
+                        <upnp:album>So (25th Anniversary Deluxe Edition)</upnp:album>
+                    </item>
+                    <item id="Q:0/35" parentID="Q:0" restricted="true">
+                        <res protocolInfo="sonos.com-http:*:audio/flac:*" duration="0:04:05">
+                            x-sonos-http:track%2f4283488.flac?sid=174&amp;flags=8232&amp;sn=34</res>
+                        <upnp:albumArtURI>
+                            /getaa?s=1&amp;u=x-sonos-http%3atrack%252f4283488.flac%3fsid%3d174%26flags%3d8232%26sn%3d34</upnp:albumArtURI>
+                        <dc:title>No Way Down</dc:title>
+                        <upnp:class>object.item.audioItem.musicTrack</upnp:class>
+                        <dc:creator>Air France</dc:creator>
+                        <upnp:album>No Way Down</upnp:album>
+                    </item>
+                    <item id="Q:0/36" parentID="Q:0" restricted="true">
+                        <res protocolInfo="sonos.com-http:*:audio/flac:*" duration="0:03:24">
+                            x-sonos-http:track%2f88455762.flac?sid=174&amp;flags=8232&amp;sn=34</res>
+                        <upnp:albumArtURI>
+                            /getaa?s=1&amp;u=x-sonos-http%3atrack%252f88455762.flac%3fsid%3d174%26flags%3d8232%26sn%3d34</upnp:albumArtURI>
+                        <dc:title>Just Dropped In</dc:title>
+                        <upnp:class>object.item.audioItem.musicTrack</upnp:class>
+                        <dc:creator>Kenny Rogers</dc:creator>
+                        <upnp:album>Ten Years Of Gold</upnp:album>
+                    </item>
+                    <item id="Q:0/37" parentID="Q:0" restricted="true">
+                        <res protocolInfo="sonos.com-http:*:audio/flac:*" duration="0:03:37">
+                            x-sonos-http:track%2f157528544.flac?sid=174&amp;flags=8232&amp;sn=34</res>
+                        <upnp:albumArtURI>
+                            /getaa?s=1&amp;u=x-sonos-http%3atrack%252f157528544.flac%3fsid%3d174%26flags%3d8232%26sn%3d34</upnp:albumArtURI>
+                        <dc:title>Rock Your Body Rock (Original Edit)</dc:title>
+                        <upnp:class>object.item.audioItem.musicTrack</upnp:class>
+                        <dc:creator>Ferry Corsten</dc:creator>
+                        <upnp:album>Rock Your Body Rock</upnp:album>
+                    </item>
+                    <item id="Q:0/38" parentID="Q:0" restricted="true">
+                        <res protocolInfo="sonos.com-http:*:audio/flac:*" duration="0:04:54">
+                            x-sonos-http:track%2f114331081.flac?sid=174&amp;flags=8232&amp;sn=34</res>
+                        <upnp:albumArtURI>
+                            /getaa?s=1&amp;u=x-sonos-http%3atrack%252f114331081.flac%3fsid%3d174%26flags%3d8232%26sn%3d34</upnp:albumArtURI>
+                        <dc:title>Intolerance</dc:title>
+                        <upnp:class>object.item.audioItem.musicTrack</upnp:class>
+                        <dc:creator>TOOL</dc:creator>
+                        <upnp:album>Undertow</upnp:album>
+                    </item>
+                    <item id="Q:0/39" parentID="Q:0" restricted="true">
+                        <res protocolInfo="sonos.com-http:*:audio/flac:*" duration="0:04:17">
+                            x-sonos-http:track%2f1406872.flac?sid=174&amp;flags=8232&amp;sn=34</res>
+                        <upnp:albumArtURI>
+                            /getaa?s=1&amp;u=x-sonos-http%3atrack%252f1406872.flac%3fsid%3d174%26flags%3d8232%26sn%3d34</upnp:albumArtURI>
+                        <dc:title>Bullet With Butterfly Wings</dc:title>
+                        <upnp:class>object.item.audioItem.musicTrack</upnp:class>
+                        <dc:creator>Smashing Pumpkins</dc:creator>
+                        <upnp:album>(Rotten Apples) The Smashing Pumpkins Greatest Hits</upnp:album>
+                    </item>
+                    <item id="Q:0/40" parentID="Q:0" restricted="true">
+                        <res protocolInfo="sonos.com-http:*:audio/flac:*" duration="0:04:06">
+                            x-sonos-http:track%2f153313272.flac?sid=174&amp;flags=8232&amp;sn=34</res>
+                        <upnp:albumArtURI>
+                            /getaa?s=1&amp;u=x-sonos-http%3atrack%252f153313272.flac%3fsid%3d174%26flags%3d8232%26sn%3d34</upnp:albumArtURI>
+                        <dc:title>MANGO (feat. Adi Oasis)</dc:title>
+                        <upnp:class>object.item.audioItem.musicTrack</upnp:class>
+                        <dc:creator>KAMAUU</dc:creator>
+                        <upnp:album>MANGO (feat. Adi Oasis)</upnp:album>
+                    </item>
+                    <item id="Q:0/41" parentID="Q:0" restricted="true">
+                        <res protocolInfo="sonos.com-http:*:audio/flac:*" duration="0:03:46">
+                            x-sonos-http:track%2f2619614.flac?sid=174&amp;flags=8232&amp;sn=34</res>
+                        <upnp:albumArtURI>
+                            /getaa?s=1&amp;u=x-sonos-http%3atrack%252f2619614.flac%3fsid%3d174%26flags%3d8232%26sn%3d34</upnp:albumArtURI>
+                        <dc:title>Let It Roll</dc:title>
+                        <upnp:class>object.item.audioItem.musicTrack</upnp:class>
+                        <dc:creator>Hieroglyphics</dc:creator>
+                        <upnp:album>Full Circle</upnp:album>
+                    </item>
+                </DIDL-Lite>
+            </Result>
+            <NumberReturned>41</NumberReturned>
+            <TotalMatches>41</TotalMatches>
+            <UpdateID>3373</UpdateID>
+        </u:BrowseResponse>
+    </s:Body>
+</s:Envelope>

@@ -80,9 +80,9 @@ func (s *Server) HandleCurations(w http.ResponseWriter, r *http.Request) {
 	}
 
 	logger = logger.With("id", c.GetID(), "op", op)
-	s.Logger.Debug("curation")
+	logger.Debug("curation")
 
-	success, err := curation.Do(op, c, s.Coordinator, s.Players)
+	success, err := curation.Do(op, c, s.Coordinator, s.Players, logger)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		logger.Error("error doing op", "error", err)

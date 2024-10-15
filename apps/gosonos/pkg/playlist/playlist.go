@@ -3,14 +3,17 @@ package playlist
 import (
 	"cmp"
 	"fmt"
+	"log/slog"
 	"math/rand"
 	"mp/gosonos/pkg/curation"
 	"mp/gosonos/pkg/player"
 	"mp/gosonos/pkg/track"
 	"mp/gosonos/pkg/ttlt"
-	"regexp"
+	"os"
 	"slices"
 	"time"
+
+	"github.com/phsym/console-slog"
 )
 
 type TidalTrack struct {
@@ -30,13 +33,14 @@ func (t *TidalTrack) URI() track.URI {
 
 const (
 	DefaultMaxPlayingTracks = 42
-	IsPlayingOnCacheTTL     = time.Duration(1 * time.Minute)
+	IsPlayingOnCacheTTL     = time.Duration(1 * time.Second) // FIXME: embiggen
 )
 
 type Playlist struct {
 	ID               curation.ID
-	Name             string
+	Logger           *slog.Logger
 	MaxPlayingTracks int
+	Name             string
 	Tracks           []track.Track
 	Volume           player.Volume
 
@@ -52,7 +56,7 @@ func (p *Playlist) Enqueue(player player.Player) error {
 		p.Tracks[i], p.Tracks[j] = p.Tracks[j], p.Tracks[i]
 	})
 
-	p.playingTracks = p.Tracks[0:p.MaxPlayingTracks]
+	p.playingTracks = p.Tracks[0:min(p.MaxPlayingTracks, len(p.Tracks))]
 
 	if err := player.AddTracks(p.playingTracks); err != nil {
 		return fmt.Errorf("error adding tracks from playlist %q to player %q: %w", p.Name, player.Address().String(), err)
@@ -73,7 +77,13 @@ func (p *Playlist) GetVolume() player.Volume {
 }
 
 func (p *Playlist) IsPlayingOn(player player.Player) (bool, error) {
+	if p.playingTracks == nil || len(p.playingTracks) == 0 {
+		p.Logger.Debug("no tracks playing (internal)")
+		return false, nil
+	}
+
 	if is, ok := p.isPlayingOn.GetValue(); ok {
+		p.Logger.Debug("p.isPlayingOn", "is", is)
 		return is, nil
 	}
 	queueTracks, err := player.Queue()
@@ -81,6 +91,7 @@ func (p *Playlist) IsPlayingOn(player player.Player) (bool, error) {
 		// don't set p.isPlayingOn because we didn't answer the question one way or the other
 		return false, fmt.Errorf("error fetching queue from player %q: %w", player.Address().String(), err)
 	}
+	p.Logger.Debug("IsPlayingOn", "len(queueTracks)", len(queueTracks), "len(p.playingTracks)", len(p.playingTracks))
 
 	if len(queueTracks) != len(p.playingTracks) {
 		return p.isPlayingOn.SetValue(false), nil
@@ -102,17 +113,14 @@ func (p *Playlist) IsPlayingOn(player player.Player) (bool, error) {
 	return p.isPlayingOn.SetValue(true), nil
 }
 
-func New(id curation.ID, name string, tracks []track.Track, volume player.Volume) (*Playlist, error) {
+func New(id curation.ID, name string, tracks []track.Track, volume player.Volume, logger *slog.Logger) (*Playlist, error) {
 	if len(tracks) == 0 {
 		return nil, fmt.Errorf("no tracks")
 	}
 
-	if !regexp.MustCompile(`^[\w-]+$`).MatchString(string(id)) {
-		return nil, fmt.Errorf("invalid id %q", id)
-	}
-
 	p := Playlist{
 		ID:     id,
+		Logger: logger,
 		Name:   name,
 		Tracks: tracks,
 		Volume: volume,
@@ -123,6 +131,11 @@ func New(id curation.ID, name string, tracks []track.Track, volume player.Volume
 }
 
 func (p *Playlist) init() {
+	if p.Logger == nil {
+		p.Logger = slog.New(
+			console.NewHandler(os.Stderr, &console.HandlerOptions{Level: slog.LevelError}),
+		)
+	}
 	if p.MaxPlayingTracks == 0 {
 		p.MaxPlayingTracks = DefaultMaxPlayingTracks
 	}

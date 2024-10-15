@@ -1,11 +1,19 @@
 package curation
 
 import (
+	"fmt"
+	"regexp"
 	"strings"
 )
 
-type ID string
+type ID struct{ id string } // this way, we can't say ID("invalid id"), we must ParseID("valid-id")
 
 func ParseID(s string) (ID, error) {
-	return ID(strings.ToLower(s)), nil
+	s = strings.ToLower(s)
+
+	if !regexp.MustCompile(`^[\w-]+$`).MatchString(s) {
+		return ID{}, fmt.Errorf("invalid curation id %q", s)
+	}
+
+	return ID{id: s}, nil
 }

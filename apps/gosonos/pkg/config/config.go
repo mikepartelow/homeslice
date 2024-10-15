@@ -8,6 +8,7 @@ import (
 	"mp/gosonos/pkg/player"
 	"mp/gosonos/pkg/playlist"
 	"mp/gosonos/pkg/sonos"
+	"mp/gosonos/pkg/station"
 	"mp/gosonos/pkg/track"
 
 	"gopkg.in/yaml.v3"
@@ -60,9 +61,14 @@ func (c *Config) Parse(r io.Reader, logger *slog.Logger) error {
 
 	(*c).Curations = make(map[curation.ID]curation.Curation)
 
-	err = makePlaylists(cfg, c.Curations)
+	err = makePlaylists(cfg, c.Curations, logger)
 	if err != nil {
 		return fmt.Errorf("couldn't parse playlists: %w", err)
+	}
+
+	err = makeStations(cfg, c.Curations, logger)
+	if err != nil {
+		return fmt.Errorf("couldn't parse stations: %w", err)
 	}
 
 	return nil
@@ -86,7 +92,7 @@ func makePlayers(cfg config, logger *slog.Logger) (player.Player, []player.Playe
 	return coordinator, players, nil
 }
 
-func makePlaylists(cfg config, m map[curation.ID]curation.Curation) error {
+func makePlaylists(cfg config, m map[curation.ID]curation.Curation, logger *slog.Logger) error {
 	for _, pl := range cfg.Playlists {
 		if pl.Volume == nil {
 			n := player.DefaultVolume
@@ -98,12 +104,48 @@ func makePlaylists(cfg config, m map[curation.ID]curation.Curation) error {
 			tracks = append(tracks, &playlist.TidalTrack{ID: track.TrackID(t)})
 		}
 
-		p, err := playlist.New(curation.ID(pl.ID), pl.Name, tracks, player.Volume(*pl.Volume))
+		id, err := curation.ParseID(pl.ID)
+		if err != nil {
+			return fmt.Errorf("error parsing playlist id %q: %w", pl.ID, err)
+		}
+
+		p, err := playlist.New(id, pl.Name, tracks, player.Volume(*pl.Volume), logger)
 		if err != nil {
 			return fmt.Errorf("error creating Playlist: %w", err)
 		}
 
+		if _, ok := m[p.GetID()]; ok {
+			return fmt.Errorf("duplicate curation id %q", p.GetID())
+		}
+
 		m[p.GetID()] = p
+	}
+
+	return nil
+}
+
+func makeStations(cfg config, m map[curation.ID]curation.Curation, logger *slog.Logger) error {
+	for _, st := range cfg.Stations {
+		if st.Volume == nil {
+			n := player.DefaultVolume
+			st.Volume = &n
+		}
+
+		id, err := curation.ParseID(st.ID)
+		if err != nil {
+			return fmt.Errorf("error parsing station id %q: %w", st.ID, err)
+		}
+
+		s, err := station.New(id, st.Name, player.Volume(*st.Volume), logger)
+		if err != nil {
+			return fmt.Errorf("error creating Station: %w", err)
+		}
+
+		if _, ok := m[s.GetID()]; ok {
+			return fmt.Errorf("duplicate curation id %q", s.GetID())
+		}
+
+		m[s.GetID()] = s
 	}
 
 	return nil

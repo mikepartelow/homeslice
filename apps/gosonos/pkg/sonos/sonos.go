@@ -307,14 +307,12 @@ func (p *Player) init() {
 			panic(fmt.Errorf("error fetching device info for %s: %w", p.Address().String(), err))
 		}
 
-		r, err := regexp.Compile("<UDN>uuid:(.*?)</UDN>")
-		if err != nil {
-			panic(fmt.Errorf("error fetching device info for %s: %w", p.Address().String(), err))
+		matches := regexp.MustCompile("<UDN>uuid:(.*?)</UDN>").FindSubmatch(body)
+		if len(matches) < 1 {
+			panic(fmt.Errorf("unable to determine device id for %s", p.Address().String()))
 		}
-		matches := r.FindSubmatch(body)
-		if len(matches) > 1 {
-			p.uid = string(matches[1])
-		}
+
+		p.uid = string(matches[1])
 	}
 }
 

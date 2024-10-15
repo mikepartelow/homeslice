@@ -2,6 +2,7 @@ package curation
 
 import (
 	"fmt"
+	"log/slog"
 	"mp/gosonos/pkg/player"
 	"sync"
 )
@@ -15,16 +16,17 @@ type Curation interface {
 	GetVolume() player.Volume
 }
 
-func Do(op Op, curation Curation, coordiator player.Player, players []player.Player) (bool, error) {
+func Do(op Op, curation Curation, coordiator player.Player, players []player.Player, logger *slog.Logger) (bool, error) {
 	switch op {
 	case PauseOp:
 		return true, Pause(coordiator)
 	case PlayOp:
 		isPlaying, err := curation.IsPlayingOn(coordiator)
+		logger.Debug("PlayOp", "isPlaying", isPlaying)
 		if err == nil && isPlaying {
 			return true, nil
 		}
-		return true, Play(curation, coordiator, players, nil)
+		return true, Play(curation, coordiator, players, nil, logger)
 	case StatusOp:
 		return curation.IsPlayingOn(coordiator)
 	}
@@ -39,23 +41,28 @@ func Pause(coordinator player.Player) error {
 	return nil
 }
 
-func Play(c Curation, coordinator player.Player, players []player.Player, wg *sync.WaitGroup) error {
+func Play(c Curation, coordinator player.Player, players []player.Player, wg *sync.WaitGroup, logger *slog.Logger) error {
+	logger.Debug("Ungroup")
 	if err := coordinator.Ungroup(); err != nil {
 		return fmt.Errorf("couldn't ungroup on coordinator %q: %w", coordinator.Address().String(), err)
 	}
+	logger.Debug("ClearQueue")
 	if err := coordinator.ClearQueue(); err != nil {
 		return fmt.Errorf("couldn't clear queue on coordinator %q: %w", coordinator.Address().String(), err)
 	}
+	logger.Debug("SetVolume")
 	if err := coordinator.SetVolume(c.GetVolume()); err != nil {
 		return fmt.Errorf("couldn't set volume on coordinator %q: %w", coordinator.Address().String(), err)
 	}
+	logger.Debug("Enqueue")
 	if err := c.Enqueue(coordinator); err != nil {
 		return fmt.Errorf("couldn't enqueue curation on coordinator %q: %w", coordinator.Address().String(), err)
 	}
+	logger.Debug("Play")
 	if err := coordinator.Play(); err != nil {
 		return fmt.Errorf("couldn't play on coordinator %q: %w", coordinator.Address().String(), err)
 	}
-
+	logger.Debug("Joins")
 	for _, p := range players {
 		if wg != nil {
 			wg.Add(1)

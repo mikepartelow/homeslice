@@ -2,6 +2,7 @@ package soap
 
 import (
 	"encoding/xml"
+	"fmt"
 	"io"
 )
 
@@ -62,18 +63,16 @@ type Res struct {
 // FIXME: remove unused bits here (both fields and structs)
 
 func (d *DidlLite) Decode(r io.Reader) error {
-	return xml.NewDecoder(r).Decode(d)
+	e := Envelope{}
+	if err := xml.NewDecoder(r).Decode(&e); err != nil {
+		return fmt.Errorf("error unmarshaling Envelope: %w", err)
+	}
 
-	// e := Envelope{}
-	// if err := xml.NewDecoder(r).Decode(&e); err != nil {
-	// 	return fmt.Errorf("error unmarshaling Envelope: %w", err)
-	// }
+	if err := xml.Unmarshal([]byte(e.Body.BrowseResponse.Result), d); err != nil {
+		return fmt.Errorf("error unmarshaling Envelope.Body.BrowseResponse.Result: %w", err)
+	}
 
-	// if err := xml.Unmarshal([]byte(e.Body.BrowseResponse.Result), d); err != nil {
-	// 	return fmt.Errorf("error unmarshaling Envelope.Body.BrowseResponse.Result: %w", err)
-	// }
-
-	// return nil
+	return nil
 }
 
 func (d *DidlLite) Encode(w io.Writer) error {
