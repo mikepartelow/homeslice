@@ -32,6 +32,7 @@ type Player struct {
 	addTrackDidlLiteXmlTemplate *template.Template
 	joinXmlTemplate             *template.Template
 	queueXmlTemplate            *template.Template
+	setVolumeXmlTemplate        *template.Template
 
 	uid string
 }
@@ -129,8 +130,6 @@ func (p *Player) Join(other player.Player) error {
 		return fmt.Errorf("error executing join XML template: %w", err)
 	}
 
-	fmt.Println(joinXML.String())
-
 	return p.post(endpoint, action, joinXML.String(), func(r io.Reader) error {
 		return nil
 	})
@@ -151,6 +150,9 @@ func (p *Player) Play() error {
 
 	endpoint := "MediaRenderer/AVTransport/Control"
 	action := "urn:schemas-upnp-org:service:AVTransport:1#Play"
+
+	logger := p.Logger.With("method", "Play", "player", p.Address().String())
+	logger.Info("", "endpoint", endpoint)
 
 	return p.post(endpoint, action, playXml, nil)
 }
@@ -209,8 +211,28 @@ func (p *Player) Queue() ([]track.Track, error) {
 }
 
 func (p *Player) SetVolume(volume player.Volume) error {
-	fmt.Println("NIY")
-	return nil
+	p.init()
+	endpoint := "MediaRenderer/RenderingControl/Control"
+	action := "urn:schemas-upnp-org:service:RenderingControl:1#SetVolume"
+
+	logger := p.Logger.With("method", "SetVolume", "player", p.Address().String(), "volume", volume)
+	logger.Info("", "endpoint", endpoint)
+
+	var setVolumeXML bytes.Buffer
+	err := p.setVolumeXmlTemplate.Execute(&setVolumeXML, struct {
+		Volume int
+	}{
+		Volume: int(volume),
+	})
+	if err != nil {
+		return fmt.Errorf("error executing setVolume XML template: %w", err)
+	}
+
+	fmt.Println(setVolumeXML.String())
+
+	return p.post(endpoint, action, setVolumeXML.String(), func(r io.Reader) error {
+		return nil
+	})
 }
 
 func (p *Player) Ungroup() error {
@@ -260,6 +282,9 @@ var joinXmlTemplate string
 //go:embed requests/queue.xml.tmpl
 var queueXmlTemplate string
 
+//go:embed requests/set_volume.xml.tmpl
+var setVolumeXmlTemplate string
+
 func (p *Player) init() {
 	if p.Logger == nil {
 		p.Logger = slog.New(
@@ -267,32 +292,19 @@ func (p *Player) init() {
 		)
 	}
 	if p.addTrackDidlLiteXmlTemplate == nil {
-		t, err := template.New("addTrackDidlLiteXML").Parse(addTrackDidlLiteXmlTemplate)
-		if err != nil {
-			panic(fmt.Errorf("error parsing addTrackDidlLite XML template: %w", err))
-		}
-		p.addTrackDidlLiteXmlTemplate = t
+		p.addTrackDidlLiteXmlTemplate = mustParseTemplate("addTrackDidlLiteXml", addTrackDidlLiteXmlTemplate)
 	}
 	if p.addTracksXmlTemplate == nil {
-		t, err := template.New("addTracksXML").Parse(addTracksXmlTemplate)
-		if err != nil {
-			panic(fmt.Errorf("error parsing addTracks XML template: %w", err))
-		}
-		p.addTracksXmlTemplate = t
+		p.addTracksXmlTemplate = mustParseTemplate("addTracksXml", addTracksXmlTemplate)
 	}
 	if p.joinXmlTemplate == nil {
-		t, err := template.New("joinXML").Parse(joinXmlTemplate)
-		if err != nil {
-			panic(fmt.Errorf("error parsing join XML template: %w", err))
-		}
-		p.joinXmlTemplate = t
+		p.joinXmlTemplate = mustParseTemplate("joinXml", joinXmlTemplate)
 	}
 	if p.queueXmlTemplate == nil {
-		t, err := template.New("queueXML").Parse(queueXmlTemplate)
-		if err != nil {
-			panic(fmt.Errorf("error parsing queue XML template: %w", err))
-		}
-		p.queueXmlTemplate = t
+		p.queueXmlTemplate = mustParseTemplate("queueXml", queueXmlTemplate)
+	}
+	if p.setVolumeXmlTemplate == nil {
+		p.setVolumeXmlTemplate = mustParseTemplate("setVolumeXML", setVolumeXmlTemplate)
 	}
 
 	if p.uid == "" {
@@ -322,4 +334,12 @@ func New(ip string, logger *slog.Logger) (*Player, error) {
 		return nil, fmt.Errorf("couldn't resolve coordinator IP address %q: %w", ip, err)
 	}
 	return &Player{Addr: a, Logger: logger}, nil
+}
+
+func mustParseTemplate(name, text string) *template.Template {
+	t, err := template.New(name).Parse(text)
+	if err != nil {
+		panic(fmt.Errorf("error parsing %s XML template: %w", name, err))
+	}
+	return t
 }
