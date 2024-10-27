@@ -5,6 +5,8 @@ import (
 	"log/slog"
 	"mp/gosonos/pkg/player"
 	"sync"
+
+	"golang.org/x/sync/errgroup"
 )
 
 type Curation interface {
@@ -42,18 +44,36 @@ func Pause(coordinator player.Player) error {
 }
 
 func Play(c Curation, coordinator player.Player, players []player.Player, wg *sync.WaitGroup, logger *slog.Logger) error {
-	logger.Debug("Ungroup")
-	if err := coordinator.Ungroup(); err != nil {
-		return fmt.Errorf("couldn't ungroup on coordinator %q: %w", coordinator.Address().String(), err)
+	var eg errgroup.Group
+
+	eg.Go(func() error {
+		logger.Debug("Unjoin")
+		if err := coordinator.Unjoin(); err != nil {
+			return fmt.Errorf("couldn't unjoin on coordinator %q: %w", coordinator.Address().String(), err)
+		}
+		return nil
+	})
+
+	eg.Go(func() error {
+		logger.Debug("ClearQueue")
+		if err := coordinator.ClearQueue(); err != nil {
+			return fmt.Errorf("couldn't clear queue on coordinator %q: %w", coordinator.Address().String(), err)
+		}
+		return nil
+	})
+
+	eg.Go(func() error {
+		logger.Debug("SetVolume")
+		if err := coordinator.SetVolume(c.GetVolume()); err != nil {
+			return fmt.Errorf("couldn't set volume on coordinator %q: %w", coordinator.Address().String(), err)
+		}
+		return nil
+	})
+
+	if err := eg.Wait(); err != nil {
+		return err
 	}
-	logger.Debug("ClearQueue")
-	if err := coordinator.ClearQueue(); err != nil {
-		return fmt.Errorf("couldn't clear queue on coordinator %q: %w", coordinator.Address().String(), err)
-	}
-	logger.Debug("SetVolume")
-	if err := coordinator.SetVolume(c.GetVolume()); err != nil {
-		return fmt.Errorf("couldn't set volume on coordinator %q: %w", coordinator.Address().String(), err)
-	}
+
 	logger.Debug("Enqueue")
 	if err := c.Enqueue(coordinator); err != nil {
 		return fmt.Errorf("couldn't enqueue curation on coordinator %q: %w", coordinator.Address().String(), err)

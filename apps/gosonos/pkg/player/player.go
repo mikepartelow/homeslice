@@ -23,5 +23,5 @@ type Player interface {
 	Queue() ([]track.Track, error)
 	SetVolume(volume Volume) error
 	UID() string
-	Ungroup() error
+	Unjoin() error
 }

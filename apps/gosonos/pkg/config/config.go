@@ -10,7 +10,10 @@ import (
 	"mp/gosonos/pkg/sonos"
 	"mp/gosonos/pkg/station"
 	"mp/gosonos/pkg/track"
+	"os"
+	"strconv"
 
+	"github.com/phsym/console-slog"
 	"gopkg.in/yaml.v3"
 )
 
@@ -19,6 +22,52 @@ type Config struct {
 	Players     []player.Player
 
 	Curations map[curation.ID]curation.Curation
+
+	ListenPort int
+}
+
+func getenvOrError(name string) (string, error) {
+	val := os.Getenv(name)
+	if val == "" {
+		return "", fmt.Errorf("missing required env var %q", name)
+	}
+	return val, nil
+}
+
+func getenvOrDefault(name, defaultValue string) string {
+	if val := os.Getenv(name); val != "" {
+		return val
+	}
+	return defaultValue
+}
+
+func (c *Config) Load() (*slog.Logger, error) {
+	// FIXME: log level from env
+	logger := slog.New(console.NewHandler(os.Stderr, &console.HandlerOptions{Level: slog.LevelDebug}))
+
+	port, err := strconv.Atoi(getenvOrDefault("LISTEN_PORT", "8000"))
+	if err != nil {
+		return nil, fmt.Errorf("invalid value for LISTEN_PORT: %w", err)
+	}
+	c.ListenPort = port
+
+	configPath, err := getenvOrError("CONFIG_PATH")
+	if err != nil {
+		return nil, err
+	}
+
+	file, err := os.Open(configPath)
+	if err != nil {
+		return nil, fmt.Errorf("couldn't open config file at %q: %w", configPath, err)
+	}
+	defer file.Close()
+
+	err = c.parse(file, logger)
+	if err != nil {
+		return nil, fmt.Errorf("error parsing config file %q: %w", configPath, err)
+	}
+
+	return logger, nil
 }
 
 type config struct {
@@ -45,7 +94,7 @@ type cfgstation struct {
 	Volume *int   `yaml:"volume"`
 }
 
-func (c *Config) Parse(r io.Reader, logger *slog.Logger) error {
+func (c *Config) parse(r io.Reader, logger *slog.Logger) error {
 	var cfg config
 	err := yaml.NewDecoder(r).Decode(&cfg)
 	if err != nil {

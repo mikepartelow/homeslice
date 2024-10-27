@@ -13,16 +13,15 @@ import (
 )
 
 const (
-	DefaultPort    = 8080
-	DefaultSuccess = "1"
-	DefaultFailure = "0"
+	DefaultListenPort = 8080
+	DefaultSuccess    = "1"
+	DefaultFailure    = "0"
 )
 
 type Server struct {
 	*config.Config
 
 	Logger *slog.Logger
-	Port   int
 
 	Failure string
 	Success string
@@ -35,8 +34,8 @@ func (s *Server) init() {
 		)
 	}
 
-	if s.Port == 0 {
-		s.Port = DefaultPort
+	if s.ListenPort == 0 {
+		s.ListenPort = DefaultListenPort
 	}
 
 	if s.Failure == "" {
@@ -54,8 +53,8 @@ func (s *Server) Serve() error {
 	http.HandleFunc("POST /curations/{id}/{op}", s.HandleCurations)
 	http.HandleFunc("GET /curations/{id}/status", s.HandleCurations)
 
-	s.Logger.Warn("Listening", "port", s.Port)
-	if err := http.ListenAndServe(":"+strconv.Itoa(s.Port), nil); err != nil {
+	s.Logger.Warn("Listening", "port", s.ListenPort)
+	if err := http.ListenAndServe(":"+strconv.Itoa(s.ListenPort), nil); err != nil {
 		s.Logger.Error("http.ListenAndServe", "error", err)
 		return fmt.Errorf("http.ListenAndServe failed: %w", err)
 	}

@@ -28,7 +28,6 @@ def getenv_or_raise(name: str) -> str:
 CONFIG_PATH = getenv_or_raise("CONFIG_PATH")
 LISTEN_HOST = "0.0.0.0"
 LISTEN_PORT = os.environ.get("LISTEN_PORT", 8000)
-PLAYLIST_LENGTH = int(os.environ.get("PLAYLIST_LENGTH", 42))
 SONOS_IPS = getenv_or_raise("SONOS_IPS").split(",")
 VOLUME = os.environ.get("VOLUME", 20)
 

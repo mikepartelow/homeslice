@@ -103,9 +103,21 @@ func (p *Player) AddTracks(tracks []track.Track) error {
 	})
 }
 
+// ClearQueue operation has no variables, and so is not a template
+//
+//go:embed requests/clear_queue.xml
+var clearQueueXml string
+
 func (p *Player) ClearQueue() error {
-	fmt.Println("NIY")
-	return nil
+	p.init()
+
+	endpoint := "MediaRenderer/AVTransport/Control"
+	action := "urn:schemas-upnp-org:service:AVTransport:1#RemoveAllTracksFromQueue"
+
+	logger := p.Logger.With("method", "ClearQueue", "player", p.Address().String())
+	logger.Info("", "endpoint", endpoint)
+
+	return p.post(endpoint, action, clearQueueXml, nil)
 }
 
 func (p *Player) Join(other player.Player) error {
@@ -228,16 +240,26 @@ func (p *Player) SetVolume(volume player.Volume) error {
 		return fmt.Errorf("error executing setVolume XML template: %w", err)
 	}
 
-	fmt.Println(setVolumeXML.String())
-
 	return p.post(endpoint, action, setVolumeXML.String(), func(r io.Reader) error {
 		return nil
 	})
 }
 
-func (p *Player) Ungroup() error {
-	fmt.Println("NIY")
-	return nil
+// Ungroup operation has no variables, and so is not a template
+//
+//go:embed requests/unjoin.xml
+var unjoinXml string
+
+func (p *Player) Unjoin() error {
+	p.init()
+
+	endpoint := "MediaRenderer/AVTransport/Control"
+	action := "urn:schemas-upnp-org:service:AVTransport:1#BecomeCoordinatorOfStandaloneGroup"
+
+	logger := p.Logger.With("method", "Unjoin", "player", p.Address().String())
+	logger.Info("", "endpoint", endpoint)
+
+	return p.post(endpoint, action, unjoinXml, nil)
 }
 
 func (p *Player) post(endpoint, action, body string, callback func(io.Reader) error) error {
