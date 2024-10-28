@@ -16,7 +16,6 @@ import (
 	"regexp"
 	"strings"
 	"text/template"
-	"time"
 
 	"github.com/phsym/console-slog"
 )
@@ -57,7 +56,9 @@ func (p *Player) AddTracks(tracks []track.Track) error {
 	p.init()
 
 	// implementation detail: the maximum number of tracks we can send in a single SOAP call.
-	// more than this and Sonos returns HTTP 500. experimentally determined to be 16.
+	// more than this and Sonos returns HTTP 500. experimentally determined to be 16
+	// however, if Sonos "doesn't like" any of the track ids, it will 500 the whole request
+	// so we don't add the max to slightly limit the blast radius
 	const AddTracksMax = 8
 
 	endpoint := "MediaRenderer/AVTransport/Control"
@@ -71,6 +72,8 @@ func (p *Player) AddTracks(tracks []track.Track) error {
 
 	for i, t := range tracks {
 		tid := t.TrackID()
+		// tid := "140695808" // always fails
+		// tid := "21078302" // should work
 		uris = uris + string(t.URI()) + " " // the " " is required!
 
 		// in this template, whitespace is extremely significant. make sure there isn't any!
@@ -106,18 +109,13 @@ func (p *Player) AddTracks(tracks []track.Track) error {
 
 			logger.Debug("posting", "count", count, "len(uris)", strings.Count(uris, " "))
 
-			for retry := 0; retry < 3; retry++ {
-				logger.Debug("retry", "try", retry)
-				err = p.post(endpoint, action, addTracksXML.String(), func(r io.Reader) error {
-					return nil
-				})
-				if err == nil {
-					break
-				}
-				time.Sleep(time.Millisecond * time.Duration(10*(retry+1)))
-			}
+			err = p.post(endpoint, action, addTracksXML.String(), func(r io.Reader) error {
+				return nil
+			})
+			// some tracks, like 140695808, give us a HTTP 500 every time we try to add them
+			// so we can't take errors here too seriously.
 			if err != nil {
-				return err
+				logger.Error("error enqueing tracks", "uris", uris, "error", err)
 			}
 
 			didls, uris = "", ""

@@ -46,13 +46,15 @@ func Pause(coordinator player.Player) error {
 func Play(c Curation, coordinator player.Player, players []player.Player, wg *sync.WaitGroup, logger *slog.Logger) error {
 	var eg errgroup.Group
 
-	eg.Go(func() error {
-		logger.Debug("Unjoin")
-		if err := coordinator.Unjoin(); err != nil {
-			return fmt.Errorf("couldn't unjoin on coordinator %q: %w", coordinator.Address().String(), err)
-		}
-		return nil
-	})
+	// judgement call whether we want to bother with this.
+	// it slows things down quite a lot
+	// eg.Go(func() error {
+	// 	logger.Debug("Unjoin")
+	// 	if err := coordinator.Unjoin(); err != nil {
+	// 		return fmt.Errorf("couldn't unjoin on coordinator %q: %w", coordinator.Address().String(), err)
+	// 	}
+	// 	return nil
+	// })
 
 	eg.Go(func() error {
 		logger.Debug("ClearQueue")
@@ -74,14 +76,24 @@ func Play(c Curation, coordinator player.Player, players []player.Player, wg *sy
 		return err
 	}
 
-	logger.Debug("Enqueue")
-	if err := c.Enqueue(coordinator); err != nil {
-		return fmt.Errorf("couldn't enqueue curation on coordinator %q: %w", coordinator.Address().String(), err)
+	if wg != nil {
+		wg.Add(1)
 	}
-	logger.Debug("Play")
-	if err := coordinator.Play(); err != nil {
-		return fmt.Errorf("couldn't play on coordinator %q: %w", coordinator.Address().String(), err)
-	}
+	go func() {
+		if wg != nil {
+			defer wg.Done()
+		}
+
+		logger.Debug("Enqueue")
+		if err := c.Enqueue(coordinator); err != nil {
+			logger.Error("error enqueuing", "error", fmt.Errorf("couldn't enqueue curation on coordinator %q: %w", coordinator.Address().String(), err))
+		}
+		logger.Debug("Play")
+		if err := coordinator.Play(); err != nil {
+			logger.Error("error playing", "error", fmt.Errorf("couldn't play on coordinator %q: %w", coordinator.Address().String(), err))
+		}
+	}()
+
 	logger.Debug("Joins")
 	for _, p := range players {
 		if wg != nil {
