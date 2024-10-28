@@ -16,6 +16,7 @@ import (
 	"regexp"
 	"strings"
 	"text/template"
+	"time"
 
 	"github.com/phsym/console-slog"
 )
@@ -55,16 +56,20 @@ func (p *Player) GetLogger() *slog.Logger {
 func (p *Player) AddTracks(tracks []track.Track) error {
 	p.init()
 
+	// implementation detail: the maximum number of tracks we can send in a single SOAP call.
+	// more than this and Sonos returns HTTP 500. experimentally determined to be 16.
+	const AddTracksMax = 8
+
 	endpoint := "MediaRenderer/AVTransport/Control"
 	action := "urn:schemas-upnp-org:service:AVTransport:1#AddMultipleURIsToQueue"
 
 	logger := p.Logger.With("method", "AddTracks", "player", p.Address().String())
 	logger.Info("", "endpoint", endpoint)
 
-	var uris string
-	var didls string
+	var uris, didls string
+	var count int
 
-	for _, t := range tracks {
+	for i, t := range tracks {
 		tid := t.TrackID()
 		uris = uris + string(t.URI()) + " " // the " " is required!
 
@@ -80,27 +85,47 @@ func (p *Player) AddTracks(tracks []track.Track) error {
 		}
 
 		didls += addTrackDidlLiteXML.String()
+		count++
+
+		if (count > 0 && count == AddTracksMax) || i == len(tracks)-1 {
+			didls = strings.TrimSpace(didls)
+
+			var addTracksXML bytes.Buffer
+			err := p.addTracksXmlTemplate.Execute(&addTracksXML, struct {
+				Count    int
+				URIs     string
+				Metadata string
+			}{
+				Count:    count,
+				URIs:     uris,
+				Metadata: didls,
+			})
+			if err != nil {
+				return fmt.Errorf("error executing addTracks XML template: %w", err)
+			}
+
+			logger.Debug("posting", "count", count, "len(uris)", strings.Count(uris, " "))
+
+			for retry := 0; retry < 3; retry++ {
+				logger.Debug("retry", "try", retry)
+				err = p.post(endpoint, action, addTracksXML.String(), func(r io.Reader) error {
+					return nil
+				})
+				if err == nil {
+					break
+				}
+				time.Sleep(time.Millisecond * time.Duration(10*(retry+1)))
+			}
+			if err != nil {
+				return err
+			}
+
+			didls, uris = "", ""
+			count = 0
+		}
 	}
-
-	didls = strings.TrimSpace(didls)
-
-	var addTracksXML bytes.Buffer
-	err := p.addTracksXmlTemplate.Execute(&addTracksXML, struct {
-		Count    int
-		URIs     string
-		Metadata string
-	}{
-		Count:    len(tracks),
-		URIs:     uris,
-		Metadata: didls,
-	})
-	if err != nil {
-		return fmt.Errorf("error executing addTracks XML template: %w", err)
-	}
-
-	return p.post(endpoint, action, addTracksXML.String(), func(r io.Reader) error {
-		return nil
-	})
+	logger.Debug("bye")
+	return nil
 }
 
 // ClearQueue operation has no variables, and so is not a template
