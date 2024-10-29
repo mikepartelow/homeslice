@@ -17,6 +17,7 @@ type Player interface {
 	AddTracks([]track.Track) error
 	ClearQueue() error
 	GetLogger() *slog.Logger
+	IsPlaying() (bool, error)
 	Join(Player) error
 	Pause() error
 	Play() error

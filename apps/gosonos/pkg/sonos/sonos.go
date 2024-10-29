@@ -170,6 +170,34 @@ func (p *Player) Join(other player.Player) error {
 	})
 }
 
+// IsPlaying operation has no variables, and so is not a template
+//
+//go:embed requests/get_current_transport_info.xml
+var getCurrentTransportInfoXml string
+
+func (p *Player) IsPlaying() (bool, error) {
+	p.init()
+
+	endpoint := "MediaRenderer/AVTransport/Control"
+	action := "urn:schemas-upnp-org:service:AVTransport:1#GetTransportInfo"
+
+	logger := p.Logger.With("method", "IsPlaying", "player", p.Address().String())
+	logger.Info("", "endpoint", endpoint)
+
+	var isPlaying bool
+
+	err := p.post(endpoint, action, getCurrentTransportInfoXml, func(r io.Reader) error {
+		body, err := io.ReadAll(r)
+		if err != nil {
+			return err
+		}
+		isPlaying = strings.Contains(string(body), "PLAYING")
+		return nil
+	})
+
+	return isPlaying, err
+}
+
 func (p *Player) Pause() error {
 	p.init()
 	panic("NIY")

@@ -86,6 +86,7 @@ func (p *Playlist) IsPlayingOn(player player.Player) (bool, error) {
 		p.Logger.Debug("p.isPlayingOn", "is", is)
 		return is, nil
 	}
+
 	queueTracks, err := player.Queue()
 	if err != nil {
 		// don't set p.isPlayingOn because we didn't answer the question one way or the other
@@ -110,10 +111,13 @@ func (p *Playlist) IsPlayingOn(player player.Player) (bool, error) {
 		}
 	}
 
-	// FIXME: need to check if it's actually playing!!
-	panic("NIY")
+	isPlaying, err := player.IsPlaying()
+	if err != nil {
+		// don't set p.isPlayingOn because we didn't answer the question one way or the other
+		return false, fmt.Errorf("error getting IsPlaying status from player %q: %w", player.Address().String(), err)
+	}
 
-	return p.isPlayingOn.SetValue(true), nil
+	return p.isPlayingOn.SetValue(isPlaying), nil
 }
 
 func New(id curation.ID, name string, tracks []track.Track, volume player.Volume, logger *slog.Logger) (*Playlist, error) {
