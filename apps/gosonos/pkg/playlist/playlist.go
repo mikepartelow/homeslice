@@ -110,6 +110,9 @@ func (p *Playlist) IsPlayingOn(player player.Player) (bool, error) {
 		}
 	}
 
+	// FIXME: need to check if it's actually playing!!
+	panic("NIY")
+
 	return p.isPlayingOn.SetValue(true), nil
 }
 

@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"mp/gosonos/pkg/player"
 	"sync"
+	"time"
 
 	"golang.org/x/sync/errgroup"
 )
@@ -106,7 +107,11 @@ func Play(c Curation, coordinator player.Player, players []player.Player, wg *sy
 			if err := p.SetVolume(c.GetVolume()); err != nil {
 				p.GetLogger().Error("error setting volume", "player", p.Address().String(), "error", err)
 			}
-			if err := p.Join(coordinator); err != nil {
+
+			logger := logger.With("method", "p.Join", "player", p.Address().String())
+			if err := retry(3, backoffer(time.Millisecond*30), logger, func() error {
+				return p.Join(coordinator)
+			}); err != nil {
 				p.GetLogger().Error("error joining", "player", p.Address().String(), "coordinator", coordinator.Address().String(), "error", err)
 			}
 		}()
