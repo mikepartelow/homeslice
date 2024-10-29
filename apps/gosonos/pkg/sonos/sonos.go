@@ -198,9 +198,21 @@ func (p *Player) IsPlaying() (bool, error) {
 	return isPlaying, err
 }
 
+// Pause operation has no variables, and so is not a template
+//
+//go:embed requests/pause.xml
+var pauseXml string
+
 func (p *Player) Pause() error {
 	p.init()
-	panic("NIY")
+
+	endpoint := "MediaRenderer/AVTransport/Control"
+	action := "urn:schemas-upnp-org:service:AVTransport:1#Pause"
+
+	logger := p.Logger.With("method", "Pause", "player", p.Address().String())
+	logger.Info("", "endpoint", endpoint)
+
+	return p.post(endpoint, action, pauseXml, nil)
 }
 
 // Play operation has no variables, and so is not a template
