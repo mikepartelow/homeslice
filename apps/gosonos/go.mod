@@ -1,6 +1,6 @@
 module mp/gosonos
 
-go 1.22.6
+go 1.23.2
 
 require (
 	github.com/phsym/console-slog v0.3.1
