@@ -31,6 +31,7 @@ type Player struct {
 	addTracksXmlTemplate        *template.Template
 	addTrackDidlLiteXmlTemplate *template.Template
 	joinXmlTemplate             *template.Template
+	playURIXmlTemplate          *template.Template
 	queueXmlTemplate            *template.Template
 	setVolumeXmlTemplate        *template.Template
 
@@ -124,6 +125,44 @@ func (p *Player) AddTracks(tracks []track.Track) error {
 	}
 	logger.Debug("bye")
 	return nil
+}
+
+//	if zone.get_current_media_info()["channel"] != self.title:
+//
+// IsPlaying operation has no variables, and so is not a template
+//
+//go:embed requests/get_current_media_info.xml
+var getCurrentMediaInfoXml string
+
+func (p *Player) Channel() (string, error) {
+	p.init()
+
+	endpoint := "MediaRenderer/AVTransport/Control"
+	action := "urn:schemas-upnp-org:service:AVTransport:1#GetMediaInfo"
+
+	logger := p.Logger.With("method", "Channel", "player", p.Address().String())
+	logger.Info("", "endpoint", endpoint)
+
+	// dc:title&gt;SomaFM Groove Salad (Powered by Kubernetes)&lt;/dc:title
+
+	var channel string
+	err := p.post(endpoint, action, getCurrentMediaInfoXml, func(r io.Reader) error {
+		body, err := io.ReadAll(r)
+		if err != nil {
+			return err
+		}
+
+		matches := regexp.MustCompile("dc:title&gt;(.*?)&lt;/dc:title").FindSubmatch(body)
+		if len(matches) != 2 {
+			panic(fmt.Errorf("unable to determine channel for %s", p.Address().String()))
+		}
+
+		channel = string(matches[1])
+
+		return nil
+	})
+
+	return channel, err
 }
 
 // ClearQueue operation has no variables, and so is not a template
@@ -230,6 +269,32 @@ func (p *Player) Play() error {
 	logger.Info("", "endpoint", endpoint)
 
 	return p.post(endpoint, action, playXml, nil)
+}
+
+func (p *Player) PlayURI(uri track.URI, title string) error {
+	p.init()
+
+	endpoint := "MediaRenderer/AVTransport/Control"
+	action := "urn:schemas-upnp-org:service:AVTransport:1#SetAVTransportURI"
+
+	logger := p.Logger.With("method", "PlayURI", "player", p.Address().String(), "uri", uri)
+	logger.Info("", "endpoint", endpoint)
+
+	var playURIXml bytes.Buffer
+	err := p.playURIXmlTemplate.Execute(&playURIXml, struct {
+		Title string
+		URI   string
+	}{
+		Title: title,
+		URI:   strings.Replace(string(uri), "https://", "x-rincon-mp3radio://", 1),
+	})
+	if err != nil {
+		return fmt.Errorf("error executing playURI XML template: %w", err)
+	}
+
+	return p.post(endpoint, action, playURIXml.String(), func(r io.Reader) error {
+		return nil
+	})
 }
 
 // FIXME: iterator: have this return (error, func() Iter) so that we can stop panicking on error
@@ -364,6 +429,9 @@ var addTracksXmlTemplate string
 //go:embed requests/join.xml.tmpl
 var joinXmlTemplate string
 
+//go:embed requests/play_uri.xml.tmpl
+var playURIXmlTemplate string
+
 //go:embed requests/queue.xml.tmpl
 var queueXmlTemplate string
 
@@ -384,6 +452,9 @@ func (p *Player) init() {
 	}
 	if p.joinXmlTemplate == nil {
 		p.joinXmlTemplate = mustParseTemplate("joinXml", joinXmlTemplate)
+	}
+	if p.playURIXmlTemplate == nil {
+		p.playURIXmlTemplate = mustParseTemplate("playURI", playURIXmlTemplate)
 	}
 	if p.queueXmlTemplate == nil {
 		p.queueXmlTemplate = mustParseTemplate("queueXml", queueXmlTemplate)

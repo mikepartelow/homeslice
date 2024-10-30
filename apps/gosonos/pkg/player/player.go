@@ -15,12 +15,14 @@ const (
 type Player interface {
 	Address() net.Addr
 	AddTracks([]track.Track) error
+	Channel() (string, error)
 	ClearQueue() error
 	GetLogger() *slog.Logger
 	IsPlaying() (bool, error)
 	Join(Player) error
 	Pause() error
 	Play() error
+	PlayURI(track.URI, string) error
 	Queue() ([]track.Track, error)
 	SetVolume(volume Volume) error
 	UID() string

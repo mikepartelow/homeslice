@@ -33,7 +33,7 @@ func (t *TidalTrack) URI() track.URI {
 
 const (
 	DefaultMaxPlayingTracks = 42
-	IsPlayingOnCacheTTL     = time.Duration(1 * time.Second) // FIXME: embiggen
+	IsPlayingOnCacheTTL     = time.Duration(16 * time.Second)
 )
 
 type Playlist struct {
@@ -77,6 +77,8 @@ func (p *Playlist) GetVolume() player.Volume {
 }
 
 func (p *Playlist) IsPlayingOn(player player.Player) (bool, error) {
+	p.init()
+
 	if p.playingTracks == nil || len(p.playingTracks) == 0 {
 		p.Logger.Debug("no tracks playing (internal)")
 		return false, nil

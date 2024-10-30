@@ -185,7 +185,7 @@ func makeStations(cfg config, m map[curation.ID]curation.Curation, logger *slog.
 			return fmt.Errorf("error parsing station id %q: %w", st.ID, err)
 		}
 
-		s, err := station.New(id, st.Name, player.Volume(*st.Volume), logger)
+		s, err := station.New(id, st.Name, track.URI(st.URI), player.Volume(*st.Volume), logger)
 		if err != nil {
 			return fmt.Errorf("error creating Station: %w", err)
 		}
