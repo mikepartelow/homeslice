@@ -31,7 +31,7 @@ def app(config: homeslice_config.SonosConfig) -> None:
         },
     )
 
-    with open("../apps/sonos/config/config.yaml", encoding="utf-8") as f:
+    with open("homeslice_secrets/gosonos-config.yaml", encoding="utf-8") as f:
         homeslice.configmap(
             f"{NAME}-config",
             {
