@@ -122,6 +122,18 @@ func (p *Playlist) IsPlayingOn(player player.Player) (bool, error) {
 	return p.isPlayingOn.SetValue(isPlaying), nil
 }
 
+func (p *Playlist) Play(player player.Player) error {
+	if err := player.Seek(0); err != nil {
+		return fmt.Errorf("error seeking to 0 from player %q: %w", player.Address().String(), err)
+	}
+
+	if err := player.Play(); err != nil {
+		return fmt.Errorf("error playing from player %q: %w", player.Address().String(), err)
+	}
+
+	return nil
+}
+
 func New(id curation.ID, name string, tracks []track.Track, volume player.Volume, logger *slog.Logger) (*Playlist, error) {
 	if len(tracks) == 0 {
 		return nil, fmt.Errorf("no tracks")
