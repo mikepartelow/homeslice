@@ -28,12 +28,14 @@ type Player struct {
 	Addr   net.Addr
 	Logger *slog.Logger
 
-	addTracksXmlTemplate        *template.Template
-	addTrackDidlLiteXmlTemplate *template.Template
-	joinXmlTemplate             *template.Template
-	playURIXmlTemplate          *template.Template
-	queueXmlTemplate            *template.Template
-	setVolumeXmlTemplate        *template.Template
+	addTracksXmlTemplate         *template.Template
+	addTrackDidlLiteXmlTemplate  *template.Template
+	joinXmlTemplate              *template.Template
+	playURIXmlTemplate           *template.Template
+	queueXmlTemplate             *template.Template
+	seekXmlTemplate              *template.Template
+	setAVTransportURIXmlTemplate *template.Template
+	setVolumeXmlTemplate         *template.Template
 
 	uid string
 }
@@ -154,7 +156,7 @@ func (p *Player) Channel() (string, error) {
 
 		matches := regexp.MustCompile("dc:title&gt;(.*?)&lt;/dc:title").FindSubmatch(body)
 		if len(matches) != 2 {
-			panic(fmt.Errorf("unable to determine channel for %s", p.Address().String()))
+			return fmt.Errorf("unable to determine channel for %s", p.Address().String())
 		}
 
 		channel = string(matches[1])
@@ -350,6 +352,58 @@ func (p *Player) Queue() ([]track.Track, error) {
 	return tracks, nil
 }
 
+func (p *Player) Seek(position uint) error {
+	p.init()
+
+	if err := p.setAVTransportURI(); err != nil {
+		return err
+	}
+
+	position = position + 1
+
+	endpoint := "MediaRenderer/AVTransport/Control"
+	action := "urn:schemas-upnp-org:service:AVTransport:1#Seek"
+
+	logger := p.Logger.With("method", "Seek", "player", p.Address().String(), "position", position)
+	logger.Info("", "endpoint", endpoint)
+
+	var seekXml bytes.Buffer
+	err := p.seekXmlTemplate.Execute(&seekXml, struct {
+		Target uint
+	}{
+		Target: position,
+	})
+	if err != nil {
+		return fmt.Errorf("error executing seek XML template: %w", err)
+	}
+
+	return p.post(endpoint, action, seekXml.String(), func(r io.Reader) error {
+		return nil
+	})
+}
+
+func (p *Player) setAVTransportURI() error {
+	p.init()
+	endpoint := "MediaRenderer/AVTransport/Control"
+	action := "urn:schemas-upnp-org:service:AVTransport:1#SetAVTransportURI"
+
+	logger := p.Logger.With("method", "SetAVTransportURI", "player", p.Address().String())
+	logger.Info("", "endpoint", endpoint)
+
+	var setAVTransportURIXML bytes.Buffer
+	err := p.setAVTransportURIXmlTemplate.Execute(&setAVTransportURIXML, struct {
+		Rincon string
+	}{
+		Rincon: p.UID(),
+	})
+	if err != nil {
+		return fmt.Errorf("error executing setAVTransportURI XML template: %w", err)
+	}
+
+	return p.post(endpoint, action, setAVTransportURIXML.String(), func(r io.Reader) error {
+		return nil
+	})
+}
 func (p *Player) SetVolume(volume player.Volume) error {
 	p.init()
 	endpoint := "MediaRenderer/RenderingControl/Control"
@@ -435,6 +489,12 @@ var playURIXmlTemplate string
 //go:embed requests/queue.xml.tmpl
 var queueXmlTemplate string
 
+//go:embed requests/seek.xml.tmpl
+var seekXmlTemplate string
+
+//go:embed requests/set_av_transport_uri.xml.tmpl
+var setAVTransportURIXmlTemplate string
+
 //go:embed requests/set_volume.xml.tmpl
 var setVolumeXmlTemplate string
 
@@ -458,6 +518,12 @@ func (p *Player) init() {
 	}
 	if p.queueXmlTemplate == nil {
 		p.queueXmlTemplate = mustParseTemplate("queueXml", queueXmlTemplate)
+	}
+	if p.seekXmlTemplate == nil {
+		p.seekXmlTemplate = mustParseTemplate("seekXml", seekXmlTemplate)
+	}
+	if p.setAVTransportURIXmlTemplate == nil {
+		p.setAVTransportURIXmlTemplate = mustParseTemplate("setAVTransportURIXML", setAVTransportURIXmlTemplate)
 	}
 	if p.setVolumeXmlTemplate == nil {
 		p.setVolumeXmlTemplate = mustParseTemplate("setVolumeXML", setVolumeXmlTemplate)

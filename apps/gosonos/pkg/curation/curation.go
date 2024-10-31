@@ -13,6 +13,7 @@ import (
 type Curation interface {
 	Enqueue(player.Player) error
 	IsPlayingOn(player.Player) (bool, error)
+	Play(player.Player) error
 
 	GetID() ID
 	GetName() string
@@ -57,6 +58,7 @@ func Play(c Curation, coordinator player.Player, players []player.Player, wg *sy
 	// 	return nil
 	// })
 
+	// without this, if a Station is playing and we try to play a Playlist, the Playlist enqueues but does not play
 	eg.Go(func() error {
 		logger.Debug("ClearQueue")
 		if err := coordinator.ClearQueue(); err != nil {
@@ -89,8 +91,9 @@ func Play(c Curation, coordinator player.Player, players []player.Player, wg *sy
 		if err := c.Enqueue(coordinator); err != nil {
 			logger.Error("error enqueuing", "error", fmt.Errorf("couldn't enqueue curation on coordinator %q: %w", coordinator.Address().String(), err))
 		}
+
 		logger.Debug("Play")
-		if err := coordinator.Play(); err != nil {
+		if err := c.Play(coordinator); err != nil {
 			logger.Error("error playing", "error", fmt.Errorf("couldn't play on coordinator %q: %w", coordinator.Address().String(), err))
 		}
 	}()

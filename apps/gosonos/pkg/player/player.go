@@ -24,6 +24,7 @@ type Player interface {
 	Play() error
 	PlayURI(track.URI, string) error
 	Queue() ([]track.Track, error)
+	Seek(uint) error
 	SetVolume(volume Volume) error
 	UID() string
 	Unjoin() error

@@ -73,6 +73,10 @@ func (s *Station) IsPlayingOn(player player.Player) (bool, error) {
 	return s.isPlayingOn.SetValue(isPlaying), nil
 }
 
+func (s *Station) Play(player player.Player) error {
+	return player.Play()
+}
+
 func New(id curation.ID, name string, uri track.URI, volume player.Volume, logger *slog.Logger) (*Station, error) {
 	s := &Station{
 		ID:     id,
