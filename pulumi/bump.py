@@ -1,14 +1,22 @@
+"""bump all homeslice images in Pulumi.prod.yaml to the latest from ghcr.io"""
+
 #!/usr/bin/env python
+
 
 from pathlib import Path
 from typing import Generator
 import logging
-import requests
 import yaml
-from coregio.registry_api import ContainerRegistry
+from coregio.registry_api import ContainerRegistry  # pylint: disable=import-error
+
+CACHE_FILE = "./bump-cache.yaml"
+IMAGE_BASE = "ghcr.io/mikepartelow/homeslice"
+IMAGE_PREFIX = "ghcr.io/mikepartelow"
+LOCAL_REGISTRY = "registry.localdomain:32000"
 
 
 def find_keys(haystack: dict, needle: str) -> Generator[str, None, None]:
+    """yield all values of key needle in dict haystack"""
     if isinstance(haystack, dict):
         for key, value in haystack.items():
             if key == needle:
@@ -18,7 +26,9 @@ def find_keys(haystack: dict, needle: str) -> Generator[str, None, None]:
         for item in haystack:
             yield from find_keys(item, needle)
 
+
 def get_latest_main(image: str) -> str:
+    """return the latest ghcr.io image uri for image"""
     registry = ContainerRegistry("ghcr.io")
 
     tags = registry.get_tags(image.replace("ghcr.io/", ""))
@@ -26,18 +36,15 @@ def get_latest_main(image: str) -> str:
 
     latest_tag = sorted(tags)[-1]
     manifest = registry.get_manifest_headers(image, latest_tag)
-    digest = manifest['docker-content-digest']
+    digest = manifest["docker-content-digest"]
 
     return f"{image}:{latest_tag}@{digest}"
 
-CACHE_FILE = "./bump-cache.yaml"
-IMAGE_BASE = "ghcr.io/mikepartelow/homeslice"
-IMAGE_PREFIX = "ghcr.io/mikepartelow"
-LOCAL_REGISTRY = "registry.localdomain:32000"
 
 def get_latest_images(config: dict[any, any]) -> dict[str, str]:
+    """return {image: latest_image} for all homeslice images in the pulumi config"""
     if Path(CACHE_FILE).exists():
-        with open(CACHE_FILE, "r") as f:
+        with open(CACHE_FILE, "r", encoding="utf-8") as f:
             return yaml.safe_load(f)
     else:
         latest_images: dict[str, str] = {}
@@ -59,7 +66,7 @@ def get_latest_images(config: dict[any, any]) -> dict[str, str]:
             latest_images[image] = latest
             logging.info("got latest: '%s' : '%s'", image, latest)
 
-        with open(CACHE_FILE, "w") as f:
+        with open(CACHE_FILE, "w", encoding="utf-8") as f:
             yaml.safe_dump(latest_images, f)
 
         return latest_images
@@ -67,19 +74,22 @@ def get_latest_images(config: dict[any, any]) -> dict[str, str]:
 
 PULUMI_FILE = "Pulumi.prod.yaml"
 
+
 def main():
-    with open(PULUMI_FILE, "r") as f:
+    """main()"""
+    with open(PULUMI_FILE, "r", encoding="utf-8") as f:
         config = yaml.safe_load(f)
 
-    with open(PULUMI_FILE, "r") as f:
+    with open(PULUMI_FILE, "r", encoding="utf-8") as f:
         text = f.read()
 
-    for (image, latest) in get_latest_images(config).items():
+    for image, latest in get_latest_images(config).items():
         logging.info("bumping '%s' to '%s'", image, latest)
         text = text.replace(image, latest)
 
-    with open(PULUMI_FILE, "w") as f:
+    with open(PULUMI_FILE, "w", encoding="utf-8") as f:
         f.write(text)
+
 
 if __name__ == "__main__":
     logging.basicConfig()
