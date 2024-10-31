@@ -3,6 +3,7 @@
 from pathlib import Path
 from typing import Generator
 import logging
+import requests
 import yaml
 from coregio.registry_api import ContainerRegistry
 
@@ -24,8 +25,8 @@ def get_latest_main(image: str) -> str:
     tags = [t for t in tags if t.startswith("main.")]
 
     latest_tag = sorted(tags)[-1]
-    manifest = registry.get_manifest(image, latest_tag)
-    digest = manifest['config']['digest']
+    manifest = registry.get_manifest_headers(image, latest_tag)
+    digest = manifest['docker-content-digest']
 
     return f"{image}:{latest_tag}@{digest}"
 
