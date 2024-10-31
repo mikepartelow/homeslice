@@ -1,6 +1,6 @@
-"""bump all homeslice images in Pulumi.prod.yaml to the latest from ghcr.io"""
-
 #!/usr/bin/env python
+
+"""bump all homeslice images in Pulumi.prod.yaml to the latest from ghcr.io"""
 
 
 from pathlib import Path
@@ -41,11 +41,11 @@ def get_latest_main(image: str) -> str:
     return f"{image}:{latest_tag}@{digest}"
 
 
-def get_latest_images(config: dict[any, any]) -> dict[str, str]:
-    """return {image: latest_image} for all homeslice images in the pulumi config"""
+def get_latest_images(config: dict[any, any]) -> tuple[dict[str, str], bool]:
+    """return [{image: latest_image}, used_cache] for all homeslice images in the pulumi config"""
     if Path(CACHE_FILE).exists():
         with open(CACHE_FILE, "r", encoding="utf-8") as f:
-            return yaml.safe_load(f)
+            return yaml.safe_load(f), True
     else:
         latest_images: dict[str, str] = {}
 
@@ -69,7 +69,7 @@ def get_latest_images(config: dict[any, any]) -> dict[str, str]:
         with open(CACHE_FILE, "w", encoding="utf-8") as f:
             yaml.safe_dump(latest_images, f)
 
-        return latest_images
+        return latest_images, False
 
 
 PULUMI_FILE = "Pulumi.prod.yaml"
@@ -83,12 +83,16 @@ def main():
     with open(PULUMI_FILE, "r", encoding="utf-8") as f:
         text = f.read()
 
-    for image, latest in get_latest_images(config).items():
+    latest_images, used_cache = get_latest_images(config)
+    for image, latest in latest_images.items():
         logging.info("bumping '%s' to '%s'", image, latest)
         text = text.replace(image, latest)
 
     with open(PULUMI_FILE, "w", encoding="utf-8") as f:
         f.write(text)
+
+    if used_cache:
+        print("WARNING: used cache")
 
 
 if __name__ == "__main__":
