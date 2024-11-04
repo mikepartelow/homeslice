@@ -1,4 +1,4 @@
-FROM python:3.12.1@sha256:a3d69b8412f7068fd060ccc7e175825713d5a767e1e14753e75bce6f746c8a7e AS venv
+FROM python:3.12.7@sha256:b52e97a85736bc3a6bfb081ec3f2a5b828233120b2138080af1761e504b06529 AS venv
 
 COPY requirements.txt /tmp/requirements.txt
 
@@ -6,7 +6,7 @@ RUN python -m venv --copies /venv && \
     /venv/bin/pip install --upgrade pip && \
     /venv/bin/pip install --require-virtualenv --no-deps -r /tmp/requirements.txt
 
-FROM python AS dev
+FROM python:3.12.7@sha256:b52e97a85736bc3a6bfb081ec3f2a5b828233120b2138080af1761e504b06529 AS dev
 
 COPY --from=venv /venv /venv
 
