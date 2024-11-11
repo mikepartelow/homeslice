@@ -8,6 +8,7 @@ from buttons import buttons
 from chime import chime
 from clocktime import clocktime
 from homebridge import homebridge
+from istio import istio
 from lmz import lmz
 from observability import grafana, loki, prometheus, promtail
 from switches import switches
@@ -17,6 +18,7 @@ from homeslice_config import (
     BackupTodoistConfig,
     ChimeConfig,
     HomeBridgeConfig,
+    IstioConfig,
     LmzConfig,
     SonosConfig,
     UnifiConfig,
@@ -49,6 +51,9 @@ if cfg := config.get_object("clocktime"):
 
 if cfg := config.get_object("homebridge"):
     homebridge.app(HomeBridgeConfig(**dict(cfg)))
+
+if cfg := config.get_object("istio"):
+    istio.app(IstioConfig(**dict(cfg)))
 
 if cfg := config.get_object("lmz"):
     lmz.app(LmzConfig(**dict(cfg)))

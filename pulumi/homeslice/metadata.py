@@ -11,7 +11,12 @@ def metadata(
 ) -> kubernetes.meta.v1.ObjectMetaArgs:
     """THE kubernetes metadata factory"""
 
-    labels = labels or {"app.kubernetes.io/name": name}
+    labels = labels or \
+        {
+            "app.kubernetes.io/name": name,
+            "app": name,
+            "version": "0.0.1",
+        }
 
     return kubernetes.meta.v1.ObjectMetaArgs(
         annotations=annotations,

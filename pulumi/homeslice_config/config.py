@@ -62,6 +62,15 @@ class HomeBridgeConfig(BaseModel):
     node_selector: dict[str, str]
 
 
+class IstioConfig(BaseModel):
+    """Istio Config"""
+
+    inject_namespaces: list[str]
+    istio_chart_version: str
+    kiali_chart_version: Optional[str] = Field(default=None)
+    namespace: str
+
+
 class LmzConfig(BaseModel):
     """LMZ Config"""
 
