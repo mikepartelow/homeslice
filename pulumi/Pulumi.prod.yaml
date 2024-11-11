@@ -3,7 +3,7 @@ config:
   homeslice:backup_tidal:
     git_author_email: github@mikepartelow.com
     git_author_name: Mike Partelow
-    image: ghcr.io/mikepartelow/homeslice/backup-tidal:main.20241031-032438.7f09724@sha256:673bccebf20100cbbd931795652752e0719272d4d7b80f00800bdaa299d89ce1
+    image: registry.localdomain:32000/backup-tidal:20241103_172231
     schedule: 0 1 * * *
   homeslice:backup_todoist:
     git_author_email: github@mikepartelow.com
@@ -24,7 +24,7 @@ config:
         media_uri: http://{{ingress}}/api/v0/chime/swed.mp3
         schedule: 20 16 * * *
     container_port: 80
-    image: ghcr.io/mikepartelow/homeslice/chime:main.20241031-032438.7f09724@sha256:cc06580a8907f9ecd3d2fa65ea72bb9abc95ae7caf70dce89fac79c3f237d86f
+    image: registry.localdomain:32000/chime:20241103_172053
     ingress_prefix: /(api/v0/chime/)(.*)$
     nginx: nginx:1.25
     pvc_mount_path: /usr/share/nginx/html
@@ -85,7 +85,7 @@ config:
     node_selector:
       "homeslice/homebridge": "true"
   homeslice:unifi:
-    image: ghcr.io/mikepartelow/homeslice/backup-unifi:main.20241031-032434.7f09724@sha256:e0ef9444843d2d3ac9cca5c200df11c202a998e2c0fa693fc97f5a628a787919
+    image: registry.localdomain:32000/backup-unifi:20241103_172224
     redirect_prefix: /unifi
     redirect_url: https://moe.localdomain:8443
     node_selector:
