@@ -62,6 +62,8 @@ def app(config: homeslice_config.ChimeConfig, k8s_context: str, namespace: str) 
 
     # populate the hostPath PV with the chime mp3
     # WARNING: makes heavy assumptions about the PVC's StorageClass!
+    # pylint: disable=W0511
+    # FIXME: stopped working at some point. come up with a better solution.
     # pylint: disable=line-too-long
     local.Command(
         "populate",
@@ -78,6 +80,12 @@ def app(config: homeslice_config.ChimeConfig, k8s_context: str, namespace: str) 
                 )
         """,
         triggers=[nginx],
+    )
+
+    # FIXME: update local.Command to work but keep this reminder
+    pulumi.export(
+        "chime mp3",
+        "remember to manually populate chime.mp3 somewhere under /var/snap/microk8s/common/default-storage/ on the node, if using hostPathStorage",
     )
 
     homeslice.service(NAME)
