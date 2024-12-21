@@ -62,6 +62,7 @@ def app(config: homeslice_config.ChimeConfig, k8s_context: str, namespace: str) 
 
     # populate the hostPath PV with the chime mp3
     # WARNING: makes heavy assumptions about the PVC's StorageClass!
+    # pylint: disable=W0511
     # FIXME: stopped working at some point. come up with a better solution.
     # pylint: disable=line-too-long
     local.Command(
