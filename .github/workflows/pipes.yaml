@@ -25,7 +25,9 @@ jobs:
         run: |
           curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.61.0
       - name: setup Python
-        uses: actions/setup-python@v3.12
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.12'
       - name: lint
         run: cd apps/${{ matrix.app }} && make lint
       - name: test
@@ -55,6 +57,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: setup python
-        uses: actions/setup-python@v3.12
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.12'
       - name: lint
         run: cd pulumi && make lint
