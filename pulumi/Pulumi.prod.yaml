@@ -3,18 +3,18 @@ config:
   homeslice:backup_tidal:
     git_author_email: github@mikepartelow.com
     git_author_name: Mike Partelow
-    image: ghcr.io/mikepartelow/homeslice/backup-tidal:main.20241111-045120.bfd5b0d@sha256:ad3cc637cbc57cc0030bd4aa81b537768bac0212e77bdc664046115ce129c812
+    image: ghcr.io/mikepartelow/homeslice/backup-tidal:main.20241221-172314.4e92048@sha256:8bfdcf7f05422818ace0dbf7f0795234e5f8c2e2624a27ec6d8e2f9340346917
     schedule: 0 1 * * *
   homeslice:backup_todoist:
     git_author_email: github@mikepartelow.com
     git_author_name: Mike Partelow
     ssh_known_hosts_path_env_var_name: SSH_KNOWN_HOSTS
-    image: ghcr.io/mikepartelow/homeslice/backup-todoist:main.20241111-045154.bfd5b0d@sha256:dd61a727c330935483ea1edf367d44da61327f1e2fe3bc3024c6fcdfb2c6aeb7
+    image: ghcr.io/mikepartelow/homeslice/backup-todoist:main.20241221-172342.4e92048@sha256:c3b3c8c4e1676580343b11a349ea030b660cf1cc689691ccc14d0c00b48905ea
     schedule: 0 0 * * *
   homeslice:buttons:
     clocktime_url: http://clocktime.homeslice.svc.cluster.local/api/v0/clocktime/
     container_port: 8000
-    image: ghcr.io/mikepartelow/homeslice/buttons:main.20241111-045140.bfd5b0d@sha256:50d1598574d5c6922acbdb14524818b43ce6a958e409465398a9e0768ad89e3a
+    image: ghcr.io/mikepartelow/homeslice/buttons:main.20241221-172338.4e92048@sha256:611815128d051ae5b83e844244fc5b61a5118e1edbd3c3bf185c1307844c6afa
     ingress_prefixes:
       - /api/v0/buttons/
       - /api/v0/buttontimes/
@@ -24,17 +24,17 @@ config:
         media_uri: http://{{ingress}}/api/v0/chime/swed.mp3
         schedule: 20 16 * * *
     container_port: 80
-    image: ghcr.io/mikepartelow/homeslice/chime:main.20241111-045118.bfd5b0d@sha256:4a3a1092224376c02077bc44b4b778c88e015e46a53d8e4b81fb3af3f9e809fa
+    image: ghcr.io/mikepartelow/homeslice/chime:main.20241221-172308.4e92048@sha256:769704e1259b17874d56e477ee358ff3f878589f6da4fc59f410a9380b8fb2fd
     ingress_prefix: /(api/v0/chime/)(.*)$
     nginx: nginx:1.25
     pvc_mount_path: /usr/share/nginx/html
   homeslice:clocktime:
     container_port: 8000
-    image: ghcr.io/mikepartelow/homeslice/clocktime:main.20241111-045140.bfd5b0d@sha256:95ce001ba20ee91c15607b9dc111d8bc68dbbeffdccfe203009f91f507dd2740
+    image: ghcr.io/mikepartelow/homeslice/clocktime:main.20241221-172329.4e92048@sha256:f8e02d3a3e25f299ed5ba92fb36998aa0a7a224944fb4356062058e94414bbdf
     ingress_prefix: /api/v0/clocktime/
     location: America/Los_Angeles
   homeslice:lmz:
-    image: ghcr.io/mikepartelow/homeslice/lmz:main.20241111-045144.bfd5b0d@sha256:822849c4c531f8be09390f2795455d939c666b566142bcc33fb768dbd8379d50
+    image: ghcr.io/mikepartelow/homeslice/lmz:main.20241221-172330.4e92048@sha256:80c0877f0b2d82d67685df009965aaee1cb8c547ce7e99759de906e399a159ae
     container_port: 8000
     ingress_prefix: /(api/v0/lmz)/(.*)$
     lmz_yaml_path: /home/nonroot/.config/lmz/config.yaml
@@ -52,14 +52,14 @@ config:
   #   promtail_chart_version: "6.16.3"
   homeslice:namespace: homeslice
   homeslice:sonos:
-    image: ghcr.io/mikepartelow/homeslice/gosonos:main.20241111-045148.bfd5b0d@sha256:7279396db9cb6de8c33c176c98c8b3d7fab472b0d7ef25e48315cae9999ec262
+    image: ghcr.io/mikepartelow/homeslice/gosonos:main.20241221-172331.4e92048@sha256:555b82937e14048e9d923db7512388e35eaaf0408b1d7c51fde11236ce9f8324
     container_port: 8000
     config_path: /etc/sonos/config.yaml
     ingress_prefix: /(api/v0/sonos/)(.*)$
     volume: 20
   homeslice:switches:
     container_port: 8000
-    image: ghcr.io/mikepartelow/homeslice/switches:main.20241111-045145.bfd5b0d@sha256:f7893791e58571a76647ff440d0ed620d94de2185db0eb237734305bc4e4eb05
+    image: ghcr.io/mikepartelow/homeslice/switches:main.20241221-172334.4e92048@sha256:688a1951466c9ad0ac14e7dabdd193f3152edda9808763743dd1e6edec22e946
     ingress_prefix: /api/v0/switches/
     switches_json: |
       [
@@ -85,7 +85,7 @@ config:
     node_selector:
       "homeslice/homebridge": "true"
   homeslice:unifi:
-    image: ghcr.io/mikepartelow/homeslice/backup-unifi:main.20241111-045119.bfd5b0d@sha256:7ee6ce6493bf0ed4f62de2a9fa6980f7a1a2c0e6c1c494f180cc5bb57d97e9aa
+    image: ghcr.io/mikepartelow/homeslice/backup-unifi:main.20241221-172313.4e92048@sha256:15e1c52a002bc7e63b7de7309b94735b7ba48e43ef67c7c5f1fcc08c8d3e2376
     redirect_prefix: /unifi
     redirect_url: https://moe.localdomain:8443
     node_selector:
