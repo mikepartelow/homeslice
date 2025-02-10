@@ -27,7 +27,7 @@ jobs:
       - name: setup Python
         uses: actions/setup-python@v3
       - name: install lint dependencies
-        run: apt-get install -y libxml2-utils
+        run: sudo apt-get install -y libxml2-utils
       - name: lint
         run: cd apps/${{ matrix.app }} && make lint
       - name: test
