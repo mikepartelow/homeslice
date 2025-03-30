@@ -11,7 +11,6 @@ import (
 	"mp/gosonos/pkg/station"
 	"mp/gosonos/pkg/track"
 	"os"
-	"strconv"
 
 	"github.com/phsym/console-slog"
 	"gopkg.in/yaml.v3"
@@ -26,35 +25,11 @@ type Config struct {
 	ListenPort int
 }
 
-func getenvOrError(name string) (string, error) {
-	val := os.Getenv(name)
-	if val == "" {
-		return "", fmt.Errorf("missing required env var %q", name)
-	}
-	return val, nil
-}
-
-func getenvOrDefault(name, defaultValue string) string {
-	if val := os.Getenv(name); val != "" {
-		return val
-	}
-	return defaultValue
-}
-
-func (c *Config) Load() (*slog.Logger, error) {
+func (c *Config) Load(configPath string, listenPort int) (*slog.Logger, error) {
 	// FIXME: log level from env
 	logger := slog.New(console.NewHandler(os.Stderr, &console.HandlerOptions{Level: slog.LevelDebug}))
 
-	port, err := strconv.Atoi(getenvOrDefault("LISTEN_PORT", "8000"))
-	if err != nil {
-		return nil, fmt.Errorf("invalid value for LISTEN_PORT: %w", err)
-	}
-	c.ListenPort = port
-
-	configPath, err := getenvOrError("CONFIG_PATH")
-	if err != nil {
-		return nil, err
-	}
+	c.ListenPort = listenPort
 
 	file, err := os.Open(configPath)
 	if err != nil {

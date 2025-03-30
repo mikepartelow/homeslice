@@ -61,6 +61,7 @@ def app(config: homeslice_config.SonosConfig) -> None:
     homeslice.deployment(
         NAME,
         config.image,
+        args="serve",
         env_from=env_from,
         ports=ports,
         volume_mounts=volume_mounts,
