@@ -2,7 +2,9 @@
 
 from pathlib import Path
 
+from pulumi_command import local
 import pulumi_kubernetes as kubernetes
+import pulumi
 import homeslice_config
 import homeslice
 from homeslice_secrets import (  # pylint: disable=no-name-in-module
@@ -32,7 +34,7 @@ def app(config: homeslice_config.SonosConfig) -> None:
     )
 
     with open("homeslice_secrets/gosonos-config.yaml", encoding="utf-8") as f:
-        homeslice.configmap(
+        config_configmap = homeslice.configmap(
             f"{NAME}-config",
             {
                 Path(config.config_path).name: f.read(),
@@ -61,10 +63,21 @@ def app(config: homeslice_config.SonosConfig) -> None:
     homeslice.deployment(
         NAME,
         config.image,
+        args=["serve"],
         env_from=env_from,
         ports=ports,
         volume_mounts=volume_mounts,
         volumes=volumes,
+    )
+
+    kconfig = pulumi.Config("kubernetes")
+    context = kconfig.require("context")
+
+    local.Command(
+        "roll-sonos",
+        opts=pulumi.ResourceOptions(depends_on=[config_configmap]),
+        create=f"zsh -c 'kubectl --context {context} rollout restart deployment/{NAME} -n homeslice'",  # pylint: disable=C0301
+        triggers=[config_configmap],
     )
 
     homeslice.service(NAME)

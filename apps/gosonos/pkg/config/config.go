@@ -11,7 +11,7 @@ import (
 	"mp/gosonos/pkg/station"
 	"mp/gosonos/pkg/track"
 	"os"
-	"strconv"
+	"strings"
 
 	"github.com/phsym/console-slog"
 	"gopkg.in/yaml.v3"
@@ -22,39 +22,11 @@ type Config struct {
 	Players     []player.Player
 
 	Curations map[curation.ID]curation.Curation
-
-	ListenPort int
 }
 
-func getenvOrError(name string) (string, error) {
-	val := os.Getenv(name)
-	if val == "" {
-		return "", fmt.Errorf("missing required env var %q", name)
-	}
-	return val, nil
-}
-
-func getenvOrDefault(name, defaultValue string) string {
-	if val := os.Getenv(name); val != "" {
-		return val
-	}
-	return defaultValue
-}
-
-func (c *Config) Load() (*slog.Logger, error) {
+func (c *Config) Load(configPath string) (*slog.Logger, error) {
 	// FIXME: log level from env
 	logger := slog.New(console.NewHandler(os.Stderr, &console.HandlerOptions{Level: slog.LevelDebug}))
-
-	port, err := strconv.Atoi(getenvOrDefault("LISTEN_PORT", "8000"))
-	if err != nil {
-		return nil, fmt.Errorf("invalid value for LISTEN_PORT: %w", err)
-	}
-	c.ListenPort = port
-
-	configPath, err := getenvOrError("CONFIG_PATH")
-	if err != nil {
-		return nil, err
-	}
 
 	file, err := os.Open(configPath)
 	if err != nil {
@@ -121,6 +93,53 @@ func (c *Config) parse(r io.Reader, logger *slog.Logger) error {
 	}
 
 	return nil
+}
+
+func (c *Config) Write(w io.Writer) error {
+	var cfg config
+
+	var players []string
+	for _, player := range c.Players {
+		players = append(players, strings.SplitN(player.Address().String(), ":", 2)[0])
+	}
+
+	var stations []cfgstation
+	var playlists []cfgplaylist
+	for _, curation := range c.Curations {
+		if st, ok := curation.(*station.Station); ok {
+			stations = append(stations, cfgstation{
+				Kind:   "somafm/v1",
+				ID:     st.ID.String(),
+				Name:   st.Name,
+				URI:    string(st.URI),
+				Volume: (*int)(&st.Volume),
+			})
+		} else if pl, ok := curation.(*playlist.Playlist); ok {
+			var trackIDs []string
+			for _, track := range pl.Tracks {
+				trackIDs = append(trackIDs, string(track.TrackID()))
+			}
+
+			playlists = append(playlists, cfgplaylist{
+				Kind:     "tidalplaylist/v1",
+				ID:       pl.ID.String(),
+				Name:     pl.Name,
+				Volume:   (*int)(&pl.Volume),
+				TrackIDs: trackIDs,
+			})
+		} else {
+			panic("unknown curation kind")
+		}
+	}
+
+	cfg.Kind = "gosonos/v1"
+	cfg.Coordinator = strings.SplitN(c.Coordinator.Address().String(), ":", 2)[0]
+	cfg.Players = players
+	cfg.Stations = stations
+	cfg.Playlists = playlists
+
+	return yaml.NewEncoder(w).Encode(&cfg)
+
 }
 
 func makePlayers(cfg config, logger *slog.Logger) (player.Player, []player.Player, error) {

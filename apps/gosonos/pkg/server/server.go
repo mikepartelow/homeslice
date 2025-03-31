@@ -23,6 +23,8 @@ type Server struct {
 
 	Logger *slog.Logger
 
+	Port int
+
 	Failure string
 	Success string
 }
@@ -34,8 +36,8 @@ func (s *Server) init() {
 		)
 	}
 
-	if s.ListenPort == 0 {
-		s.ListenPort = DefaultListenPort
+	if s.Port == 0 {
+		s.Port = DefaultListenPort
 	}
 
 	if s.Failure == "" {
@@ -53,8 +55,8 @@ func (s *Server) Serve() error {
 	http.HandleFunc("POST /curations/{id}/{op}", s.HandleCurations)
 	http.HandleFunc("GET /curations/{id}/status", s.HandleCurations)
 
-	s.Logger.Warn("Listening", "port", s.ListenPort)
-	if err := http.ListenAndServe(":"+strconv.Itoa(s.ListenPort), nil); err != nil {
+	s.Logger.Warn("Listening", "port", s.Port)
+	if err := http.ListenAndServe(":"+strconv.Itoa(s.Port), nil); err != nil {
 		s.Logger.Error("http.ListenAndServe", "error", err)
 		return fmt.Errorf("http.ListenAndServe failed: %w", err)
 	}
