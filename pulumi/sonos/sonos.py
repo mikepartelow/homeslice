@@ -80,7 +80,6 @@ def app(config: homeslice_config.SonosConfig) -> None:
         triggers=[config_configmap],
     )
 
-
     homeslice.service(NAME)
 
     # pylint: disable=R0801
