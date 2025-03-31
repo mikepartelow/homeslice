@@ -12,6 +12,7 @@ import (
 	"mp/gosonos/pkg/server"
 	"mp/gosonos/pkg/track"
 	"os"
+	"strconv"
 
 	"github.com/urfave/cli/v3"
 )
@@ -83,61 +84,17 @@ func updateConfig() *cli.Command {
 		Aliases: []string{"uc"},
 		Usage:   "update config from a tidal backup",
 		Action: func(ctx context.Context, cmd *cli.Command) error {
-			var cfg config.Config
-
-			// -1 num-tracks means all tracks from backup
-			_, err := cfg.Load(cmd.String("config"))
-			if err != nil {
-				return cli.Exit(err.Error(), 1)
-			}
-
-			playlistID := cmd.String("playlist-id")
-
-			cid, err := curation.ParseID(playlistID)
-			if err != nil {
-				return cli.Exit(err.Error(), 1)
-			}
-
-			pl, ok := cfg.Curations[cid].(*playlist.Playlist)
-			if !ok {
-				return cli.Exit(fmt.Sprintf("curation %q is not a Playlist", pl.GetID()), 1)
-			}
-
-			type BackupTidalTrack struct {
-				ID int `json:"id"`
-			}
-
-			file, err := os.Open(cmd.String("tidal-backup"))
-			if err != nil {
-				return cli.Exit(err.Error(), 1)
-			}
-			defer file.Close()
-
-			var backup []BackupTidalTrack
-			err = json.NewDecoder(file).Decode(&backup)
+			pl, cfg, err := getPlaylist(cmd.String("config"), cmd.String("playlist-id"))
 			if err != nil {
 				cli.Exit(err.Error(), 1)
 			}
 
-			rand.Shuffle(len(backup), func(i, j int) {
-				backup[i], backup[j] = backup[j], backup[i]
-			})
-
-			numTracks := int(cmd.Int("num-tracks"))
-			if numTracks < 1 {
-				numTracks = len(backup)
-			} else {
-				numTracks = min(numTracks, len(backup))
+			tracks, err := chooseBackupTracks(cmd.String("tidal-backup"), int(cmd.Int("num-tracks")))
+			if err != nil {
+				cli.Exit(err.Error(), 1)
 			}
 
-			// tracks := backup[0:numTracks]
-			var tracks []track.Track
-
-			for _, tid := range pl.Tracks[0:numTracks] {
-				tracks = append(tracks, &playlist.TidalTrack{ID: track.TrackID(tid.TrackID())})
-			}
-
-			(cfg.Curations[cid]).(*playlist.Playlist).Tracks = tracks
+			pl.Tracks = tracks
 
 			ofile, err := os.Create(cmd.String("output"))
 			if err != nil {
@@ -183,4 +140,60 @@ func updateConfig() *cli.Command {
 			},
 		},
 	}
+}
+
+func chooseBackupTracks(backupFilename string, numTracks int) ([]track.Track, error) {
+	type BackupTidalTrack struct {
+		ID int `json:"id"`
+	}
+
+	file, err := os.Open(backupFilename)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	var backup []BackupTidalTrack
+	err = json.NewDecoder(file).Decode(&backup)
+	if err != nil {
+		return nil, err
+	}
+
+	rand.Shuffle(len(backup), func(i, j int) {
+		backup[i], backup[j] = backup[j], backup[i]
+	})
+
+	if numTracks < 1 {
+		numTracks = len(backup)
+	} else {
+		numTracks = min(numTracks, len(backup))
+	}
+
+	var tracks []track.Track
+	for _, btt := range backup[0:numTracks] {
+		tracks = append(tracks, &playlist.TidalTrack{ID: track.TrackID(strconv.Itoa(btt.ID))})
+	}
+
+	return tracks, nil
+}
+
+func getPlaylist(configPath, playlistID string) (*playlist.Playlist, *config.Config, error) {
+	var cfg config.Config
+
+	_, err := cfg.Load(configPath)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	cid, err := curation.ParseID(playlistID)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	pl, ok := cfg.Curations[cid].(*playlist.Playlist)
+	if !ok {
+		return nil, nil, fmt.Errorf("curation %q is not a Playlist", pl.GetID())
+	}
+
+	return pl, &cfg, nil
 }
