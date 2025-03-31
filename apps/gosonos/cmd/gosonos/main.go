@@ -89,7 +89,7 @@ func updateConfig() *cli.Command {
 				cli.Exit(err.Error(), 1)
 			}
 
-			tracks, err := chooseBackupTracks(cmd.String("tidal-backup"), int(cmd.Int("num-tracks")))
+			tracks, err := chooseBackupTracks(cmd.String("tidal-backup"))
 			if err != nil {
 				cli.Exit(err.Error(), 1)
 			}
@@ -133,16 +133,11 @@ func updateConfig() *cli.Command {
 				Sources:  cli.EnvVars("TIDAL_BACKUP_PATH"),
 				Required: true,
 			},
-			&cli.IntFlag{
-				Name:  "num-tracks",
-				Usage: "number of Tidal Backup tracks to copy to gosonos config, or <1 for all",
-				Value: 42,
-			},
 		},
 	}
 }
 
-func chooseBackupTracks(backupFilename string, numTracks int) ([]track.Track, error) {
+func chooseBackupTracks(backupFilename string) ([]track.Track, error) {
 	type BackupTidalTrack struct {
 		ID int `json:"id"`
 	}
@@ -163,14 +158,8 @@ func chooseBackupTracks(backupFilename string, numTracks int) ([]track.Track, er
 		backup[i], backup[j] = backup[j], backup[i]
 	})
 
-	if numTracks < 1 {
-		numTracks = len(backup)
-	} else {
-		numTracks = min(numTracks, len(backup))
-	}
-
 	var tracks []track.Track
-	for _, btt := range backup[0:numTracks] {
+	for _, btt := range backup {
 		tracks = append(tracks, &playlist.TidalTrack{ID: track.TrackID(strconv.Itoa(btt.ID))})
 	}
 
