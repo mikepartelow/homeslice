@@ -17,3 +17,7 @@ func ParseID(s string) (ID, error) {
 
 	return ID{id: s}, nil
 }
+
+func (id ID) String() string {
+	return id.id
+}
