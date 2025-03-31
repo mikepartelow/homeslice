@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"math/rand/v2"
 	"mp/gosonos/pkg/config"
 	"mp/gosonos/pkg/curation"
 	"mp/gosonos/pkg/playlist"
@@ -153,10 +152,6 @@ func chooseBackupTracks(backupFilename string) ([]track.Track, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	rand.Shuffle(len(backup), func(i, j int) {
-		backup[i], backup[j] = backup[j], backup[i]
-	})
 
 	var tracks []track.Track
 	for _, btt := range backup {

@@ -11,6 +11,7 @@ import (
 	"mp/gosonos/pkg/station"
 	"mp/gosonos/pkg/track"
 	"os"
+	"strings"
 
 	"github.com/phsym/console-slog"
 	"gopkg.in/yaml.v3"
@@ -99,7 +100,7 @@ func (c *Config) Write(w io.Writer) error {
 
 	var players []string
 	for _, player := range c.Players {
-		players = append(players, player.Address().String())
+		players = append(players, strings.SplitN(player.Address().String(), ":", 2)[0])
 	}
 
 	var stations []cfgstation
@@ -132,7 +133,7 @@ func (c *Config) Write(w io.Writer) error {
 	}
 
 	cfg.Kind = "gosonos/v1"
-	cfg.Coordinator = c.Coordinator.Address().String()
+	cfg.Coordinator = strings.SplitN(c.Coordinator.Address().String(), ":", 2)[0]
 	cfg.Players = players
 	cfg.Stations = stations
 	cfg.Playlists = playlists
