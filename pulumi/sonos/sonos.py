@@ -2,9 +2,9 @@
 
 from pathlib import Path
 
-import pulumi
-import pulumi_kubernetes as kubernetes
 from pulumi_command import local
+import pulumi_kubernetes as kubernetes
+import pulumi
 import homeslice_config
 import homeslice
 from homeslice_secrets import (  # pylint: disable=no-name-in-module
@@ -76,7 +76,7 @@ def app(config: homeslice_config.SonosConfig) -> None:
     local.Command(
         "roll-sonos",
         opts=pulumi.ResourceOptions(depends_on=[config_configmap]),
-        create=f"zsh -c 'kubectl --context {context} rollout restart deployment/{NAME} -n homeslice'",
+        create=f"zsh -c 'kubectl --context {context} rollout restart deployment/{NAME} -n homeslice'",  # pylint: disable=C0301
         triggers=[config_configmap],
     )
 

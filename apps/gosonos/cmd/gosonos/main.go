@@ -85,25 +85,25 @@ func updateConfig() *cli.Command {
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			pl, cfg, err := getPlaylist(cmd.String("config"), cmd.String("playlist-id"))
 			if err != nil {
-				cli.Exit(err.Error(), 1)
+				_ = cli.Exit(err.Error(), 1)
 			}
 
 			tracks, err := chooseBackupTracks(cmd.String("tidal-backup"))
 			if err != nil {
-				cli.Exit(err.Error(), 1)
+				_ = cli.Exit(err.Error(), 1)
 			}
 
 			pl.Tracks = tracks
 
 			ofile, err := os.Create(cmd.String("output"))
 			if err != nil {
-				cli.Exit(err.Error(), 1)
+				_ = cli.Exit(err.Error(), 1)
 			}
 			defer ofile.Close()
 
 			err = cfg.Write(ofile)
 			if err != nil {
-				cli.Exit(err.Error(), 1)
+				_ = cli.Exit(err.Error(), 1)
 			}
 
 			return nil
