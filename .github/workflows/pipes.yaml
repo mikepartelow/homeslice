@@ -17,6 +17,10 @@ jobs:
         app: [backup-tidal, backup-todoist, backup-unifi, buttons, chime, clocktime, gosonos, lmz, sonos, switches]
     steps:
       - uses: actions/checkout@v4
+      - name: Install ruff without running check or format
+        uses: astral-sh/ruff-action@v3
+        with:
+          args: "--version"
       - name: Setup Go
         uses: actions/setup-go@v4
         with:
