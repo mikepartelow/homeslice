@@ -1,3 +1,5 @@
 """"Homeslice Config"""
 
-from .config import *
+import config
+
+__all__ = ["config"]

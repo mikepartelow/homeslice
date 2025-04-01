@@ -1,17 +1,17 @@
 """kubernetes helpers"""
 
-# pylint: disable=cyclic-import
+import configmap
+import cronjob
+import deployment
+import env_from
+import ingress
+import metadata
+import namespace
+import port
+import secret
+import service
+import backup_to_github
 
-from .configmap import *
-from .cronjob import *
-from .deployment import *
-from .env_from import *
-from .ingress import *
-from .metadata import *
-from .namespace import *
-from .port import *
-from .secret import *
-from .service import *
-from .backup_to_github import *
+__all__ = [ "configmap", "cronjob", "deployment", "env_from", "ingress", "metadata", "namespace", "port", "secret", "service", "backup_to_github", ]
 
 HOMESLICE = "homeslice"
