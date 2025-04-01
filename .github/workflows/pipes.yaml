@@ -14,9 +14,13 @@ jobs:
       packages: write
     strategy:
       matrix:
-        app: [backup-tidal, backup-todoist, backup-unifi, buttons, chime, clocktime, gosonos, lmz, sonos, switches]
+        app: [backup-tidal, backup-todoist, backup-unifi, buttons, chime, clocktime, gosonos, lmz, switches]
     steps:
       - uses: actions/checkout@v4
+      - name: Install ruff without running check or format
+        uses: astral-sh/ruff-action@v3
+        with:
+          args: "--version"
       - name: Setup Go
         uses: actions/setup-go@v4
         with:
@@ -56,6 +60,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Install ruff without running check or format
+        uses: astral-sh/ruff-action@v3
+        with:
+          args: "--version"
       - name: setup python
         uses: actions/setup-python@v3
         with:
