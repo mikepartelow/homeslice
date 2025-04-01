@@ -16,17 +16,11 @@ test:
 	echo FIXME
 
 # FIXME: share with pulumi
-VENV_LINT := ./.venv.lint
-venv-lint:
-	python3 -m venv $(VENV_LINT)
-	$(VENV_LINT)/bin/pip install --no-deps -r requirements-lint.txt -r requirements.txt
+lint:
+	ruff check
 
-lint: venv-lint
-	$(VENV_LINT)/bin/black --exclude '.venv.*' --check .
-	$(VENV_LINT)/bin/pylint --ignore-paths=.venv,.venv.lint "**/*.py"
-
-fmt: venv-lint
-	$(VENV_LINT)/bin/black --exclude '.venv.*' .
+fmt:
+	ruff check --fix
 
 VENV := ./.venv
 venv:

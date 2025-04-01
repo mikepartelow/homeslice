@@ -1,6 +1,8 @@
 """Module Docstring"""
 
-from .config import *
-from .playlist import *
-from .server import *
-from .station import *
+import config
+import playlist
+import server
+import station
+
+__all__ = [ "config", "playlist", "server", "station" ]
