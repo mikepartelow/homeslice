@@ -1,24 +1,20 @@
-FROM python:3.12.7@sha256:b52e97a85736bc3a6bfb081ec3f2a5b828233120b2138080af1761e504b06529 AS venv
-
-COPY requirements.txt /tmp/requirements.txt
-
-RUN python -m venv --copies /venv && \
-    /venv/bin/pip install --upgrade pip && \
-    /venv/bin/pip install --require-virtualenv --no-deps -r /tmp/requirements.txt
-
-FROM python:3.12.7@sha256:b52e97a85736bc3a6bfb081ec3f2a5b828233120b2138080af1761e504b06529 AS dev
-
-COPY --from=venv /venv /venv
-
-WORKDIR /app
-COPY chime.py chime.py
-
-ENV PATH=/venv/bin:$PATH
-
-FROM dev AS prod
+FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim@sha256:0ddac20e6ed02c16bc5f3881619d4ef959427f2ffbe246db87b375b133523be3 AS dev
 
 WORKDIR /app
 
-USER nobody
+RUN --mount=type=cache,target=/root/.cache/uv \
+    --mount=type=bind,source=uv.lock,target=uv.lock \
+    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
+    uv sync --frozen --no-install-project
 
-ENTRYPOINT ["/app/chime.py"]
+ADD . /app
+
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --frozen
+
+FROM python:3.12-slim@sha256:a866731a6b71c4a194a845d86e06568725e430ed21821d0c52e4efb385cf6c6f AS prod
+
+COPY --from=dev --chown=app:app /app/.venv /app/.venv
+ADD ./chime.py /app/chime.py
+
+ENTRYPOINT ["/app/.venv/bin/python", "/app/chime.py"]
