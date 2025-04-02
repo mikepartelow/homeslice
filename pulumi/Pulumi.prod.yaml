@@ -3,18 +3,18 @@ config:
   homeslice:backup_tidal:
     git_author_email: github@mikepartelow.com
     git_author_name: Mike Partelow
-    image: registry.localdomain:32000/backup-tidal:20250401_221458
+    image: ghcr.io/mikepartelow/homeslice/backup-tidal:main.20250402-052226.855d27d@sha256:0efb24aef469ac058897596ea6b7ef1d23aeead7ad2ae64f5bb267ac23894e9f
     schedule: 0 1 * * *
   homeslice:backup_todoist:
     git_author_email: github@mikepartelow.com
     git_author_name: Mike Partelow
     ssh_known_hosts_path_env_var_name: SSH_KNOWN_HOSTS
-    image: ghcr.io/mikepartelow/homeslice/backup-todoist:main.20241221-172342.4e92048@sha256:c3b3c8c4e1676580343b11a349ea030b660cf1cc689691ccc14d0c00b48905ea
+    image: ghcr.io/mikepartelow/homeslice/backup-todoist:main.20250402-052305.855d27d@sha256:332a2043b1b33b006fd9b1858dcc13b2a27827a8e2d4b8781e90701eac42ed37
     schedule: 0 0 * * *
   homeslice:buttons:
     clocktime_url: http://clocktime.homeslice.svc.cluster.local/api/v0/clocktime/
     container_port: 8000
-    image: ghcr.io/mikepartelow/homeslice/buttons:main.20241221-172338.4e92048@sha256:611815128d051ae5b83e844244fc5b61a5118e1edbd3c3bf185c1307844c6afa
+    image: ghcr.io/mikepartelow/homeslice/buttons:main.20250402-052255.855d27d@sha256:ba930b23c70574cd76c39bfe5be6fcb926b748dc1805f07fadb6d38dc3b42027
     ingress_prefixes:
       - /api/v0/buttons/
       - /api/v0/buttontimes/
@@ -24,17 +24,17 @@ config:
         media_uri: http://{{ingress}}/api/v0/chime/swed.mp3
         schedule: 20 16 * * *
     container_port: 80
-    image: registry.localdomain:32000/chime:20250401_213410
+    image: ghcr.io/mikepartelow/homeslice/chime:main.20250402-052222.855d27d@sha256:1dfb7d764107bbb2a0a741ee2398b8701d4cbd073ff3bc59e63068259b3f85ea
     ingress_prefix: /(api/v0/chime/)(.*)$
     nginx: nginx:1.25
     pvc_mount_path: /usr/share/nginx/html
   homeslice:clocktime:
     container_port: 8000
-    image: ghcr.io/mikepartelow/homeslice/clocktime:main.20241221-172329.4e92048@sha256:f8e02d3a3e25f299ed5ba92fb36998aa0a7a224944fb4356062058e94414bbdf
+    image: ghcr.io/mikepartelow/homeslice/clocktime:main.20250402-052257.855d27d@sha256:59d3db0a9fd3b332f83e11067531f7453cc6f845444fe01388e8b65a65bdf204
     ingress_prefix: /api/v0/clocktime/
     location: America/Los_Angeles
   homeslice:lmz:
-    image: ghcr.io/mikepartelow/homeslice/lmz:main.20241221-172330.4e92048@sha256:80c0877f0b2d82d67685df009965aaee1cb8c547ce7e99759de906e399a159ae
+    image: ghcr.io/mikepartelow/homeslice/lmz:main.20250402-052258.855d27d@sha256:975cc894697659cdfa4ddc097fb48987a23a47ccd4ee7eb8c9cc1a5dd46adf60
     container_port: 8000
     ingress_prefix: /(api/v0/lmz)/(.*)$
     lmz_yaml_path: /home/nonroot/.config/lmz/config.yaml
@@ -52,14 +52,14 @@ config:
   #   promtail_chart_version: "6.16.3"
   homeslice:namespace: homeslice
   homeslice:sonos:
-    image: ghcr.io/mikepartelow/homeslice/gosonos:main.20241221-172331.4e92048@sha256:555b82937e14048e9d923db7512388e35eaaf0408b1d7c51fde11236ce9f8324
+    image: ghcr.io/mikepartelow/homeslice/gosonos:main.20250402-052253.855d27d@sha256:0bc06f59139389a834cd93cf87f90cc4929a65c6e2904c6cc5b41029959e7bbc
     container_port: 8000
     config_path: /etc/sonos/config.yaml
     ingress_prefix: /(api/v0/sonos/)(.*)$
     volume: 20
   homeslice:switches:
     container_port: 8000
-    image: ghcr.io/mikepartelow/homeslice/switches:main.20241221-172334.4e92048@sha256:688a1951466c9ad0ac14e7dabdd193f3152edda9808763743dd1e6edec22e946
+    image: ghcr.io/mikepartelow/homeslice/switches:main.20250402-052252.855d27d@sha256:99094ba92d7f8c1835821a958d09d80f999627438358cb6ce580853728d8989d
     ingress_prefix: /api/v0/switches/
     switches_json: |
       [
@@ -85,7 +85,7 @@ config:
     node_selector:
       "homeslice/homebridge": "true"
   homeslice:unifi:
-    image: registry.localdomain:32000/backup-unifi:20250401_221654
+    image: ghcr.io/mikepartelow/homeslice/backup-unifi:main.20250402-052226.855d27d@sha256:b0dc37f3a48ed48ea5a6419786081c44faf90bbfd54a7491be18310573a88617
     redirect_prefix: /unifi
     redirect_url: https://moe.localdomain:8443
     node_selector:
