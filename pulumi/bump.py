@@ -1,4 +1,12 @@
-#!/usr/bin/env python
+#!/usr/bin/env uv run --no-project
+
+# /// script
+# requires-python = ">=3.12"
+# dependencies = [
+#     "coregio",
+#     "pyyaml",
+# ]
+# ///
 
 """bump all homeslice images in Pulumi.prod.yaml to the latest from ghcr.io"""
 
