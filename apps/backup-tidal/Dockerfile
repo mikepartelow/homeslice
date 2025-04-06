@@ -13,7 +13,7 @@ ADD . /app
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --frozen --link-mode=copy
 
-FROM python:3.12-slim@sha256:a866731a6b71c4a194a845d86e06568725e430ed21821d0c52e4efb385cf6c6f AS prod
+FROM python:3.12@sha256:4e7024df2f2099e87d0a41893c299230d2a974c3474e681b0996f141951f9817 AS prod
 
 COPY --from=dev --chown=app:app /venv /venv
 ADD ./backup_tidal.py /app/backup_tidal.py
