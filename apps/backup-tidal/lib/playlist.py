@@ -31,6 +31,7 @@ def write(
                     "num": track.track_num,
                     "id": track.id,
                     "artists": [a.name for a in track.artists],
+                    "available": track.available,
                 }
             )
         time.sleep(rate_limit_sleep_seconds)
