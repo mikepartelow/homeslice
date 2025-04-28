@@ -40,3 +40,9 @@ build: copy-libs
 copy-libs:
 	cp -v ../pylib/git.py lib/git.py
 	cp -v ../pylib/github_backup.py lib/github_backup.py
+
+find-unavailable:
+	jq '[.[] | select(.available == false)]' tmp/mega_playlist.json > tmp/unavailable.json
+
+remedy-unavailables: dev
+	docker run --rm --entrypoint '' -v`pwd`/tmp:/tmp -ti ${--shell-args} $(PROJECT)-dev ./remedy_unavailables.py $(PLAYLIST_PATH)
