@@ -10,7 +10,7 @@ from lib import auth
 from collections import namedtuple
 from typing import Optional
 
-Track = namedtuple("Track", "name artist album artists")
+Track = namedtuple("Track", "id name artist album artists")
 
 def require_env(name: str) -> str:
     """Returns the value of the given environment variable or prints a message and exits."""
@@ -32,6 +32,7 @@ PLAYLIST_PATH = os.environ.get("PLAYLIST_PATH", "/tmp")
 
 def scrub(ot: Track) -> Track:
     return Track(
+        id=ot.id,
         name=ot.name,
         artist=ot.artist,
         album=ot.album.replace(" (Remastered)", ""),
@@ -58,7 +59,6 @@ def find_track(session: tidalapi.Session, target: Track) -> Optional[str]:
     target = scrub(target)
 
     search_terms = [f"{target.artist} {target.name}", target.name]
-    print(search_terms)
 
     candidates = []
 
@@ -67,9 +67,7 @@ def find_track(session: tidalapi.Session, target: Track) -> Optional[str]:
 
         for result in results["tracks"]:
             artist_group = ', '.join(sorted(a.name for a in result.artists))
-            candidate = scrub(Track(name=result.name, artist=result.artist.name, album=result.album.name, artists=artist_group))
-
-            print(f"{candidate} ?== {target}")
+            candidate = scrub(Track(id=result.id, name=result.name, artist=result.artist.name, album=result.album.name, artists=artist_group))
 
             if cscore := score(candidate, target) > 0:
                 candidates.append((candidate, cscore))
@@ -77,27 +75,11 @@ def find_track(session: tidalapi.Session, target: Track) -> Optional[str]:
     if len(candidates) == 0:
         return None
 
-    return sorted(candidates, key=lambda e: -e[1])[0]
+    return sorted(candidates, key=lambda e: -e[1])[0][0].id
 
-def main():
-    """Does the magic."""
-    if len(sys.argv) != 2:
-        print(f"Usage: {sys.argv[0]} <path to playlist json>")
-        sys.exit(1)
-
-    playlist_path = sys.argv[1]
-
-    session = tidalapi.Session()
-    auth.login(session, PATH_TO_CREDS)
-
+def remedy_playlist(playlist_path: str, session: tidalapi.Session, cache: dict[str, int]):
     with open(playlist_path, "r", encoding="utf-8") as f:
         tracks = json.load(f)
-
-    if not Path(PATH_TO_CACHE).exists():
-        Path(PATH_TO_CACHE).write_text("{}")
-
-    with open(PATH_TO_CACHE, "r", encoding="utf-8") as f:
-        cache = json.load(f)
 
     try:
         for track in tracks:
@@ -113,6 +95,7 @@ def main():
             if not track["available"]:
                 print(f"🧑‍⚕️ Attempting to remedy track {track["name"]}")
                 if new_track_id := find_track(session, Track(
+                    id="",
                     name=track["name"],
                     artist=track["artist"],
                     album=track["album"],
@@ -130,7 +113,48 @@ def main():
         with open(PATH_TO_CACHE, "w", encoding="utf-8") as f:
             json.dump(cache, f)
 
-            # sys.exit(1)
+def publish_corrections(session: tidalapi.Session, track_ids: list[str], new_playlist_name: str):
+    playlist = None
+    for candidate in session.user.playlists():
+        if candidate.name == new_playlist_name:
+            print(f"Found playlist {new_playlist_name}")
+            playlist = candidate
+            break
+
+    if not playlist:
+        print(f"Creating playlist {new_playlist_name}")
+        playlist = session.user.create_playlist(new_playlist_name, new_playlist_name)
+
+    MAX_ADD = min(100, len(track_ids))
+    start, finish = 0, MAX_ADD
+    while finish <= len(track_ids):
+        print(f"adding {start}:{finish}")
+        playlist.add(track_ids[start:finish])
+        start, finish = finish, finish + MAX_ADD
+
+def main():
+    """Does the magic."""
+    if len(sys.argv) != 3:
+        print(f"Usage: {sys.argv[0]} <path to playlist json> <new playlist name>")
+        sys.exit(1)
+
+    playlist_path = sys.argv[1]
+    new_playlist_name = sys.argv[2]
+
+
+    session = tidalapi.Session()
+    auth.login(session, PATH_TO_CREDS)
+
+    if not Path(PATH_TO_CACHE).exists():
+        Path(PATH_TO_CACHE).write_text("{}")
+
+    with open(PATH_TO_CACHE, "r", encoding="utf-8") as f:
+        cache = json.load(f)
+
+    remedy_playlist(playlist_path, session, cache)
+
+    publish_corrections(session, [str(v) for v in cache.values()], new_playlist_name)
+
 
 if __name__ == "__main__":
     main()

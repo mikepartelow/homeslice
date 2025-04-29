@@ -41,8 +41,9 @@ copy-libs:
 	cp -v ../pylib/git.py lib/git.py
 	cp -v ../pylib/github_backup.py lib/github_backup.py
 
+UNAVAILABLE_JSON_PATH := tmp/unavailable.json
 find-unavailable:
-	jq '[.[] | select(.available == false)]' tmp/mega_playlist.json > tmp/unavailable.json
+	jq '[.[] | select(.available == false)]' tmp/mega_playlist.json > $(UNAVAILABLE_JSON_PATH)
 
 remedy-unavailables: dev
-	docker run --rm --entrypoint '' -v`pwd`/tmp:/tmp -ti ${--shell-args} $(PROJECT)-dev ./remedy_unavailables.py $(PLAYLIST_PATH)
+	docker run --rm --entrypoint '' -v`pwd`/tmp:/tmp -ti ${--shell-args} $(PROJECT)-dev ./remedy_unavailables.py /$(UNAVAILABLE_JSON_PATH) "remedied jamboree"
