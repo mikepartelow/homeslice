@@ -25,11 +25,6 @@ def require_env(name: str) -> str:
 PATH_TO_CREDS = require_env("PATH_TO_CREDS")
 PATH_TO_CACHE = "/tmp/remedy.cache.json"
 
-# Optional
-# time to sleep between tracks() API calls to avoid rate limits
-RATE_LIMIT_SLEEP_SECONDS = os.environ.get("RATE_LIMIT_SLEEP_SECONDS", 8)
-PLAYLIST_PATH = os.environ.get("PLAYLIST_PATH", "/tmp")
-
 def scrub(ot: Track) -> Track:
     return Track(
         id=ot.id,
