@@ -11,7 +11,7 @@ lint:
 	@uv run mypy .
 
 PYFLYTE_RUN_ARGS=--project $(FLYTE_PROJECT) \
-	remedy_tidal.py remedy_tidal_wf \
+	src/workflows/remedy_tidal.py remedy_tidal_wf \
 	--playlist_id="$(PLAYLIST_ID)" \
 	--path_to_creds="$(TIDAL_CREDS_PATH)"
 
@@ -35,4 +35,4 @@ sandbox-run-remote:
 run:
 	FLYTE_IMAGE_REGISTRY=$(FLYTE_IMAGE_REGISTRY) \
 		PATH_TO_CREDS=$(TIDAL_CREDS_PATH) \
-		uv run ./remedy_tidal.py $(PLAYLIST_ID) $(TIDAL_CREDS_PATH)
+		PYTHONPATH=src uv run ./src/workflows/remedy_tidal.py $(PLAYLIST_ID) $(TIDAL_CREDS_PATH)
