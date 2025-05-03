@@ -2,7 +2,7 @@
 
 import json
 import time
-import tidalapi  # type: ignore[import-not-found]
+import tidalapi  # type: ignore[import-untyped]
 
 
 def write(

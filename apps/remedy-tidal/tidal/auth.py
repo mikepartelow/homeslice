@@ -2,7 +2,7 @@
 
 from pathlib import Path
 import json
-import tidalapi  # type: ignore[import-not-found]
+import tidalapi  # type: ignore[import-untyped]
 
 
 def store_creds(session: tidalapi.Session, path_to_creds: str):

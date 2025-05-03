@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.9,<3.13"
 dependencies = [
     "flytekit",
+    "pydantic>=2.11.4",
     "tidalapi>=0.8.3",
 ]
 

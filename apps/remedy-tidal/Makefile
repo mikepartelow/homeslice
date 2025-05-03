@@ -8,7 +8,7 @@ make fmt:
 
 lint:
 	@ruff check
-	@uvx mypy .
+	@uv run mypy .
 
 PYFLYTE_RUN_ARGS=--project $(FLYTE_PROJECT) \
 	remedy_tidal.py remedy_tidal_wf \
