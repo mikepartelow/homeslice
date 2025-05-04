@@ -1,10 +1,8 @@
-"""Flyte task for fetching Tidal playlists."""
+"""Flyte task for publishing a new Tidal playlist."""
 
 import flytekit as fl  # type: ignore[import-untyped]
-import tidalapi  # type: ignore[import-untyped]
 
 from core import model
-from core.tidal import auth, playlist
 from orchestration import image_spec, secrets
 
 
@@ -20,8 +18,8 @@ from orchestration import image_spec, secrets
     cache=True,
     cache_version="v5",
 )
-def fetch_playlist(playlist_id: str, path_to_creds: str) -> list[model.Track]:
-    """Fetch the given playlist from Tidal."""
-    session = tidalapi.Session()
-    auth.login(session, path_to_creds)
-    return playlist.fetch(session, playlist_id)
+def publish_playlist(
+    playlist: list[model.Track], new_playlist_name: str, path_to_creds: str
+) -> str:
+    """Publish a Tidal playlist. Create a new playlist if needed. Return playlist id."""
+    return "1"

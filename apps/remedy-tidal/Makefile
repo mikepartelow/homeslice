@@ -3,12 +3,12 @@ FLYTE_PROJECT := remedy-tidal
 PLAYLIST_ID := 8427c6cc-12cf-43c5-84ce-77fbc095e455
 
 make fmt:
-	@ruff check --fix
-	@ ruff format
+	@ruff check --fix src
+	@ruff format src
 
 lint:
-	@ruff check
-	@uv run mypy .
+	@ruff check src
+	@uv run mypy src
 
 SECRET_GROUP := tidal-creds
 SECRET_KEY := json

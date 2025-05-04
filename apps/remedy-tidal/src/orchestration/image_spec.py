@@ -1,5 +1,8 @@
-import flytekit as fl  # type: ignore[import-untyped]
+"""Flyte image specs."""
+
 import os
+
+import flytekit as fl  # type: ignore[import-untyped]
 
 DEFAULT = fl.ImageSpec(
     name="remedy-tidal-dev",

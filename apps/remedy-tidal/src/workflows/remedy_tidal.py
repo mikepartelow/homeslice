@@ -1,15 +1,30 @@
-import flytekit as fl  # type: ignore[import-untyped]
-import tasks
-from core import model
-from typing import List
+"""Flyte workflow for remedying Tidal playlists.
+
+Over time, a Tidal playlist experiences bitrot, pointing to tracks that are no longer available.
+
+This workflow scans a given playlist for unavailable tracks, publishes reasonable replacement tracks
+to a new playlist, creating the new playlist if necessary.
+"""
+
 import functools
+
+import flytekit as fl  # type: ignore[import-untyped]
+
+import tasks
 from orchestration import secrets
 
 
 @fl.workflow
 def remedy_tidal_wf(
-    playlist_id: str, path_to_creds: str = secrets.TIDAL_CREDS_PATH
-) -> List[model.Track]:
+    playlist_id: str,
+    new_playlist_name: str,
+    path_to_creds: str = secrets.TIDAL_CREDS_PATH,
+) -> str:
+    """Remedy a Tidal playlist. Publish remedied tracks to new_playlist_name and return its id.
+
+    Tidal tracks can become unavailable. This workflow finds those tracks and publishes reasonable
+    alternatives to a new playlist.
+    """
     playlist = tasks.fetch_playlist(playlist_id, path_to_creds)
 
     unavailable = tasks.filter_unavailable(playlist)
@@ -20,10 +35,12 @@ def remedy_tidal_wf(
 
     remedied = tasks.filter_nones(new_tracks)
 
-    return remedied
+    new_playlist_id = tasks.publish_playlist(remedied, new_playlist_name, path_to_creds)
+
+    return new_playlist_id
 
 
 if __name__ == "__main__":
     import sys
 
-    print(remedy_tidal_wf(sys.argv[1], sys.argv[2]))
+    print(remedy_tidal_wf(sys.argv[1], sys.argv[2]))  # noqa: T201

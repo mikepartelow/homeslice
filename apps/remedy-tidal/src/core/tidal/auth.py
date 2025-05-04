@@ -1,17 +1,15 @@
-"""Functions for authenticating to Tidal."""
+"""Tidal authentication helpers."""
 
-from pathlib import Path
 import json
+from pathlib import Path
+
 import tidalapi  # type: ignore[import-untyped]
 
 
 def load_creds(path_to_creds: str):
     """Load Tidal session credentials from a JSON file."""
-
-    print(f"🔑 Reading credentials from {path_to_creds}")
-
     if Path(path_to_creds).exists():
-        with open(path_to_creds, "r", encoding="utf-8") as creds_f:
+        with open(path_to_creds, encoding="utf-8") as creds_f:
             return json.load(creds_f)
 
     return None
