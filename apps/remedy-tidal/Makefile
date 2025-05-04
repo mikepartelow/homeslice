@@ -5,15 +5,27 @@ TIDAL_CREDS_PATH := ../backup-tidal/tidal-creds.json
 
 make fmt:
 	@ruff check --fix
+	@ ruff format
 
 lint:
 	@ruff check
 	@uv run mypy .
 
+build:
+	FLYTE_IMAGE_REGISTRY=$(FLYTE_IMAGE_REGISTRY) \
+		uv run pyflyte build --project $(FLYTE_PROJECT) src/workflows/remedy_tidal.py remedy_tidal_wf
+
+register:
+	FLYTE_IMAGE_REGISTRY=$(FLYTE_IMAGE_REGISTRY) \
+		uv run pyflyte register --project $(FLYTE_PROJECT) src/workflows/remedy_tidal.py
+
 PYFLYTE_RUN_ARGS=--project $(FLYTE_PROJECT) \
 	src/workflows/remedy_tidal.py remedy_tidal_wf \
 	--playlist_id="$(PLAYLIST_ID)" \
 	--path_to_creds="$(TIDAL_CREDS_PATH)"
+
+sandbox-rebuild-run-remote: FLYTE_FORCE_PUSH_IMAGE_SPEC := True
+sandbox-rebuild-run-remote: sandbox-run-remote
 
 sandbox-create-project:
 	flytectl create project \
@@ -28,6 +40,7 @@ sandbox-run-local:
 		$(PYFLYTE_RUN_ARGS)
 
 sandbox-run-remote:
+	FLYTE_FORCE_PUSH_IMAGE_SPEC=$(FLYTE_FORCE_PUSH_IMAGE_SPEC) \
 	FLYTE_IMAGE_REGISTRY=$(FLYTE_IMAGE_REGISTRY) \
 		uv run pyflyte run --remote \
 		$(PYFLYTE_RUN_ARGS)

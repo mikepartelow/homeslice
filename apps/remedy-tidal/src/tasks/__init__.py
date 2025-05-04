@@ -1,5 +1,10 @@
-from .decorate_title import decorate_title
 from .fetch_playlist import fetch_playlist
-from .get_last_title import get_last_title
+from .filter import filter_nones, filter_unavailable
+from .find_new_track import find_new_track
 
-__all__ = ["decorate_title", "fetch_playlist", "get_last_title"]
+__all__ = [
+    "fetch_playlist",
+    "filter_nones",
+    "filter_unavailable",
+    "find_new_track",
+]

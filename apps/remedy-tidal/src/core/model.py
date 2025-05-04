@@ -1,9 +1,7 @@
 from pydantic import BaseModel
-from typing import List, TypeAlias
+
 
 class Track(BaseModel):
-    name: str
+    available: bool
     id: int
-
-
-Playlist: TypeAlias = List[Track]
+    name: str
