@@ -33,6 +33,14 @@ config:
     image: ghcr.io/mikepartelow/homeslice/clocktime:main.20250427-170812.f09e9ef@sha256:a248756768b2bf5b222109e32610d1b7baaf031110de5b809f340c5a6b6dc204
     ingress_prefix: /api/v0/clocktime/
     location: America/Los_Angeles
+  homeslice:istio:
+    hostname: moe.localdomain
+    namespace: istio-system
+    istio_chart_version: "1.24.0"
+    # kiali_chart_version: "2.0.0"
+    inject_namespaces:
+      - homeslice
+      - observability
   homeslice:lmz:
     image: ghcr.io/mikepartelow/homeslice/lmz:main.20250427-170814.f09e9ef@sha256:899d1f4e3e08a6c407b3eb0a9295870121d22b422ecc0f00bb35777e10508ebe
     container_port: 8000
