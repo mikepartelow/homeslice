@@ -3,10 +3,13 @@ import tasks
 from core import model
 from typing import List
 import functools
+from orchestration import secrets
 
 
 @fl.workflow
-def remedy_tidal_wf(playlist_id: str, path_to_creds: str) -> List[model.Track]:
+def remedy_tidal_wf(
+    playlist_id: str, path_to_creds: str = secrets.TIDAL_CREDS_PATH
+) -> List[model.Track]:
     playlist = tasks.fetch_playlist(playlist_id, path_to_creds)
 
     unavailable = tasks.filter_unavailable(playlist)

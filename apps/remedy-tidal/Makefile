@@ -1,7 +1,6 @@
 FLYTE_IMAGE_REGISTRY := registry.localdomain:32000
 FLYTE_PROJECT := remedy-tidal
 PLAYLIST_ID := 8427c6cc-12cf-43c5-84ce-77fbc095e455
-TIDAL_CREDS_PATH := ../backup-tidal/tidal-creds.json
 
 make fmt:
 	@ruff check --fix
@@ -11,13 +10,16 @@ lint:
 	@ruff check
 	@uv run mypy .
 
-build:
-	FLYTE_IMAGE_REGISTRY=$(FLYTE_IMAGE_REGISTRY) \
-		uv run pyflyte build --project $(FLYTE_PROJECT) src/workflows/remedy_tidal.py remedy_tidal_wf
+SECRET_GROUP := tidal-creds
+SECRET_KEY := json
+SECRET_PATH := ../backup-tidal/tidal-creds.json
 
-register:
-	FLYTE_IMAGE_REGISTRY=$(FLYTE_IMAGE_REGISTRY) \
-		uv run pyflyte register --project $(FLYTE_PROJECT) src/workflows/remedy_tidal.py
+secret:
+	kubectl --context flyte-sandbox \
+		create secret -n $(FLYTE_PROJECT)-development \
+		generic \
+		$(SECRET_GROUP) \
+		--from-file=$(SECRET_KEY)=$(SECRET_PATH)
 
 PYFLYTE_RUN_ARGS=--project $(FLYTE_PROJECT) \
 	src/workflows/remedy_tidal.py remedy_tidal_wf \
@@ -34,11 +36,13 @@ sandbox-create-project:
       		--description "$(FLYTE_PROJECT)" \
       		--name "$(FLYTE_PROJECT)"
 
+sandbox-run-local: TIDAL_CREDS_PATH := ../backup-tidal/tidal-creds.json
 sandbox-run-local:
 	FLYTE_IMAGE_REGISTRY=$(FLYTE_IMAGE_REGISTRY) \
 		uv run pyflyte run \
 		$(PYFLYTE_RUN_ARGS)
 
+sandbox-run-remote: TIDAL_CREDS_PATH := /etc/flyte/secrets/tidal-creds/json
 sandbox-run-remote:
 	FLYTE_FORCE_PUSH_IMAGE_SPEC=$(FLYTE_FORCE_PUSH_IMAGE_SPEC) \
 	FLYTE_IMAGE_REGISTRY=$(FLYTE_IMAGE_REGISTRY) \

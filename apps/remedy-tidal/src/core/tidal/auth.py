@@ -5,24 +5,15 @@ import json
 import tidalapi  # type: ignore[import-untyped]
 
 
-def store_creds(session: tidalapi.Session, path_to_creds: str):
-    """Store Tidal session credentials to a JSON file."""
-    creds = {
-        "token_type": session.token_type,
-        "access_token": session.access_token,
-        "refresh_token": session.refresh_token,
-        "expiry_time": session.expiry_time,
-    }
-
-    with open(path_to_creds, "w", encoding="utf-8") as creds_f:
-        json.dump(creds, creds_f, default=str)
-
-
 def load_creds(path_to_creds: str):
     """Load Tidal session credentials from a JSON file."""
+
+    print(f"🔑 Reading credentials from {path_to_creds}")
+
     if Path(path_to_creds).exists():
         with open(path_to_creds, "r", encoding="utf-8") as creds_f:
             return json.load(creds_f)
+
     return None
 
 
