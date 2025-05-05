@@ -7,6 +7,7 @@ from backup_todoist import backup_todoist
 from buttons import buttons
 from chime import chime
 from clocktime import clocktime
+from flyte import flyte
 from homebridge import homebridge
 from lmz import lmz
 from observability import grafana, loki, prometheus, promtail
@@ -46,6 +47,9 @@ if cfg := config.get_object("chime"):
 
 if cfg := config.get_object("clocktime"):
     clocktime.app(cfg)
+
+if cfg := config.get_object("flyte"):
+    flyte.app(cfg)
 
 if cfg := config.get_object("homebridge"):
     homebridge.app(HomeBridgeConfig(**dict(cfg)))

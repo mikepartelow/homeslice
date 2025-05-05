@@ -6,8 +6,10 @@ bump:
 	uv run --no-project ./bump.py
 
 # FIXME: refactor to a common Python lint/fmt
-lint:
-	ruff check
+make fmt:
+	@ruff check --fix
+	@ruff format
 
-fmt:
-	ruff check --fix
+lint:
+	@ruff check
+	# @uv run mypy .
