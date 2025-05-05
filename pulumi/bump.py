@@ -10,7 +10,6 @@
 
 """bump all homeslice images in Pulumi.prod.yaml to the latest from ghcr.io"""
 
-
 from pathlib import Path
 from typing import Generator
 import logging

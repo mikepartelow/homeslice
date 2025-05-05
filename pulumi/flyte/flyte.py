@@ -1,4 +1,5 @@
 """Resources for the homeslice/flyte app."""
+
 import yaml
 import pulumi_kubernetes as kubernetes
 import pulumi
@@ -14,9 +15,8 @@ def app(config: pulumi.Config) -> None:
     ns = homeslice.namespace(config["namespace"])
 
     for chart in config["charts"]:
-
         if filename := config.get("values-resource"):
-            with importlib.resources.open_text('flyte', filename) as f:
+            with importlib.resources.open_text("flyte", filename) as f:
                 values = yaml.load(f)
         else:
             values = config.get("values")
@@ -33,5 +33,5 @@ def app(config: pulumi.Config) -> None:
                 ),
                 values=values,
             ),
-            pulumi.ResourceOptions(depends_on=[ns])
+            pulumi.ResourceOptions(depends_on=[ns]),
         )
