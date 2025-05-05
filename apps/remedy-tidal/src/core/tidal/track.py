@@ -56,4 +56,4 @@ def find(session: tidalapi.Session, target: model.Track) -> model.Track | None:
     if len(candidates) == 0:
         return None
 
-    return sorted(candidates, key=lambda e: -e[1])[0][0]
+    return sorted(candidates, key=lambda c: -c[1])[0][0]

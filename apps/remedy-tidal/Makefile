@@ -11,6 +11,11 @@ lint:
 	@ruff check src
 	@uv run mypy src
 
+test:
+	@uv run pytest --tb=short -v
+	@uv run coverage run -m pytest
+	@uv run coverage report -m
+
 SECRET_GROUP := tidal-creds
 SECRET_KEY := json
 SECRET_PATH := ../backup-tidal/tidal-creds.json

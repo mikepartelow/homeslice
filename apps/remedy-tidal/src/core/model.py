@@ -16,7 +16,7 @@ class Track(BaseModel):
     artists: list[str] = Field(default_factory=list)
     num: int = Field(default=0)
     version: str | None = Field(default=None)
-    available: bool
+    available: bool = Field(default=True)
 
     @classmethod
     def from_tidal(cls, ttrack: tidalapi.Track) -> Self:
