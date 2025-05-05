@@ -7,9 +7,11 @@ to a new playlist, creating the new playlist if necessary.
 """
 
 import functools
+import logging
 
 import flytekit as fl  # type: ignore[import-untyped]
 
+import core.logging
 import tasks
 from orchestration import secrets
 
@@ -25,6 +27,10 @@ def remedy_tidal_wf(
     Tidal tracks can become unavailable. This workflow finds those tracks and publishes reasonable
     alternatives to a new playlist.
     """
+    core.logging.init()
+
+    logging.info("remedy tidal wf(%s, %s, %s)", playlist_id, new_playlist_name, path_to_creds)
+
     playlist = tasks.fetch_playlist(playlist_id, path_to_creds)
 
     unavailable = tasks.filter_unavailable(playlist)
@@ -43,4 +49,4 @@ def remedy_tidal_wf(
 if __name__ == "__main__":
     import sys
 
-    print(remedy_tidal_wf(sys.argv[1], sys.argv[2]))  # noqa: T201
+    print(remedy_tidal_wf(sys.argv[1], sys.argv[2], sys.argv[3]))  # noqa: T201

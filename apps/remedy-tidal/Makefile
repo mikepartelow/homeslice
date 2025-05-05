@@ -1,6 +1,7 @@
 FLYTE_IMAGE_REGISTRY := registry.localdomain:32000
 FLYTE_PROJECT := remedy-tidal
 PLAYLIST_ID := 8427c6cc-12cf-43c5-84ce-77fbc095e455
+NEW_PLAYLIST_NAME := flyte-remedied
 
 make fmt:
 	@ruff check --fix src
@@ -24,6 +25,7 @@ secret:
 PYFLYTE_RUN_ARGS=--project $(FLYTE_PROJECT) \
 	src/workflows/remedy_tidal.py remedy_tidal_wf \
 	--playlist_id="$(PLAYLIST_ID)" \
+	--new_playlist_name="$(NEW_PLAYLIST_NAME)" \
 	--path_to_creds="$(TIDAL_CREDS_PATH)"
 
 sandbox-rebuild-run-remote: FLYTE_FORCE_PUSH_IMAGE_SPEC := True
@@ -49,7 +51,7 @@ sandbox-run-remote:
 		uv run pyflyte run --remote \
 		$(PYFLYTE_RUN_ARGS)
 
+run: TIDAL_CREDS_PATH := ../backup-tidal/tidal-creds.json
 run:
 	FLYTE_IMAGE_REGISTRY=$(FLYTE_IMAGE_REGISTRY) \
-		PATH_TO_CREDS=$(TIDAL_CREDS_PATH) \
-		PYTHONPATH=src uv run ./src/workflows/remedy_tidal.py $(PLAYLIST_ID) $(TIDAL_CREDS_PATH)
+		PYTHONPATH=src uv run ./src/workflows/remedy_tidal.py $(PLAYLIST_ID) $(NEW_PLAYLIST_NAME) $(TIDAL_CREDS_PATH)

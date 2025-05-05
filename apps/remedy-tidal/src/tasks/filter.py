@@ -12,7 +12,11 @@ def filter_nones(tracks: list[model.Track | None]) -> list[model.Track]:
     return [t for t in tracks if t is not None]
 
 
-@fl.task(container_image=image_spec.DEFAULT)
+@fl.task(
+    container_image=image_spec.DEFAULT,
+    cache=True,
+    cache_version="v5",
+)
 def filter_unavailable(playlist: list[model.Track]) -> list[model.Track]:
     """Return a list of unavailable tracks from playlist."""
     return [t for t in playlist if not t.available]

@@ -15,8 +15,6 @@ from orchestration import image_spec, secrets
             mount_requirement=fl.Secret.MountType.FILE,
         )
     ],
-    cache=True,
-    cache_version="v5",
 )
 def publish_playlist(
     playlist: list[model.Track], new_playlist_name: str, path_to_creds: str
