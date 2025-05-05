@@ -37,12 +37,14 @@ db:
       port: 5432
       username: postgres
       host: postgres
+      password: flyte
       dbname: "datacatalog"
   admin:
     database:
       port: 5432
       username: postgres
       host: postgres
+      password: flyte
       dbname: "flyteadmin"
 
 configmap:
