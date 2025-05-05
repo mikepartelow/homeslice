@@ -1,7 +1,6 @@
 """Flyte task for fetching Tidal playlists."""
 
 import flytekit as fl  # type: ignore[import-untyped]
-import tidalapi  # type: ignore[import-untyped]
 
 from core import model
 from core.tidal import auth, playlist
@@ -22,6 +21,5 @@ from orchestration import image_spec, secrets
 )
 def fetch_playlist(playlist_id: str, path_to_creds: str) -> list[model.Track]:
     """Fetch the given playlist from Tidal."""
-    session = tidalapi.Session()
-    auth.login(session, path_to_creds)
+    session = auth.login(path_to_creds)
     return playlist.fetch(session, playlist_id)

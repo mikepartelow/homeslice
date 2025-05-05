@@ -7,6 +7,12 @@ from pathlib import Path
 import tidalapi  # type: ignore[import-untyped]
 
 
+def login(path_to_creds) -> tidalapi.Session:
+    """Login to Tidal with stored creds."""
+    session = tidalapi.Session()
+    return login_session(session, path_to_creds)
+
+
 def load_creds(path_to_creds: str) -> dict[str, str]:
     """Load Tidal session credentials from a JSON file."""
     logging.debug("reading tidal creds from %s", path_to_creds)
@@ -17,8 +23,8 @@ def load_creds(path_to_creds: str) -> dict[str, str]:
     raise OSError(f"no such file: {path_to_creds}")
 
 
-def login(session: tidalapi.Session, path_to_creds: str):
-    """Login to Tidal with stored or fresh credentials."""
+def login_session(session: tidalapi.Session, path_to_creds: str) -> tidalapi.Session:
+    """Login to Tidal with stored creds."""
     logging.debug("logging in to tidal")
     creds = load_creds(path_to_creds)
     session.load_oauth_session(
@@ -27,3 +33,4 @@ def login(session: tidalapi.Session, path_to_creds: str):
         creds["refresh_token"],
         creds["expiry_time"],
     )
+    return session

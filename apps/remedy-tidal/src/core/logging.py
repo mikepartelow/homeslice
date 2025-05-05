@@ -22,6 +22,7 @@ class JsonFormatter(logging.Formatter):
 
 def init():
     """Initialize logging."""
+    # Flyte calls this multiple times, resulting in duplicate handlers, hence the guard.
     global _initted
     if _initted:
         return
