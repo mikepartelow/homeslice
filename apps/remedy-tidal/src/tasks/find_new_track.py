@@ -1,11 +1,13 @@
 """Flyte task for finding tracks in Tidal that match a given model.Track."""
 
+import logging
+
 import flytekit as fl  # type: ignore[import-untyped]
 
 from core import model
 from core.tidal import auth, track
 from orchestration import image_spec, secrets
-import logging
+
 
 @fl.task(
     container_image=image_spec.DEFAULT,

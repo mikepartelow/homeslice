@@ -6,7 +6,11 @@ from core import model
 from orchestration import image_spec
 
 
-@fl.task(container_image=image_spec.DEFAULT)
+@fl.task(
+    container_image=image_spec.DEFAULT,
+    cache=True,
+    cache_version="v5",
+)
 def filter_nones(tracks: list[model.Track | None]) -> list[model.Track]:
     """Return the given list of tracks with any None elements removed."""
     return [t for t in tracks if t is not None]
