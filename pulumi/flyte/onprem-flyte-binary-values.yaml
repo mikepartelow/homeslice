@@ -31,10 +31,11 @@ configuration:
 
     task_resources:
       defaults:
-        cpu: 100m
-        memory: 500Mi #change default requested resources and limits to fit your needs
+        cpu: 500m
+        memory: 2Gi #change default requested resources and limits to fit your needs
       limits:
-        memory: 2Gi
+        cpu: 3000m
+        memory: 4Gi
 
 serviceAccount:
   create: true

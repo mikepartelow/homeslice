@@ -22,13 +22,15 @@ def app(config: pulumi.Config) -> None:
         metadata=homeslice.metadata(config["secret-name"], namespace=NAME),
         type="Opaque",
         string_data={
-            "202-database-secrets.yaml": json.dumps({
-                "database": {
-                    "postgres": {
-                        "password": FLYTE_SECRETS.DB_PASSWORD,
+            "202-database-secrets.yaml": json.dumps(
+                {
+                    "database": {
+                        "postgres": {
+                            "password": FLYTE_SECRETS.DB_PASSWORD,
+                        }
                     }
                 }
-            })
+            )
         },
     )
 
@@ -51,8 +53,9 @@ def app(config: pulumi.Config) -> None:
                 ),
                 values=values,
             ),
-            pulumi.ResourceOptions(depends_on=[ns,db_secret]),
+            pulumi.ResourceOptions(depends_on=[ns, db_secret]),
         )
+
 
 def render_values(thing: str | dict | list) -> str | dict | None:
     if thing is None:

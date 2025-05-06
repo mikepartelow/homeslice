@@ -1,7 +1,7 @@
-from flytekit import Resources, task, workflow
+from flytekit import task, workflow
 
 
-@task
+@task  # (requests=Resources(cpu="900m", mem="3Gi"))
 def say_hello() -> str:
     return "hello world"
 

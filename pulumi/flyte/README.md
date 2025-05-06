@@ -10,5 +10,5 @@ kubectl --context ${CONTEXT} -n flyte port-forward service/minio 9000:9000 &
 kubectl --context ${CONTEXT} -n flyte port-forward service/flyte-binary-grpc 8089:8089 &
 kubectl --context ${CONTEXT} -n flyte port-forward service/flyte-binary-http 8088:8088 &
 
-pyflyte run --remote flyte/hello_world.py my_wf
+pyflyte run --remote hello_world.py my_wf
 ```
