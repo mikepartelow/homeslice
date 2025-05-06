@@ -17,6 +17,7 @@ configuration:
         disableSSL: "true"
         secure: "false"
         v2Signing: "true"
+
   inlineSecretRef: flyte-binary-inline-config-secret
   inline:
     plugins:
