@@ -9,6 +9,7 @@ import importlib.resources
 from homeslice_secrets import (  # pylint: disable=no-name-in-module
     flyte as FLYTE_SECRETS,
 )
+
 NAME = "flyte"
 
 
@@ -38,24 +39,17 @@ def app(config: pulumi.Config) -> None:
         else:
             values = render_values(chart.get("values"))
 
-        transformations = []
-        if chart.get("transform-names"):
-            transformations = [
-                lambda obj: obj["metadata"].update({
-                    "name": obj["metadata"]["name"].replace(f"{chart['name']}-", "", 1)
-                }) if "metadata" in obj and "name" in obj["metadata"] else None
-            ]
-        kubernetes.helm.v3.Chart(
+        kubernetes.helm.v3.Release(
             chart["name"],
-            kubernetes.helm.v3.ChartOpts(
+            kubernetes.helm.v3.ReleaseArgs(
                 chart=chart["chart"],
+                name=chart["name"],
                 namespace=config["namespace"],
                 version=chart["version"],
-                fetch_opts=kubernetes.helm.v3.FetchOpts(
+                repository_opts=kubernetes.helm.v3.RepositoryOptsArgs(
                     repo=chart.get("repo"),
                 ),
                 values=values,
-                transformations=transformations,
             ),
             pulumi.ResourceOptions(depends_on=[ns,db_secret]),
         )
@@ -70,5 +64,7 @@ def render_values(thing: str | dict | list) -> str | dict | None:
         for i in range(0, len(thing)):
             thing[i] = render_values(thing[i])
     else:
-        thing = thing.replace("%DB_PASSWORD%", FLYTE_SECRETS.DB_PASSWORD).replace("%MINIO_PASSWORD%", FLYTE_SECRETS.MINIO_PASSWORD)
+        thing = thing.replace("%DB_PASSWORD%", FLYTE_SECRETS.DB_PASSWORD).replace(
+            "%MINIO_PASSWORD%", FLYTE_SECRETS.MINIO_PASSWORD
+        )
     return thing
