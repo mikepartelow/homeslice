@@ -1,4 +1,4 @@
-""""Homeslice Config"""
+""" "Homeslice Config"""
 
 from .config import ChimeConfig as ChimeConfig
 from .config import LmzConfig as LmzConfig

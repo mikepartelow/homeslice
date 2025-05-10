@@ -14,13 +14,17 @@ jobs:
       packages: write
     strategy:
       matrix:
-        app: [backup-tidal, backup-todoist, backup-unifi, buttons, chime, clocktime, gosonos, lmz, switches]
+        app: [backup-tidal, backup-todoist, backup-unifi, buttons, chime, clocktime, gosonos, lmz, remedy-tidal, switches]
     steps:
       - uses: actions/checkout@v4
       - name: Install ruff without running check or format
         uses: astral-sh/ruff-action@v3
         with:
           args: "--version"
+      - name: Install a pep440-specifier-satisfying version of uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          version: ">=0.4.25,<0.5"
       - name: Setup Go
         uses: actions/setup-go@v4
         with:

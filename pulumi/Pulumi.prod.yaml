@@ -33,6 +33,34 @@ config:
     image: ghcr.io/mikepartelow/homeslice/clocktime:main.20250427-170812.f09e9ef@sha256:a248756768b2bf5b222109e32610d1b7baaf031110de5b809f340c5a6b6dc204
     ingress_prefix: /api/v0/clocktime/
     location: America/Los_Angeles
+  homeslice:flyte:
+    namespace: flyte
+    # based off https://github.com/davidmirror-ops/flyte-the-hard-way/blob/main/docs/on-premises/single-node/002-single-node-onprem-install.md
+    secret-name: flyte-binary-inline-config-secret
+    charts:
+      - name: postgres
+        version: 16.6.6
+        chart: oci://registry-1.docker.io/bitnamicharts/postgresql
+        values:
+          fullnameOverride: postgres
+          auth:
+            postgresPassword: "%DB_PASSWORD%"
+            username: flyte
+            password: "%DB_PASSWORD%"
+            database: flyte
+      - name: minio
+        version: 16.0.8
+        chart: oci://registry-1.docker.io/bitnamicharts/minio
+        values:
+          auth:
+            rootUser: minio
+            rootPassword: "%MINIO_PASSWORD%"
+          defaultBuckets: flyte
+      - name: flyte
+        chart: flyte-binary
+        version: v1.15.3
+        repo: https://flyteorg.github.io/flyte
+        values-resource: onprem-flyte-binary-values.yaml
   homeslice:lmz:
     image: ghcr.io/mikepartelow/homeslice/lmz:main.20250427-170814.f09e9ef@sha256:899d1f4e3e08a6c407b3eb0a9295870121d22b422ecc0f00bb35777e10508ebe
     container_port: 8000

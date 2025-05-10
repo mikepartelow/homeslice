@@ -1,0 +1,50 @@
+[project]
+name = "flyte-simple"
+version = "0.1.0"
+description = "A simple Flyte project"
+readme = "README.md"
+requires-python = ">=3.9,<3.13"
+dependencies = [
+    "flytekit",
+    "pydantic>=2.11.4",
+    "tidalapi>=0.8.3",
+]
+
+[dependency-groups]
+dev = [
+    "coverage>=7.8.0",
+    "mypy>=1.15.0",
+    "pytest>=8.3.5",
+]
+
+# pyproject.toml
+[tool.ruff]
+lint.select = [
+  "E",    # pycodestyle (formatting issues)
+  "F",    # pyflakes (logic issues)
+  "D",    # pydocstyle (docstring rules)
+  "I",    # isort (import sorting)
+  "UP",   # pyupgrade (modernize syntax)
+  "N",    # pep8-naming
+  "B",    # flake8-bugbear (common bugs and anti-patterns)
+  "A",    # flake8-builtins (avoid shadowing built-ins)
+  "C4",   # flake8-comprehensions (inefficient comprehensions)
+  "T20",  # flake8-print (detect stray print/debug)
+  "SIM",  # flake8-simplify (simplifiable code)
+  "PT",   # flake8-pytest-style (for pytest users)
+  "RUF",  # ruff-specific rules (e.g. typing improvements)
+]
+lint.ignore = [
+  "D100",  # Missing docstring in public module
+  "D104",  # Missing docstring in public package
+  "D107",  # Missing docstring in __init__
+  "D203",  # Incorrect blank line before class
+  "D213",  # Multi-line summary second line
+]
+
+# Optional: Restrict line length, etc.
+line-length = 100
+target-version = "py312"  # Adjust to your Python version
+
+# Exclude common virtualenv and cache dirs
+exclude = [".venv", "__pycache__", "build", "dist"]

@@ -6,7 +6,7 @@ import homeslice
 
 def secret(
     name: str, data: dict = None, string_data: dict = None
-) -> kubernetes.core.v1.Namespace:
+) -> kubernetes.core.v1.Secret:
     """THE kubernetes Secret factory"""
     return kubernetes.core.v1.Secret(
         name,
