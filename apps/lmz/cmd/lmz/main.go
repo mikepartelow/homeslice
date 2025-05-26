@@ -27,12 +27,12 @@ const (
 )
 
 func main() {
-	logger := mustMakeLogger()
+	slog.SetDefault(mustMakeLogger())
 
 	op := MustGetOp()
 
 	c := config.MustRead()
-	l := lmz.New(c, logger)
+	l := lmz.New(c)
 
 	var output string
 	switch op {
@@ -43,16 +43,14 @@ func main() {
 		check(l.TurnOff())
 		output = "OFF"
 	case Status:
-		status := must(l.Status())
-		localTime := status.Received.Local()
-		output = "Status as of " + localTime.String() + ": " + status.MachineStatus
+		output = string(must(l.Status()))
 	case Serve:
-		handler := makeHandler(logger, l)
+		handler := makeHandler(l)
 		http.HandleFunc("GET /{op}", handler)
 
-		logger.Info("Listening", "port", Port)
+		slog.Info("Listening", "port", Port)
 		if err := http.ListenAndServe(":"+strconv.Itoa(Port), nil); err != nil {
-			logger.Error("Error: http.ListenAndServe", "error", err)
+			slog.Error("Error: http.ListenAndServe", "error", err)
 			os.Exit(1)
 
 		}
@@ -61,10 +59,10 @@ func main() {
 	fmt.Println(output)
 }
 
-func makeHandler(logger *slog.Logger, l *lmz.LMZ) func(http.ResponseWriter, *http.Request) {
+func makeHandler(l *lmz.LMZ) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		op := strings.ToLower(r.PathValue("op"))
-		logger.Debug(r.URL.Path, "method", r.Method, "op", op)
+		slog.Debug(r.URL.Path, "method", r.Method, "op", op)
 
 		switch op {
 		case "on":
@@ -83,11 +81,11 @@ func makeHandler(logger *slog.Logger, l *lmz.LMZ) func(http.ResponseWriter, *htt
 				w.WriteHeader(http.StatusInternalServerError)
 				return
 			}
-			if status.MachineStatus == lmz.StatusOn {
-				logger.Debug("on")
+			if lmz.IsOn(status) {
+				slog.Debug("on")
 				_, _ = w.Write([]byte("1"))
-			} else if status.MachineStatus == lmz.StatusOff {
-				logger.Debug("off")
+			} else if lmz.IsOff(status) {
+				slog.Debug("off")
 				_, _ = w.Write([]byte("0"))
 			} else {
 				w.WriteHeader(http.StatusInternalServerError)

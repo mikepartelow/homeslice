@@ -13,10 +13,8 @@ import (
 // Config holds auth credentials and machine serial number
 type Config struct {
 	Auth struct {
-		Username     string `yaml:"username"`
-		Password     string `yaml:"password"`
-		ClientId     string `yaml:"client_id"`
-		ClientSecret string `yaml:"client_secret"`
+		Username string `yaml:"username"`
+		Password string `yaml:"password"`
 	} `yaml:"auth"`
 	Serial string `yaml:"serial"`
 }
