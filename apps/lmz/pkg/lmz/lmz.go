@@ -130,28 +130,20 @@ func (l *LMZ) setStatus(status MachineStatus) error {
 }
 
 func (l *LMZ) auth() error {
-	if l.token == "" || time.Now().After(l.newTokenAt) {
-		slog.Warn("fetching auth token")
+	needRefresh := l.refreshToken != "" && time.Now().After(l.newTokenAt)
 
-		if l.refreshToken != "" {
-			panic("FIXME")
-		}
-
-		return l.signin()
+	if l.token == "" || needRefresh {
+		slog.Warn("fetching auth token", "needRefresh", needRefresh)
+		return l.signin(needRefresh)
 	}
 
 	return nil
 }
 
-func (l *LMZ) signin() error {
-	endpoint, err := url.JoinPath(lmzApiUrl, "auth/signin")
+func (l *LMZ) signin(refresh bool) error {
+	endpoint, body, err := l.prepareSignin(refresh)
 	if err != nil {
-		return fmt.Errorf("error constructing URL: %w", err)
-	}
-
-	body, err := newSigninBody(l.c.Auth.Username, l.c.Auth.Password)
-	if err != nil {
-		return fmt.Errorf("error constructing signin body: %w", err)
+		return fmt.Errorf("error preparing signin: %w", err)
 	}
 
 	resp, err := http.Post(endpoint, "application/json", body)
@@ -170,11 +162,39 @@ func (l *LMZ) signin() error {
 	if err != nil {
 		return fmt.Errorf("error decoding auth response JSON: %w", err)
 	}
-	l.token, l.newTokenAt = signinResponse.Token, time.Now().Add(TokenLifespan)
+	l.token, l.refreshToken, l.newTokenAt = signinResponse.Token, signinResponse.RefreshToken, time.Now().Add(TokenLifespan)
 
 	slog.Info("fetched auth token", "expires_at", l.newTokenAt)
 
 	return nil
+}
+
+func (l *LMZ) prepareSignin(refresh bool) (string, io.Reader, error) {
+	var endpoint string
+	var err error
+	var body io.Reader
+
+	if refresh {
+		endpoint, err = url.JoinPath(lmzApiUrl, "auth/refreshtoken")
+		if err != nil {
+			return "", nil, fmt.Errorf("error constructing URL: %w", err)
+		}
+		body, err = newRefreshTokenBody(l.c.Auth.Username, l.refreshToken)
+		if err != nil {
+			return "", nil, fmt.Errorf("error constructing refresh token body: %w", err)
+		}
+	} else {
+		endpoint, err = url.JoinPath(lmzApiUrl, "auth/signin")
+		if err != nil {
+			return "", nil, fmt.Errorf("error constructing URL: %w", err)
+		}
+		body, err = newSigninBody(l.c.Auth.Username, l.c.Auth.Password)
+		if err != nil {
+			return "", nil, fmt.Errorf("error constructing signin body: %w", err)
+		}
+	}
+
+	return endpoint, body, nil
 }
 
 func logError(endpoint string, resp *http.Response) error {

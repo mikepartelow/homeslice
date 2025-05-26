@@ -25,6 +25,25 @@ func newSigninBody(username, password string) (io.Reader, error) {
 	return bytes.NewReader(bodyBytes), nil
 }
 
+type refreshTokenBody struct {
+	Username     string `json:"username"`
+	RefreshToken string `json:"refreshToken"`
+}
+
+func newRefreshTokenBody(username, refreshToken string) (io.Reader, error) {
+	body := refreshTokenBody{
+		Username:     username,
+		RefreshToken: refreshToken,
+	}
+
+	bodyBytes, err := json.Marshal(body)
+	if err != nil {
+		return nil, fmt.Errorf("error marshaling refresh token request body: %w", err)
+	}
+
+	return bytes.NewReader(bodyBytes), nil
+}
+
 type signinResponseBody struct {
 	Token        string `json:"accessToken"`
 	RefreshToken string `json:"refreshToken"`
