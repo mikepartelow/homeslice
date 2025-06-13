@@ -62,7 +62,7 @@ config:
         repo: https://flyteorg.github.io/flyte
         values-resource: onprem-flyte-binary-values.yaml
   homeslice:lmz:
-    image: ghcr.io/mikepartelow/homeslice/lmz:main.20250427-170814.f09e9ef@sha256:899d1f4e3e08a6c407b3eb0a9295870121d22b422ecc0f00bb35777e10508ebe
+    image: registry.localdomain:32000/lmz:20250526_162736
     container_port: 8000
     ingress_prefix: /(api/v0/lmz)/(.*)$
     lmz_yaml_path: /home/nonroot/.config/lmz/config.yaml
@@ -87,7 +87,7 @@ config:
     volume: 20
   homeslice:switches:
     container_port: 8000
-    image: ghcr.io/mikepartelow/homeslice/switches:main.20250427-170815.f09e9ef@sha256:6664b36eb1a630e0d0ab77f183b1a32b2b9fab9419708c6abfa7518c4407e2d7
+    image: registry.localdomain:32000/switches:20250612_204041
     ingress_prefix: /api/v0/switches/
     switches_json: |
       [
@@ -95,7 +95,8 @@ config:
           "id": "switch0",
           "kind": "wemo/v1",
           "name": "Living Room Torch",
-          "address": "a.b.c.d"
+          "address": "a.b.c.d",
+          "port": 49154
         },
         {
           "id": "kbulb0",
