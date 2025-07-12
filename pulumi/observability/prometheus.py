@@ -1,17 +1,17 @@
 """Resources for the homeslice/observability app."""
 
 import pulumi_kubernetes as kubernetes
-import pulumi
+from homeslice_config import ObservabilityConfig
 
 NAME = "prometheus"
 
 
-def app(config: pulumi.Config) -> None:
+def app(config: ObservabilityConfig) -> None:
     """define resources for the homeslice/observability app"""
-    namespace_name = config["namespace"]
-    chart_version = config["prometheus_chart_version"]
-    ingress_prefix = config["prometheus_ingress_prefix"]
-    hostname = config["hostname"]
+    namespace_name = config.namespace
+    chart_version = config.prometheus_chart_version
+    ingress_prefix = config.prometheus_ingress_prefix
+    hostname = config.hostname
 
     kubernetes.helm.v3.Release(
         NAME,

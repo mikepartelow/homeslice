@@ -13,7 +13,7 @@ from homeslice_secrets import (  # pylint: disable=no-name-in-module
 NAME = "unifi"
 
 
-def app(config: homeslice_config.LmzConfig) -> None:
+def app(config: homeslice_config.UnifiConfig) -> None:
     """define resources for the homeslice/unifi app"""
     image = config.image
     redirect_url = config.redirect_url
@@ -35,7 +35,7 @@ def app(config: homeslice_config.LmzConfig) -> None:
     )
 
     config.git_clone_url = UNIFI_SECRETS.GIT_CLONE_URL
-    config.ssh_private_key = TIDAL_SECRETS.SSH_PRIVATE_KEY
+    config.ssh_private_key = TIDAL_SECRETS.SSH_PRIVATE_KEY.encode("utf-8")
     btg = homeslice.BackupToGithub(NAME, config)
 
     homeslice.configmap(NAME, btg.configmap_items)

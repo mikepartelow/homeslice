@@ -2,14 +2,15 @@
 
 import pulumi_kubernetes as kubernetes
 import homeslice
+from typing import List
 
 
 def ingress(
     name: str,
-    ingress_prefixes: [str],
+    ingress_prefixes: List[str],
     path_type: str = "Prefix",
-    metadata: kubernetes.meta.v1.ObjectMetaArgs = None,
-) -> kubernetes.core.v1.Service:
+    metadata: kubernetes.meta.v1.ObjectMetaArgs | None = None,
+) -> kubernetes.networking.v1.Ingress:
     """THE kubernetes Ingress factory"""
 
     metadata = metadata or homeslice.metadata(name)

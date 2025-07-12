@@ -1,6 +1,6 @@
 """Homeslice Config"""
 
-from typing import Optional, Sequence, Mapping
+from typing import Optional
 from pydantic import BaseModel, Field
 
 
@@ -42,11 +42,25 @@ class BackupTodoistConfig(GithubBackupConfig):
     schedule: str
 
 
+class ObservabilityConfig(BaseModel):
+    namespace: str
+    hostname: str
+    grafana_chart_version: str
+    grafana_ingress_prefix: str
+    loki_chart_version: str
+    loki_datasource: str
+    loki_push_url: str
+    prometheus_chart_version: str
+    prometheus_ingress_prefix: str
+    prometheus_datasource: str
+    promtail_chart_version: str
+
+
 class ChimeConfig(BaseModel):
     """Chime Config"""
 
     image: str
-    chimes: Sequence[Mapping[str, str]]
+    chimes: list[dict[str, str]]
     nginx: str
     pvc_mount_path: str
     container_port: int
@@ -89,4 +103,31 @@ class UnifiConfig(GithubBackupConfig):
     redirect_url: str
     node_selector: dict[str, str]
     schedule: str
-    node_selector: dict[str, str]
+
+
+class SwitchesConfig(BaseModel):
+    image: str
+    container_port: int
+    ingress_prefix: Optional[str]
+    switches_json: str
+    switches_json_path: str
+
+
+class ClocktimeConfig(BaseModel):
+    image: str
+    container_port: int
+    location: str
+    ingress_prefix: Optional[str]
+
+
+class ButtonsConfig(BaseModel):
+    image: str
+    container_port: int
+    clocktime_url: str
+    ingress_prefixes: Optional[list[str]]
+
+
+class FlyteConfig(BaseModel):
+    namespace: str
+    secret_name: str = Field(alias="secret-name")
+    charts: list[dict]

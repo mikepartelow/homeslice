@@ -21,6 +21,11 @@ from homeslice_config import (
     LmzConfig,
     SonosConfig,
     UnifiConfig,
+    SwitchesConfig,
+    ClocktimeConfig,
+    ButtonsConfig,
+    FlyteConfig,
+    ObservabilityConfig,
 )
 from unifi import unifi
 
@@ -36,20 +41,20 @@ if cfg := config.get_object("backup_todoist"):
     backup_todoist.app(BackupTodoistConfig(**dict(cfg)))
 
 if cfg := config.get_object("buttons"):
-    buttons.app(cfg)
+    buttons.app(ButtonsConfig(**dict(cfg)))
 
 if cfg := config.get_object("chime"):
     chime.app(
         ChimeConfig(**dict(cfg)),
-        pulumi.Config("kubernetes").get("context"),
+        pulumi.Config("kubernetes").require("context"),
         config.require("namespace"),
     )
 
 if cfg := config.get_object("clocktime"):
-    clocktime.app(cfg)
+    clocktime.app(ClocktimeConfig(**dict(cfg)))
 
 if cfg := config.get_object("flyte"):
-    flyte.app(cfg)
+    flyte.app(FlyteConfig(**dict(cfg)))
 
 if cfg := config.get_object("homebridge"):
     homebridge.app(HomeBridgeConfig(**dict(cfg)))
@@ -58,17 +63,18 @@ if cfg := config.get_object("lmz"):
     lmz.app(LmzConfig(**dict(cfg)))
 
 if cfg := config.get_object("observability"):
-    homeslice.namespace(cfg["namespace"])  # pylint: disable=E1136
-    grafana.app(cfg)
-    loki.app(cfg)
-    prometheus.app(cfg)
-    promtail.app(cfg)
+    obs_config = ObservabilityConfig(**dict(cfg))
+    homeslice.namespace(obs_config.namespace)
+    grafana.app(obs_config)
+    loki.app(obs_config)
+    prometheus.app(obs_config)
+    promtail.app(obs_config)
 
 if cfg := config.get_object("sonos"):
     sonos.app(SonosConfig(**dict(cfg)))
 
 if cfg := config.get_object("switches"):
-    switches.app(cfg)
+    switches.app(SwitchesConfig(**dict(cfg)))
 
 if cfg := config.get_object("unifi"):
     unifi.app(UnifiConfig(**dict(cfg)))

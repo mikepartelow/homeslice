@@ -83,18 +83,19 @@ def app(config: homeslice_config.SonosConfig) -> None:
     homeslice.service(NAME)
 
     # pylint: disable=R0801
-    homeslice.ingress(
-        NAME,
-        [config.ingress_prefix],
-        path_type="ImplementationSpecific",
-        metadata=homeslice.metadata(
+    if config.ingress_prefix:
+        homeslice.ingress(
             NAME,
-            annotations={
-                "nginx.ingress.kubernetes.io/use-regex": "true",
-                "nginx.ingress.kubernetes.io/rewrite-target": "/$2",
-            },
-        ),
-    )
+            [config.ingress_prefix],
+            path_type="ImplementationSpecific",
+            metadata=homeslice.metadata(
+                NAME,
+                annotations={
+                    "nginx.ingress.kubernetes.io/use-regex": "true",
+                    "nginx.ingress.kubernetes.io/rewrite-target": "/$2",
+                },
+            ),
+        )
 
 
 # avoid "name" that could confuse siri

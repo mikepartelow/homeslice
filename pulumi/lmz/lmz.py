@@ -58,15 +58,16 @@ def app(config: homeslice_config.LmzConfig) -> None:
     homeslice.service(NAME)
 
     # pylint: disable=R0801
-    homeslice.ingress(
-        NAME,
-        [ingress_prefix],
-        path_type="ImplementationSpecific",
-        metadata=homeslice.metadata(
+    if ingress_prefix:
+        homeslice.ingress(
             NAME,
-            annotations={
-                "nginx.ingress.kubernetes.io/use-regex": "true",
-                "nginx.ingress.kubernetes.io/rewrite-target": "/$2",
-            },
-        ),
-    )
+            [ingress_prefix],
+            path_type="ImplementationSpecific",
+            metadata=homeslice.metadata(
+                NAME,
+                annotations={
+                    "nginx.ingress.kubernetes.io/use-regex": "true",
+                    "nginx.ingress.kubernetes.io/rewrite-target": "/$2",
+                },
+            ),
+        )

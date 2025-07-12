@@ -2,20 +2,21 @@
 
 import pulumi_kubernetes as kubernetes
 import homeslice
+from typing import Any
 
 
 def deployment(
     name: str,
     image: str,
-    command: list[str] = None,
-    args: list[str] = None,
+    command: list[str] | None = None,
+    args: list[str] | None = None,
     replicas: int = 1,
-    env_from: list[kubernetes.core.v1.EnvFromSourceArgs] = None,
-    ports: list[kubernetes.core.v1.ContainerPortArgs] = None,
-    volumes: list[kubernetes.core.v1.VolumeArgs] = None,
-    volume_mounts: list[kubernetes.core.v1.VolumeMountArgs] = None,
+    env_from: list[kubernetes.core.v1.EnvFromSourceArgs] | None = None,
+    ports: list[kubernetes.core.v1.ContainerPortArgs] | None = None,
+    volumes: list[kubernetes.core.v1.VolumeArgs] | None = None,
+    volume_mounts: list[kubernetes.core.v1.VolumeMountArgs] | None = None,
     host_network: bool = False,
-    node_selector: any = None,
+    node_selector: Any = None,
     strategy: kubernetes.apps.v1.DeploymentStrategyArgs | None = None,
 ) -> kubernetes.apps.v1.Deployment:
     # pylint: disable=too-many-arguments

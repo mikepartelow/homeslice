@@ -28,7 +28,7 @@ def app(config: homeslice_config.HomeBridgeConfig) -> None:
         metadata=homeslice.metadata(NAME),
         spec=kubernetes.core.v1.PersistentVolumeClaimSpecArgs(
             access_modes=["ReadWriteOnce"],
-            resources=kubernetes.core.v1.ResourceRequirementsArgs(
+            resources=kubernetes.core.v1.VolumeResourceRequirementsArgs(
                 requests={
                     "storage": "256Mi",
                 },

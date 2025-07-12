@@ -2,19 +2,20 @@
 
 import pulumi_kubernetes as kubernetes
 import homeslice
+from typing import List, Any
 
 
 def cronjob(
     name: str,
     image: str,
     schedule: str,
-    args: [str] = None,
+    args: List[str] | None = None,
     restart_policy: str = "Never",
-    env_from: list[kubernetes.core.v1.EnvFromSourceArgs] = None,
-    volumes: list[kubernetes.core.v1.VolumeArgs] = None,
-    volume_mounts: list[kubernetes.core.v1.VolumeMountArgs] = None,
-    metadata: kubernetes.meta.v1.ObjectMetaArgs = None,
-    node_selector: any = None,
+    env_from: list[kubernetes.core.v1.EnvFromSourceArgs] | None = None,
+    volumes: list[kubernetes.core.v1.VolumeArgs] | None = None,
+    volume_mounts: list[kubernetes.core.v1.VolumeMountArgs] | None = None,
+    metadata: kubernetes.meta.v1.ObjectMetaArgs | None = None,
+    node_selector: Any = None,
 ) -> kubernetes.batch.v1.CronJob:
     # pylint: disable=too-many-arguments,R0801
     """THE kubernetes Cronjob factory"""

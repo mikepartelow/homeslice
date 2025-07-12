@@ -2,19 +2,19 @@
 
 import os
 import pulumi_kubernetes as kubernetes
-import pulumi
+from homeslice_config import ObservabilityConfig
 
 NAME = "grafana"
 DASHBOARDS_ROOT = "observability/dashboards"
 
 
-def app(config: pulumi.Config) -> None:
+def app(config: ObservabilityConfig) -> None:
     """define resources for the homeslice/observability app"""
-    namespace_name = config["namespace"]
-    chart_version = config["grafana_chart_version"]
-    ingress_prefix = config["grafana_ingress_prefix"]
-    loki_datasource = config["loki_datasource"]
-    prometheus_datasource = config["prometheus_datasource"]
+    namespace_name = config.namespace
+    chart_version = config.grafana_chart_version
+    ingress_prefix = config.grafana_ingress_prefix
+    loki_datasource = config.loki_datasource
+    prometheus_datasource = config.prometheus_datasource
 
     dashboards = []
 

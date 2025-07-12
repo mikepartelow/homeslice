@@ -6,9 +6,9 @@ import homeslice
 
 def metadata(
     name: str,
-    labels: dict[str, str] = None,
-    annotations: dict[str, str] = None,
-    namespace: str = None,
+    labels: dict[str, str] | None = None,
+    annotations: dict[str, str] | None = None,
+    namespace: str | None = None,
 ) -> kubernetes.meta.v1.ObjectMetaArgs:
     """THE kubernetes metadata factory"""
 

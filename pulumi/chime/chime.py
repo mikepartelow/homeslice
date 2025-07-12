@@ -21,7 +21,7 @@ def app(config: homeslice_config.ChimeConfig, k8s_context: str, namespace: str) 
         metadata=homeslice.metadata(NAME),
         spec=kubernetes.core.v1.PersistentVolumeClaimSpecArgs(
             access_modes=["ReadWriteOnce"],
-            resources=kubernetes.core.v1.ResourceRequirementsArgs(
+            resources=kubernetes.core.v1.VolumeResourceRequirementsArgs(
                 requests={
                     "storage": "256Mi",
                 },
@@ -106,7 +106,7 @@ def app(config: homeslice_config.ChimeConfig, k8s_context: str, namespace: str) 
     # cronjobs schedule the chimes.
     for chime in config.chimes:
         for zone in CHIME_SECRET.ZONES:
-            name = make_name(NAME, chime, zone)
+            name = make_name(NAME, chime, dict(zone))
             args = [
                 zone["ip_address"],
                 chime["media_title"],
@@ -122,7 +122,7 @@ def app(config: homeslice_config.ChimeConfig, k8s_context: str, namespace: str) 
             )
 
 
-def make_name(name: str, chime: dict, zone: dict) -> str:
+def make_name(name: str, chime: dict[str, str], zone: dict[str, str]) -> str:
     """Combine the inputs and return a name suitable for a Pulumi URN"""
     boring_title = chime["media_title"].replace(" ", "-")
     boring_zone_name = zone["name"].replace(" ", "-")
