@@ -35,12 +35,3 @@ class Buttons(pulumi.ComponentResource):
             self.ingress = homeslice.ingress(name, ingress_prefixes)
 
         self.register_outputs({})
-
-
-def app(config: ButtonsConfig) -> None:
-    """Define resources for the homeslice/buttons app.
-    
-    Creates a Buttons ComponentResource with deployment, service, and optional ingress
-    for button control functionality.
-    """
-    Buttons("buttons", config)

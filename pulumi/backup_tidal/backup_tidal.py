@@ -85,12 +85,3 @@ class BackupTidal(pulumi.ComponentResource):
         )
 
         self.register_outputs({})
-
-
-def app(config: homeslice_config.BackupTidalConfig) -> None:
-    """Define resources for the homeslice/backup-tidal app.
-    
-    Creates a BackupTidal ComponentResource with cronjob, configmap, and secrets
-    for backing up Tidal data to GitHub.
-    """
-    BackupTidal("backup-tidal", config)

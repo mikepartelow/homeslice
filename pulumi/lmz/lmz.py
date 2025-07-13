@@ -75,12 +75,3 @@ class Lmz(pulumi.ComponentResource):
             )
 
         self.register_outputs({})
-
-
-def app(config: homeslice_config.LmzConfig) -> None:
-    """Define resources for the homeslice/lmz app.
-    
-    Creates an Lmz ComponentResource with deployment, service, optional ingress, and secrets
-    for LMZ functionality.
-    """
-    Lmz("lmz", config)

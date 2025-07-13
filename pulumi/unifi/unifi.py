@@ -81,12 +81,3 @@ class Unifi(pulumi.ComponentResource):
         )
 
         self.register_outputs({})
-
-
-def app(config: homeslice_config.UnifiConfig) -> None:
-    """Define resources for the homeslice/unifi app.
-    
-    Creates a Unifi ComponentResource with ingress, configmap, secrets, and cronjob
-    for backing up Unifi configuration to GitHub.
-    """
-    Unifi("unifi", config)

@@ -35,12 +35,3 @@ class Clocktime(pulumi.ComponentResource):
             self.ingress = homeslice.ingress(name, [ingress_prefix])
 
         self.register_outputs({})
-
-
-def app(config: ClocktimeConfig) -> None:
-    """Define resources for the homeslice/clocktime app.
-    
-    Creates a Clocktime ComponentResource with deployment, service, and optional ingress
-    for displaying current time information.
-    """
-    Clocktime("clocktime", config)

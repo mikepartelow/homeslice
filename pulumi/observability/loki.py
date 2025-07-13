@@ -63,11 +63,3 @@ class Loki(pulumi.ComponentResource):
         )
 
         self.register_outputs({})
-
-
-def app(config: LokiConfig) -> None:
-    """Define resources for the homeslice/observability app.
-    
-    Creates a Loki ComponentResource with Helm release for log aggregation.
-    """
-    Loki("loki", config)

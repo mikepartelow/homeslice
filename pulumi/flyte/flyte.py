@@ -84,11 +84,3 @@ def render_values(thing: str | dict | list | None) -> str | dict | list | None:
             "%MINIO_PASSWORD%", FLYTE_SECRETS.MINIO_PASSWORD
         )
     return thing
-
-
-def app(config: FlyteConfig) -> None:
-    """Define resources for the homeslice/flyte app.
-    
-    Creates a Flyte ComponentResource with multiple Helm releases for workflow orchestration.
-    """
-    Flyte("flyte", config)

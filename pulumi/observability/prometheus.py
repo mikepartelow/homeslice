@@ -52,11 +52,3 @@ class Prometheus(pulumi.ComponentResource):
         )
 
         self.register_outputs({})
-
-
-def app(config: PrometheusConfig) -> None:
-    """Define resources for the homeslice/observability app.
-    
-    Creates a Prometheus ComponentResource with Helm release for metrics collection.
-    """
-    Prometheus("prometheus", config)

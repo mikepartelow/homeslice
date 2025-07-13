@@ -50,12 +50,3 @@ class BackupTodoist(pulumi.ComponentResource):
         )
 
         self.register_outputs({})
-
-
-def app(config: homeslice_config.BackupTodoistConfig) -> None:
-    """Define resources for the homeslice/backup-todoist app.
-    
-    Creates a BackupTodoist ComponentResource with cronjob, configmap, and secrets
-    for backing up Todoist data to GitHub.
-    """
-    BackupTodoist("backup-todoist", config)

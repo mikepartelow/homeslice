@@ -140,12 +140,3 @@ def make_name(name: str, chime: Mapping[str, str], zone: Mapping[str, str]) -> s
     return (
         name + "-" + boring_title + "-" + fancy_zone_ip_address + "-" + boring_zone_name
     ).lower()
-
-
-def app(config: homeslice_config.ChimeConfig, k8s_context: str, namespace: str) -> None:
-    """Define resources for the homeslice/chime app.
-    
-    Creates a Chime ComponentResource with PVC, deployment, service, ingress, and cronjobs
-    for audio chime functionality across multiple zones.
-    """
-    Chime("chime", config, k8s_context, namespace)

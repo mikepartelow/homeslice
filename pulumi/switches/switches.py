@@ -67,15 +67,6 @@ class Switches(pulumi.ComponentResource):
         self.register_outputs({})
 
 
-def app(config: SwitchesConfig) -> None:
-    """Define resources for the homeslice/switches app.
-    
-    Creates a Switches ComponentResource with deployment, service, optional ingress, and configmap
-    for switch control functionality.
-    """
-    Switches("switches", config)
-
-
 # I don't want to publish IP addresses to GitHub
 def subst_address(s: str) -> str:
     """Returns the given string with secrets substituted in.
