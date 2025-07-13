@@ -1,17 +1,17 @@
 """Resources for the homeslice/clocktime app."""
 
-import pulumi
 import homeslice
+from homeslice_config import ClocktimeConfig
 
 NAME = "clocktime"
 
 
-def app(config: pulumi.Config) -> None:
+def app(config: ClocktimeConfig) -> None:
     """define resources for the homeslice/clocktime app"""
-    image = config["image"]
-    container_port = int(config["container_port"])
-    location = config["location"]
-    ingress_prefix = config.get("ingress_prefix")
+    image = config.image
+    container_port = config.container_port
+    location = config.location
+    ingress_prefix = config.ingress_prefix
 
     homeslice.configmap(
         NAME,
@@ -28,4 +28,5 @@ def app(config: pulumi.Config) -> None:
 
     homeslice.service(NAME)
 
-    homeslice.ingress(NAME, [ingress_prefix])
+    if ingress_prefix:
+        homeslice.ingress(NAME, [ingress_prefix])

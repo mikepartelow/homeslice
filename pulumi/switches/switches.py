@@ -59,7 +59,8 @@ def app(config: SwitchesConfig) -> None:
 
     homeslice.service(NAME)
 
-    homeslice.ingress(NAME, [ingress_prefix])
+    if ingress_prefix:
+        homeslice.ingress(NAME, [ingress_prefix])
 
 
 # I don't want to publish IP addresses to GitHub

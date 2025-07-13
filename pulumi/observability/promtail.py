@@ -1,16 +1,16 @@
 """Resources for the homeslice/observability app."""
 
 import pulumi_kubernetes as kubernetes
-import pulumi
+from homeslice_config import PromtailConfig
 
 NAME = "promtail"
 
 
-def app(config: pulumi.Config) -> None:
+def app(config: PromtailConfig) -> None:
     """define resources for the homeslice/observability app"""
-    namespace_name = config["namespace"]
-    chart_version = config["promtail_chart_version"]
-    push_url = config["loki_push_url"]
+    namespace_name = config.namespace
+    chart_version = config.promtail_chart_version
+    push_url = config.loki_push_url
 
     kubernetes.helm.v3.Release(
         NAME,

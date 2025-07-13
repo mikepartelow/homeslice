@@ -1,17 +1,17 @@
 """Resources for the homeslice/buttons app."""
 
-import pulumi
 import homeslice
+from homeslice_config import ButtonsConfig
 
 NAME = "buttons"
 
 
-def app(config: pulumi.Config) -> None:
+def app(config: ButtonsConfig) -> None:
     """define resources for the homeslice/buttons app"""
-    image = config["image"]
-    container_port = int(config["container_port"])
-    clocktime_url = config["clocktime_url"]
-    ingress_prefixes = config.get("ingress_prefixes")
+    image = config.image
+    container_port = config.container_port
+    clocktime_url = config.clocktime_url
+    ingress_prefixes = config.ingress_prefixes
 
     homeslice.configmap(
         NAME,
@@ -28,4 +28,5 @@ def app(config: pulumi.Config) -> None:
 
     homeslice.service(NAME)
 
-    homeslice.ingress(NAME, ingress_prefixes)
+    if ingress_prefixes:
+        homeslice.ingress(NAME, ingress_prefixes)

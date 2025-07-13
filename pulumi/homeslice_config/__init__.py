@@ -9,3 +9,10 @@ from .config import BackupTidalConfig as BackupTidalConfig
 from .config import GithubBackupConfig as GithubBackupConfig
 from .config import BackupTodoistConfig as BackupTodoistConfig
 from .config import SwitchesConfig as SwitchesConfig
+from .config import ClocktimeConfig as ClocktimeConfig
+from .config import ButtonsConfig as ButtonsConfig
+from .config import LokiConfig as LokiConfig
+from .config import PrometheusConfig as PrometheusConfig
+from .config import GrafanaConfig as GrafanaConfig
+from .config import PromtailConfig as PromtailConfig
+from .config import FlyteConfig as FlyteConfig

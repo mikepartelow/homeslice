@@ -6,6 +6,7 @@ import pulumi_kubernetes as kubernetes
 import pulumi
 import homeslice
 import importlib.resources
+from homeslice_config import FlyteConfig
 from homeslice_secrets import (  # pylint: disable=no-name-in-module
     flyte as FLYTE_SECRETS,
 )
@@ -13,13 +14,13 @@ from homeslice_secrets import (  # pylint: disable=no-name-in-module
 NAME = "flyte"
 
 
-def app(config: pulumi.Config) -> None:
+def app(config: FlyteConfig) -> None:
     """define resources for the homeslice/flyte app"""
-    ns = homeslice.namespace(config["namespace"])
+    ns = homeslice.namespace(config.namespace)
 
     db_secret = kubernetes.core.v1.Secret(
-        config["secret-name"],
-        metadata=homeslice.metadata(config["secret-name"], namespace=NAME),
+        config.secret_name,
+        metadata=homeslice.metadata(config.secret_name, namespace=NAME),
         type="Opaque",
         string_data={
             "202-database-secrets.yaml": json.dumps(
@@ -34,7 +35,7 @@ def app(config: pulumi.Config) -> None:
         },
     )
 
-    for chart in config["charts"]:
+    for chart in config.charts:
         if filename := chart.get("values-resource"):
             with importlib.resources.open_text("flyte", filename) as f:
                 values = yaml.safe_load(render_values(f.read()))
@@ -46,7 +47,7 @@ def app(config: pulumi.Config) -> None:
             kubernetes.helm.v3.ReleaseArgs(
                 chart=chart["chart"],
                 name=chart["name"],
-                namespace=config["namespace"],
+                namespace=config.namespace,
                 version=chart["version"],
                 repository_opts=kubernetes.helm.v3.RepositoryOptsArgs(
                     repo=chart.get("repo"),
@@ -57,7 +58,7 @@ def app(config: pulumi.Config) -> None:
         )
 
 
-def render_values(thing: str | dict | list) -> str | dict | None:
+def render_values(thing: str | dict | list | None) -> str | dict | list | None:
     if thing is None:
         return None
     if isinstance(thing, dict):
