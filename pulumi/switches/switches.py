@@ -2,8 +2,8 @@
 
 from pathlib import Path
 import pulumi_kubernetes as kubernetes
-import pulumi
 import homeslice
+from homeslice_config import SwitchesConfig
 from homeslice_secrets import (  # pylint: disable=no-name-in-module
     switches as SWITCHES_SECRETS,
 )
@@ -11,14 +11,14 @@ from homeslice_secrets import (  # pylint: disable=no-name-in-module
 NAME = "switches"
 
 
-def app(config: pulumi.Config) -> None:
+def app(config: SwitchesConfig) -> None:
     """define resources for the homeslice/switches app"""
 
-    image = config["image"]
-    container_port = int(config["container_port"])
-    ingress_prefix = config.get("ingress_prefix")
-    switches_json = subst_address(config["switches_json"])
-    switches_json_path = config["switches_json_path"]
+    image = config.image
+    container_port = config.container_port
+    ingress_prefix = config.ingress_prefix
+    switches_json = subst_address(config.switches_json)
+    switches_json_path = config.switches_json_path
     switches_json_name = str(Path(switches_json_path).name)
     volume_name = switches_json_name.replace(".", "-")
 

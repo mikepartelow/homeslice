@@ -8,3 +8,4 @@ from .config import HomeBridgeConfig as HomeBridgeConfig
 from .config import BackupTidalConfig as BackupTidalConfig
 from .config import GithubBackupConfig as GithubBackupConfig
 from .config import BackupTodoistConfig as BackupTodoistConfig
+from .config import SwitchesConfig as SwitchesConfig

@@ -20,6 +20,7 @@ from homeslice_config import (
     HomeBridgeConfig,
     LmzConfig,
     SonosConfig,
+    SwitchesConfig,
     UnifiConfig,
 )
 from unifi import unifi
@@ -39,11 +40,13 @@ if cfg := config.get_object("buttons"):
     buttons.app(cfg)
 
 if cfg := config.get_object("chime"):
-    chime.app(
-        ChimeConfig(**dict(cfg)),
-        pulumi.Config("kubernetes").get("context"),
-        config.require("namespace"),
-    )
+    k8s_context = pulumi.Config("kubernetes").get("context")
+    if k8s_context:
+        chime.app(
+            ChimeConfig(**dict(cfg)),
+            k8s_context,
+            config.require("namespace"),
+        )
 
 if cfg := config.get_object("clocktime"):
     clocktime.app(cfg)
@@ -68,7 +71,7 @@ if cfg := config.get_object("sonos"):
     sonos.app(SonosConfig(**dict(cfg)))
 
 if cfg := config.get_object("switches"):
-    switches.app(cfg)
+    switches.app(SwitchesConfig(**dict(cfg)))
 
 if cfg := config.get_object("unifi"):
     unifi.app(UnifiConfig(**dict(cfg)))

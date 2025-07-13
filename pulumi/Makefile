@@ -12,4 +12,4 @@ make fmt:
 
 lint:
 	@ruff check
-	# @uv run mypy .
+	@uv run mypy .

@@ -89,4 +89,13 @@ class UnifiConfig(GithubBackupConfig):
     redirect_url: str
     node_selector: dict[str, str]
     schedule: str
-    node_selector: dict[str, str]
+
+
+class SwitchesConfig(BaseModel):
+    """Switches Config"""
+
+    image: str
+    container_port: int
+    switches_json: str
+    switches_json_path: str
+    ingress_prefix: Optional[str] = None

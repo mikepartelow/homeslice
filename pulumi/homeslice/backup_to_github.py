@@ -4,6 +4,7 @@ from pathlib import Path
 import pulumi_kubernetes as kubernetes
 import homeslice_config
 import homeslice
+from typing import List
 
 
 class BackupToGithub:
@@ -39,20 +40,25 @@ class BackupToGithub:
         }
 
     @property
-    def ssh_secret(self) -> dict:
+    def ssh_secret(self) -> kubernetes.core.v1.Secret:
         """Required SSH secret. Callers should read this property to create the secret,
         but don't need to directly reference it."""
+        key = self.config.ssh_private_key
+        if isinstance(key, bytes):
+            key = key.decode()
+        elif key is None:
+            key = ""
         return kubernetes.core.v1.Secret(
             self.ssh_secret_name,
             metadata=homeslice.metadata(self.ssh_secret_name),
             type="kubernetes.io/ssh-auth",
             string_data={
-                "ssh-privatekey": self.config.ssh_private_key,
+                "ssh-privatekey": key,
             },
         )
 
     @property
-    def volume_mounts(self) -> [kubernetes.core.v1.VolumeMountArgs]:
+    def volume_mounts(self) -> List[kubernetes.core.v1.VolumeMountArgs]:
         """Required volume mounts, including the SSH secret."""
         return [
             kubernetes.core.v1.VolumeMountArgs(
@@ -68,7 +74,7 @@ class BackupToGithub:
         ]
 
     @property
-    def volumes(self) -> [kubernetes.core.v1.VolumeArgs]:
+    def volumes(self) -> List[kubernetes.core.v1.VolumeArgs]:
         """Required volumes, including SSH secret."""
         return [
             kubernetes.core.v1.VolumeArgs(
@@ -84,17 +90,17 @@ class BackupToGithub:
                     name=self.app_name,
                     default_mode=0o444,
                     items=[
-                        {
-                            "key": str(Path(self.config.ssh_known_hosts_path).name),
-                            "path": str(Path(self.config.ssh_known_hosts_path).name),
-                        }
+                        kubernetes.core.v1.KeyToPathArgs(
+                            key=str(Path(self.config.ssh_known_hosts_path).name),
+                            path=str(Path(self.config.ssh_known_hosts_path).name),
+                        )
                     ],
                 ),
             ),
         ]
 
     @property
-    def env_from(self) -> [kubernetes.core.v1.EnvFromSourceArgs]:
+    def env_from(self) -> List[kubernetes.core.v1.EnvFromSourceArgs]:
         """Required env_from items, including required configmaps and secrets."""
         return [
             homeslice.env_from_configmap(self.app_name),

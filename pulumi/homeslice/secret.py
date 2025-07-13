@@ -2,10 +2,11 @@
 
 import pulumi_kubernetes as kubernetes
 import homeslice
+from typing import Optional, Dict, Any
 
 
 def secret(
-    name: str, data: dict = None, string_data: dict = None
+    name: str, data: Optional[Dict[str, Any]] = None, string_data: Optional[Dict[str, Any]] = None
 ) -> kubernetes.core.v1.Secret:
     """THE kubernetes Secret factory"""
     return kubernetes.core.v1.Secret(
