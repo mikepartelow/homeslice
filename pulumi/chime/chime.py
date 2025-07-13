@@ -1,9 +1,9 @@
 """Resources for the homeslice/chime app."""
 
 from typing import Mapping
+import pulumi
 import pulumi_kubernetes as kubernetes
 from pulumi_command import local
-import pulumi
 import homeslice
 import homeslice_config
 from homeslice_secrets import chime as CHIME_SECRET  # pylint: disable=no-name-in-module

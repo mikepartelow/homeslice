@@ -1,10 +1,10 @@
 """Abstract common resources for backing things up to Github"""
 
 from pathlib import Path
-import pulumi_kubernetes as kubernetes
-import homeslice_config
-import homeslice
 from typing import List
+import pulumi_kubernetes as kubernetes
+import homeslice
+import homeslice_config
 
 
 class BackupToGithub:

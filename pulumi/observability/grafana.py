@@ -1,8 +1,8 @@
 """Resources for the homeslice/observability app."""
 
 import os
-import pulumi_kubernetes as kubernetes
 import pulumi
+import pulumi_kubernetes as kubernetes
 from homeslice_config import GrafanaConfig
 
 DASHBOARDS_ROOT = "observability/dashboards"

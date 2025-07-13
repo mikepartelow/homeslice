@@ -2,7 +2,7 @@
 
 import pulumi_kubernetes as kubernetes
 import homeslice
-from typing import List, Optional, Any
+from typing import Any, List, Optional
 
 
 def cronjob(

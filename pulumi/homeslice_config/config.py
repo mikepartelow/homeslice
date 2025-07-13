@@ -1,6 +1,6 @@
 """Homeslice Config"""
 
-from typing import Optional, Sequence, Mapping
+from typing import Mapping, Optional, Sequence
 from pydantic import BaseModel, Field
 
 

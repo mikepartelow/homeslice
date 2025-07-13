@@ -1,11 +1,11 @@
 """Resources for the homeslice/flyte app."""
 
-import yaml
-import json
-import pulumi_kubernetes as kubernetes
-import pulumi
-import homeslice
 import importlib.resources
+import json
+import yaml
+import pulumi
+import pulumi_kubernetes as kubernetes
+import homeslice
 from homeslice_config import FlyteConfig
 from homeslice_secrets import (  # pylint: disable=no-name-in-module
     flyte as FLYTE_SECRETS,

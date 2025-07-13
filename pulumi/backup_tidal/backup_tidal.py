@@ -1,10 +1,10 @@
 """Resources for the homeslice/backup-todoist app."""
 
 from pathlib import Path
-import pulumi_kubernetes as kubernetes
 import pulumi
-import homeslice_config
+import pulumi_kubernetes as kubernetes
 import homeslice
+import homeslice_config
 from homeslice_secrets import (  # pylint: disable=no-name-in-module
     backup_tidal as BACKUP_TIDAL_SECRETS,
 )

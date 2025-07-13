@@ -9,27 +9,27 @@ from chime import chime
 from clocktime import clocktime
 from flyte import flyte
 from homebridge import homebridge
-from lmz import lmz
-from observability import grafana, loki, prometheus, promtail
-from switches import switches
-from sonos import sonos
 from homeslice_config import (
-    BackupTidalConfig,
     BackupTodoistConfig,
+    BackupTidalConfig,
+    ButtonsConfig,
     ChimeConfig,
+    ClocktimeConfig,
+    FlyteConfig,
+    GrafanaConfig,
     HomeBridgeConfig,
+    LokiConfig,
     LmzConfig,
+    PrometheusConfig,
+    PromtailConfig,
     SonosConfig,
     SwitchesConfig,
     UnifiConfig,
-    ClocktimeConfig,
-    ButtonsConfig,
-    LokiConfig,
-    PrometheusConfig,
-    GrafanaConfig,
-    PromtailConfig,
-    FlyteConfig,
 )
+from lmz import lmz
+from observability import grafana, loki, prometheus, promtail
+from sonos import sonos
+from switches import switches
 from unifi import unifi
 
 config = pulumi.Config("homeslice")

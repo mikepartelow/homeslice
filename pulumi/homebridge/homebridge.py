@@ -1,7 +1,7 @@
 """Resources for the a Homebridge instance."""
 
-import pulumi_kubernetes as kubernetes
 import pulumi
+import pulumi_kubernetes as kubernetes
 import homeslice
 import homeslice_config
 

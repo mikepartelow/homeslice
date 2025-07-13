@@ -2,7 +2,7 @@
 
 import pulumi_kubernetes as kubernetes
 import homeslice
-from typing import Optional, Dict
+from typing import Dict, Optional
 
 
 def metadata(

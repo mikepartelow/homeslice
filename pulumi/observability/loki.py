@@ -1,7 +1,7 @@
 """Resources for the homeslice/observability app."""
 
-import pulumi_kubernetes as kubernetes
 import pulumi
+import pulumi_kubernetes as kubernetes
 from homeslice_config import LokiConfig
 
 
