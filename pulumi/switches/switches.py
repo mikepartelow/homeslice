@@ -2,65 +2,74 @@
 
 from pathlib import Path
 import pulumi_kubernetes as kubernetes
+import pulumi
 import homeslice
 from homeslice_config import SwitchesConfig
 from homeslice_secrets import (  # pylint: disable=no-name-in-module
     switches as SWITCHES_SECRETS,
 )
 
-NAME = "switches"
+
+class Switches(pulumi.ComponentResource):
+    """Switches app resources."""
+
+    def __init__(self, name: str, config: SwitchesConfig, opts: pulumi.ResourceOptions | None = None):
+        super().__init__("homeslice:switches:Switches", name, {}, opts)
+
+        image = config.image
+        container_port = config.container_port
+        ingress_prefix = config.ingress_prefix
+        switches_json = subst_address(config.switches_json)
+        switches_json_path = config.switches_json_path
+        switches_json_name = str(Path(switches_json_path).name)
+        volume_name = switches_json_name.replace(".", "-")
+
+        self.configmap = homeslice.configmap(
+            name,
+            {
+                switches_json_name: switches_json,
+            },
+        )
+
+        volumes = [
+            kubernetes.core.v1.VolumeArgs(
+                name=volume_name,
+                config_map=kubernetes.core.v1.ConfigMapVolumeSourceArgs(
+                    name=name,
+                ),
+            ),
+        ]
+
+        volume_mounts = [
+            kubernetes.core.v1.VolumeMountArgs(
+                name=volume_name,
+                mount_path=str(Path(switches_json_path).parent),
+                read_only=True,
+            ),
+        ]
+
+        ports = [homeslice.port(container_port)]
+
+        self.deployment = homeslice.deployment(
+            name,
+            image,
+            args=[switches_json_path],
+            ports=ports,
+            volumes=volumes,
+            volume_mounts=volume_mounts,
+        )
+
+        self.service = homeslice.service(name)
+
+        if ingress_prefix:
+            self.ingress = homeslice.ingress(name, [ingress_prefix])
+
+        self.register_outputs({})
 
 
 def app(config: SwitchesConfig) -> None:
     """define resources for the homeslice/switches app"""
-
-    image = config.image
-    container_port = config.container_port
-    ingress_prefix = config.ingress_prefix
-    switches_json = subst_address(config.switches_json)
-    switches_json_path = config.switches_json_path
-    switches_json_name = str(Path(switches_json_path).name)
-    volume_name = switches_json_name.replace(".", "-")
-
-    homeslice.configmap(
-        NAME,
-        {
-            switches_json_name: switches_json,
-        },
-    )
-
-    volumes = [
-        kubernetes.core.v1.VolumeArgs(
-            name=volume_name,
-            config_map=kubernetes.core.v1.ConfigMapVolumeSourceArgs(
-                name=NAME,
-            ),
-        ),
-    ]
-
-    volume_mounts = [
-        kubernetes.core.v1.VolumeMountArgs(
-            name=volume_name,
-            mount_path=str(Path(switches_json_path).parent),
-            read_only=True,
-        ),
-    ]
-
-    ports = [homeslice.port(container_port)]
-
-    homeslice.deployment(
-        NAME,
-        image,
-        args=[switches_json_path],
-        ports=ports,
-        volumes=volumes,
-        volume_mounts=volume_mounts,
-    )
-
-    homeslice.service(NAME)
-
-    if ingress_prefix:
-        homeslice.ingress(NAME, [ingress_prefix])
+    Switches("switches", config)
 
 
 # I don't want to publish IP addresses to GitHub

@@ -11,10 +11,10 @@
 """bump all homeslice images in Pulumi.prod.yaml to the latest from ghcr.io"""
 
 from pathlib import Path
-from typing import Generator
+from typing import Generator, Any
 import logging
 import yaml
-from coregio.registry_api import ContainerRegistry  # pylint: disable=import-error
+from coregio.registry_api import ContainerRegistry  # type: ignore  # pylint: disable=import-error
 
 CACHE_FILE = "./bump-cache.yaml"
 IMAGE_BASE = "ghcr.io/mikepartelow/homeslice"
@@ -48,7 +48,7 @@ def get_latest_main(image: str) -> str:
     return f"{image}:{latest_tag}@{digest}"
 
 
-def get_latest_images(config: dict[any, any]) -> tuple[dict[str, str], bool]:
+def get_latest_images(config: dict[Any, Any]) -> tuple[dict[str, str], bool]:
     """return [{image: latest_image}, used_cache] for all homeslice images in the pulumi config"""
     if Path(CACHE_FILE).exists():
         with open(CACHE_FILE, "r", encoding="utf-8") as f:

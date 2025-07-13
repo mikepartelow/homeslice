@@ -36,7 +36,7 @@ class BackupToGithub:
     def secret_items(self) -> dict:
         """Required secret items. Use with env_from()."""
         return {
-            self.config.git_clone_url_env_var_name: self.config.git_clone_url,  # secret
+            self.config.git_clone_url_env_var_name: str(self.config.git_clone_url) if self.config.git_clone_url is not None else "",
         }
 
     @property
@@ -45,15 +45,17 @@ class BackupToGithub:
         but don't need to directly reference it."""
         key = self.config.ssh_private_key
         if isinstance(key, bytes):
-            key = key.decode()
+            key_str = key.decode()
         elif key is None:
-            key = ""
+            key_str = ""
+        else:
+            key_str = key  # type: ignore
         return kubernetes.core.v1.Secret(
             self.ssh_secret_name,
             metadata=homeslice.metadata(self.ssh_secret_name),
             type="kubernetes.io/ssh-auth",
             string_data={
-                "ssh-privatekey": key,
+                "ssh-privatekey": key_str,
             },
         )
 

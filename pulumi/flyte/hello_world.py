@@ -1,4 +1,4 @@
-from flytekit import task, workflow
+from flytekit import task, workflow  # type: ignore
 
 
 @task  # (requests=Resources(cpu="900m", mem="3Gi"))
