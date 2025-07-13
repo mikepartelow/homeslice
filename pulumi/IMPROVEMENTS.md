@@ -11,6 +11,17 @@
 
 ## Todo Items
 
+- [ ] refactor __main__.py to use a more maintainable configuration pattern
+- [ ] fix FIXME items in chime/chime.py (populate command and local.Command issues)
+- [ ] add ruff configuration to pyproject.toml and remove pylint suppressions
+- [ ] create a common base class for all ComponentResources to reduce duplication
+- [ ] add proper error handling and validation to config loading
+- [ ] implement proper logging throughout the codebase
+- [ ] add integration tests for ComponentResources
+- [ ] create a proper CI/CD pipeline configuration
+- [ ] add resource tagging and cost tracking
+- [ ] implement proper secret management strategy
+
 ## Completed Items
 
 - [x] add docstrings everywhere
