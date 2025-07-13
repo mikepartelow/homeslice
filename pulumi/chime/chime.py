@@ -129,7 +129,11 @@ class Chime(pulumi.ComponentResource):
 
 
 def make_name(name: str, chime: Mapping[str, str], zone: Mapping[str, str]) -> str:
-    """Combine the inputs and return a name suitable for a Pulumi URN"""
+    """Combine the inputs and return a name suitable for a Pulumi URN.
+    
+    Creates a sanitized name by replacing spaces with hyphens and dots with hyphens
+    in the chime media title and zone name, and dots with hyphens in the zone IP.
+    """
     boring_title = chime["media_title"].replace(" ", "-")
     boring_zone_name = zone["name"].replace(" ", "-")
     fancy_zone_ip_address = zone["ip_address"].replace(".", "-")
@@ -139,5 +143,9 @@ def make_name(name: str, chime: Mapping[str, str], zone: Mapping[str, str]) -> s
 
 
 def app(config: homeslice_config.ChimeConfig, k8s_context: str, namespace: str) -> None:
-    """define resources for the homeslice/chime app"""
+    """Define resources for the homeslice/chime app.
+    
+    Creates a Chime ComponentResource with PVC, deployment, service, ingress, and cronjobs
+    for audio chime functionality across multiple zones.
+    """
     Chime("chime", config, k8s_context, namespace)

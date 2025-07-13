@@ -102,7 +102,11 @@ class Sonos(pulumi.ComponentResource):
 
 
 def app(config: homeslice_config.SonosConfig) -> None:
-    """define resources for the homeslice/sonos app"""
+    """Define resources for the homeslice/sonos app.
+    
+    Creates a Sonos ComponentResource with deployment, service, ingress, and configmap
+    for serving Sonos control functionality.
+    """
     Sonos("sonos", config)
 
 

@@ -66,6 +66,11 @@ class Flyte(pulumi.ComponentResource):
 
 
 def render_values(thing: str | dict | list | None) -> str | dict | list | None:
+    """Render values by substituting placeholders with secrets.
+    
+    Recursively processes nested dictionaries and lists, replacing
+    %DB_PASSWORD% and %MINIO_PASSWORD% placeholders with actual values.
+    """
     if thing is None:
         return None
     if isinstance(thing, dict):
@@ -82,5 +87,8 @@ def render_values(thing: str | dict | list | None) -> str | dict | list | None:
 
 
 def app(config: FlyteConfig) -> None:
-    """define resources for the homeslice/flyte app"""
+    """Define resources for the homeslice/flyte app.
+    
+    Creates a Flyte ComponentResource with multiple Helm releases for workflow orchestration.
+    """
     Flyte("flyte", config)

@@ -3,11 +3,16 @@ from flytekit import task, workflow  # type: ignore
 
 @task  # (requests=Resources(cpu="900m", mem="3Gi"))
 def say_hello() -> str:
+    """Return a simple hello world message."""
     return "hello world"
 
 
 @workflow
 def my_wf() -> str:
+    """Execute the hello world workflow.
+    
+    Returns the result of the say_hello task.
+    """
     res = say_hello()
     return res
 

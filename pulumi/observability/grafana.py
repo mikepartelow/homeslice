@@ -104,5 +104,8 @@ class Grafana(pulumi.ComponentResource):
 
 
 def app(config: GrafanaConfig) -> None:
-    """define resources for the homeslice/observability app"""
+    """Define resources for the homeslice/observability app.
+    
+    Creates a Grafana ComponentResource with Helm release for dashboard visualization.
+    """
     Grafana("grafana", config)

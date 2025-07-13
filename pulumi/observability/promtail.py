@@ -38,5 +38,8 @@ class Promtail(pulumi.ComponentResource):
 
 
 def app(config: PromtailConfig) -> None:
-    """define resources for the homeslice/observability app"""
+    """Define resources for the homeslice/observability app.
+    
+    Creates a Promtail ComponentResource with Helm release for log shipping to Loki.
+    """
     Promtail("promtail", config)

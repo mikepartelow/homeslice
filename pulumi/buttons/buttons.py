@@ -38,5 +38,9 @@ class Buttons(pulumi.ComponentResource):
 
 
 def app(config: ButtonsConfig) -> None:
-    """define resources for the homeslice/buttons app"""
+    """Define resources for the homeslice/buttons app.
+    
+    Creates a Buttons ComponentResource with deployment, service, and optional ingress
+    for button control functionality.
+    """
     Buttons("buttons", config)

@@ -89,5 +89,9 @@ class Homebridge(pulumi.ComponentResource):
 
 
 def app(config: homeslice_config.HomeBridgeConfig) -> None:
-    """define resources for the homeslice/homebridge app"""
+    """Define resources for the homeslice/homebridge app.
+    
+    Creates a Homebridge ComponentResource with deployment, service, ingress, and PVC
+    for HomeKit bridge functionality.
+    """
     Homebridge("homebridge", config)

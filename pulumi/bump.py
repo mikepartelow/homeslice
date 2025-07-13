@@ -23,7 +23,7 @@ LOCAL_REGISTRY = "registry.localdomain:32000"
 
 
 def find_keys(haystack: dict, needle: str) -> Generator[str, None, None]:
-    """yield all values of key needle in dict haystack"""
+    """Yield all values of key needle in dict haystack recursively."""
     if isinstance(haystack, dict):
         for key, value in haystack.items():
             if key == needle:
@@ -35,7 +35,7 @@ def find_keys(haystack: dict, needle: str) -> Generator[str, None, None]:
 
 
 def get_latest_main(image: str) -> str:
-    """return the latest ghcr.io image uri for image"""
+    """Return the latest ghcr.io image uri for image."""
     registry = ContainerRegistry("ghcr.io")
 
     tags = registry.get_tags(image.replace("ghcr.io/", ""))
@@ -49,7 +49,7 @@ def get_latest_main(image: str) -> str:
 
 
 def get_latest_images(config: dict[Any, Any]) -> tuple[dict[str, str], bool]:
-    """return [{image: latest_image}, used_cache] for all homeslice images in the pulumi config"""
+    """Return [{image: latest_image}, used_cache] for all homeslice images in the pulumi config."""
     if Path(CACHE_FILE).exists():
         with open(CACHE_FILE, "r", encoding="utf-8") as f:
             return yaml.safe_load(f), True
@@ -83,7 +83,7 @@ PULUMI_FILE = "Pulumi.prod.yaml"
 
 
 def main():
-    """main()"""
+    """Main function to bump all homeslice images in Pulumi.prod.yaml to the latest from ghcr.io."""
     with open(PULUMI_FILE, "r", encoding="utf-8") as f:
         config = yaml.safe_load(f)
 

@@ -38,5 +38,9 @@ class Clocktime(pulumi.ComponentResource):
 
 
 def app(config: ClocktimeConfig) -> None:
-    """define resources for the homeslice/clocktime app"""
+    """Define resources for the homeslice/clocktime app.
+    
+    Creates a Clocktime ComponentResource with deployment, service, and optional ingress
+    for displaying current time information.
+    """
     Clocktime("clocktime", config)
