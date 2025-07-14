@@ -70,17 +70,7 @@ class Chime(pulumi.ComponentResource):
         self.populate_command = local.Command(
             "populate",
             opts=pulumi.ResourceOptions(depends_on=[nginx]),
-            create=f"""
-                scp {CHIME_SECRET.PATH_TO_CHIME_MP3} \
-                    $(kubectl --context {k8s_context} \
-                        get pv \
-                            $(kubectl --context {k8s_context} \
-                                get pvc {name} -n {namespace} \
-                                -o jsonpath='{{.spec.volumeName}}' \
-                            ) \
-                        -o jsonpath='{{.spec.nodeAffinity.required.nodeSelectorTerms[0].matchExpressions[0].values[0]}}:{{.spec.local.path}}' \
-                    )
-            """,
+            create=f"""scp {CHIME_SECRET.PATH_TO_CHIME_MP3} $(kubectl --context {k8s_context} get pv $(kubectl --context {k8s_context} get pvc {name} -n {namespace} -o jsonpath='{{.spec.volumeName}}') -o jsonpath='{{.spec.nodeAffinity.required.nodeSelectorTerms[0].matchExpressions[0].values[0]}}:{{.spec.local.path}}')""",
             triggers=[nginx],
         )
 
