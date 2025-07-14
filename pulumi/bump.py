@@ -22,7 +22,7 @@ IMAGE_PREFIX = "ghcr.io/mikepartelow"
 LOCAL_REGISTRY = "registry.localdomain:32000"
 
 
-def find_keys(haystack: dict, needle: str) -> Generator[str, None, None]:
+def find_keys(haystack: object, needle: str) -> Generator[str, None, None]:
     """Yield all values of key needle in dict haystack recursively."""
     if isinstance(haystack, dict):
         for key, value in haystack.items():
@@ -53,36 +53,36 @@ def get_latest_images(config: dict[Any, Any]) -> tuple[dict[str, str], bool]:
     if Path(CACHE_FILE).exists():
         with open(CACHE_FILE, "r", encoding="utf-8") as f:
             return yaml.safe_load(f), True
-    else:
-        latest_images: dict[str, str] = {}
+    
+    latest_images: dict[str, str] = {}
 
-        for image in find_keys(config, "image"):
-            logging.info("found image '%s'", image)
+    for image in find_keys(config, "image"):
+        logging.info("found image '%s'", image)
 
-            if image.startswith(IMAGE_PREFIX):
-                base_image = image.split(":")[0]
-            elif image.startswith(LOCAL_REGISTRY):
-                logging.warning("image '%s' hosted locally", image)
-                name = image.split("/")[1].split(":")[0]
-                base_image = f"{IMAGE_BASE}/{name}"
-            else:
-                logging.warning("image '%s' not bumpable", image)
-                continue
+        if image.startswith(IMAGE_PREFIX):
+            base_image = image.split(":")[0]
+        elif image.startswith(LOCAL_REGISTRY):
+            logging.warning("image '%s' hosted locally", image)
+            name = image.split("/")[1].split(":")[0]
+            base_image = f"{IMAGE_BASE}/{name}"
+        else:
+            logging.warning("image '%s' not bumpable", image)
+            continue
 
-            latest = get_latest_main(base_image)
-            latest_images[image] = latest
-            logging.info("got latest: '%s' : '%s'", image, latest)
+        latest = get_latest_main(base_image)
+        latest_images[image] = latest
+        logging.info("got latest: '%s' : '%s'", image, latest)
 
-        with open(CACHE_FILE, "w", encoding="utf-8") as f:
-            yaml.safe_dump(latest_images, f)
+    with open(CACHE_FILE, "w", encoding="utf-8") as f:
+        yaml.safe_dump(latest_images, f)
 
-        return latest_images, False
+    return latest_images, False
 
 
 PULUMI_FILE = "Pulumi.prod.yaml"
 
 
-def main():
+def main() -> None:
     """Main function to bump all homeslice images in Pulumi.prod.yaml to the latest from ghcr.io."""
     with open(PULUMI_FILE, "r", encoding="utf-8") as f:
         config = yaml.safe_load(f)
