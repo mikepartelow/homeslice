@@ -50,14 +50,13 @@ if cfg := config.get_object("buttons"):
     Buttons("buttons", ButtonsConfig(**dict(cfg)))
 
 if cfg := config.get_object("chime"):
-    k8s_context = pulumi.Config("kubernetes").get("context")
-    if k8s_context:
-        Chime(
-            "chime",
-            ChimeConfig(**dict(cfg)),
-            k8s_context,
-            config.require("namespace"),
-        )
+    k8s_context = pulumi.Config("kubernetes").require("context")
+    Chime(
+        "chime",
+        ChimeConfig(**dict(cfg)),
+        k8s_context,
+        config.require("namespace"),
+    )
 
 if cfg := config.get_object("clocktime"):
     Clocktime("clocktime", ClocktimeConfig(**dict(cfg)))
