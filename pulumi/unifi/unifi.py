@@ -4,7 +4,7 @@ import pulumi
 import pulumi_kubernetes as kubernetes
 import homeslice
 import homeslice_config
-from homeslice_secrets import (  # pylint: disable=no-name-in-module
+from homeslice_secrets import (  # pylint: disable=no-name-in-module  # type: ignore
     unifi as UNIFI_SECRETS,
     backup_tidal as TIDAL_SECRETS,
 )

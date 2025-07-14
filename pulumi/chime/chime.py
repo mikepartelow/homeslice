@@ -6,7 +6,7 @@ import pulumi_kubernetes as kubernetes
 from pulumi_command import local
 import homeslice
 import homeslice_config
-from homeslice_secrets import chime as CHIME_SECRET  # pylint: disable=no-name-in-module
+from homeslice_secrets import chime as CHIME_SECRET  # pylint: disable=no-name-in-module  # type: ignore
 
 
 class Chime(pulumi.ComponentResource):

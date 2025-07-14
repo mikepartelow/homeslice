@@ -7,7 +7,7 @@ import pulumi
 import pulumi_kubernetes as kubernetes
 import homeslice
 from homeslice_config import FlyteConfig
-from homeslice_secrets import (  # pylint: disable=no-name-in-module
+from homeslice_secrets import (  # pylint: disable=no-name-in-module  # type: ignore
     flyte as FLYTE_SECRETS,
 )
 
