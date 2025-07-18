@@ -1,100 +1,103 @@
 """Resources for the homeslice/sonos app."""
 
 from pathlib import Path
-
 from pulumi_command import local
-import pulumi_kubernetes as kubernetes
 import pulumi
-import homeslice_config
+import pulumi_kubernetes as kubernetes
 import homeslice
+import homeslice_config
 from homeslice_secrets import (  # pylint: disable=no-name-in-module
     sonos as SONOS_SECRETS,
 )
 
-NAME = "sonos"
 
+class Sonos(pulumi.ComponentResource):
+    """Sonos app resources."""
 
-def app(config: homeslice_config.SonosConfig) -> None:
-    """define resources for the homeslice/sonos app"""
+    def __init__(self, name: str, config: homeslice_config.SonosConfig, opts: pulumi.ResourceOptions | None = None):
+        super().__init__("homeslice:sonos:Sonos", name, {}, opts)
 
-    ports = [
-        kubernetes.core.v1.ContainerPortArgs(
-            name="http",
-            container_port=config.container_port,
-        )
-    ]
+        ports = [
+            kubernetes.core.v1.ContainerPortArgs(
+                name="http",
+                container_port=config.container_port,
+            )
+        ]
 
-    homeslice.configmap(
-        NAME,
-        {
-            "CONFIG_PATH": config.config_path,
-            "SONOS_IPS": ",".join(SONOS_SECRETS.ZONE_IPS),
-            "VOLUME": str(config.volume),
-        },
-    )
-
-    with open("homeslice_secrets/gosonos-config.yaml", encoding="utf-8") as f:
-        config_configmap = homeslice.configmap(
-            f"{NAME}-config",
+        self.configmap = homeslice.configmap(
+            name,
             {
-                Path(config.config_path).name: f.read(),
+                "CONFIG_PATH": config.config_path,
+                "SONOS_IPS": ",".join(SONOS_SECRETS.ZONE_IPS),
+                "VOLUME": str(config.volume),
             },
         )
 
-    volume_mounts = [
-        kubernetes.core.v1.VolumeMountArgs(
-            name=f"{NAME}-config",
-            mount_path=str(Path(config.config_path).parent),
-            read_only=True,
-        )
-    ]
+        with open("homeslice_secrets/gosonos-config.yaml", encoding="utf-8") as f:
+            self.config_configmap = homeslice.configmap(
+                f"{name}-config",
+                {
+                    Path(config.config_path).name: f.read(),
+                },
+            )
 
-    volumes = [
-        kubernetes.core.v1.VolumeArgs(
-            name=f"{NAME}-config",
-            config_map=kubernetes.core.v1.ConfigMapVolumeSourceArgs(
-                name=f"{NAME}-config",
+        volume_mounts = [
+            kubernetes.core.v1.VolumeMountArgs(
+                name=f"{name}-config",
+                mount_path=str(Path(config.config_path).parent),
+                read_only=True,
+            )
+        ]
+
+        volumes = [
+            kubernetes.core.v1.VolumeArgs(
+                name=f"{name}-config",
+                config_map=kubernetes.core.v1.ConfigMapVolumeSourceArgs(
+                    name=f"{name}-config",
+                ),
             ),
-        ),
-    ]
+        ]
 
-    env_from = [homeslice.env_from_configmap(NAME)]
+        env_from = [homeslice.env_from_configmap(name)]
 
-    homeslice.deployment(
-        NAME,
-        config.image,
-        args=["serve"],
-        env_from=env_from,
-        ports=ports,
-        volume_mounts=volume_mounts,
-        volumes=volumes,
-    )
+        self.deployment = homeslice.deployment(
+            name,
+            config.image,
+            args=["serve"],
+            env_from=env_from,
+            ports=ports,
+            volume_mounts=volume_mounts,
+            volumes=volumes,
+        )
 
-    kconfig = pulumi.Config("kubernetes")
-    context = kconfig.require("context")
+        kconfig = pulumi.Config("kubernetes")
+        context = kconfig.require("context")
 
-    local.Command(
-        "roll-sonos",
-        opts=pulumi.ResourceOptions(depends_on=[config_configmap]),
-        create=f"zsh -c 'kubectl --context {context} rollout restart deployment/{NAME} -n homeslice'",  # pylint: disable=C0301
-        triggers=[config_configmap],
-    )
+        self.roll_command = local.Command(
+            "roll-sonos",
+            opts=pulumi.ResourceOptions(depends_on=[self.config_configmap]),
+            create=f"zsh -c 'kubectl --context {context} rollout restart deployment/{name} -n homeslice'",  # pylint: disable=C0301
+            triggers=[self.config_configmap],
+        )
 
-    homeslice.service(NAME)
+        self.service = homeslice.service(name)
 
-    # pylint: disable=R0801
-    homeslice.ingress(
-        NAME,
-        [config.ingress_prefix],
-        path_type="ImplementationSpecific",
-        metadata=homeslice.metadata(
-            NAME,
-            annotations={
-                "nginx.ingress.kubernetes.io/use-regex": "true",
-                "nginx.ingress.kubernetes.io/rewrite-target": "/$2",
-            },
-        ),
-    )
+        if config.ingress_prefix:
+            # pylint: disable=R0801
+            self.ingress = homeslice.ingress(
+                name,
+                [config.ingress_prefix],
+                path_type="ImplementationSpecific",
+                metadata=homeslice.metadata(
+                    name,
+                    annotations={
+                        "nginx.ingress.kubernetes.io/use-regex": "true",
+                        "nginx.ingress.kubernetes.io/rewrite-target": "/$2",
+                    },
+                ),
+            )
+
+        self.register_outputs({})
 
 
 # avoid "name" that could confuse siri

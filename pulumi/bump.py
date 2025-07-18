@@ -10,11 +10,11 @@
 
 """bump all homeslice images in Pulumi.prod.yaml to the latest from ghcr.io"""
 
-from pathlib import Path
-from typing import Generator
 import logging
+from pathlib import Path
+from typing import Any, Generator
 import yaml
-from coregio.registry_api import ContainerRegistry  # pylint: disable=import-error
+from coregio.registry_api import ContainerRegistry  # type: ignore  # pylint: disable=import-error
 
 CACHE_FILE = "./bump-cache.yaml"
 IMAGE_BASE = "ghcr.io/mikepartelow/homeslice"
@@ -22,8 +22,8 @@ IMAGE_PREFIX = "ghcr.io/mikepartelow"
 LOCAL_REGISTRY = "registry.localdomain:32000"
 
 
-def find_keys(haystack: dict, needle: str) -> Generator[str, None, None]:
-    """yield all values of key needle in dict haystack"""
+def find_keys(haystack: object, needle: str) -> Generator[str, None, None]:
+    """Yield all values of key needle in dict haystack recursively."""
     if isinstance(haystack, dict):
         for key, value in haystack.items():
             if key == needle:
@@ -35,7 +35,7 @@ def find_keys(haystack: dict, needle: str) -> Generator[str, None, None]:
 
 
 def get_latest_main(image: str) -> str:
-    """return the latest ghcr.io image uri for image"""
+    """Return the latest ghcr.io image uri for image."""
     registry = ContainerRegistry("ghcr.io")
 
     tags = registry.get_tags(image.replace("ghcr.io/", ""))
@@ -48,42 +48,42 @@ def get_latest_main(image: str) -> str:
     return f"{image}:{latest_tag}@{digest}"
 
 
-def get_latest_images(config: dict[any, any]) -> tuple[dict[str, str], bool]:
-    """return [{image: latest_image}, used_cache] for all homeslice images in the pulumi config"""
+def get_latest_images(config: dict[Any, Any]) -> tuple[dict[str, str], bool]:
+    """Return [{image: latest_image}, used_cache] for all homeslice images in the pulumi config."""
     if Path(CACHE_FILE).exists():
         with open(CACHE_FILE, "r", encoding="utf-8") as f:
             return yaml.safe_load(f), True
-    else:
-        latest_images: dict[str, str] = {}
+    
+    latest_images: dict[str, str] = {}
 
-        for image in find_keys(config, "image"):
-            logging.info("found image '%s'", image)
+    for image in find_keys(config, "image"):
+        logging.info("found image '%s'", image)
 
-            if image.startswith(IMAGE_PREFIX):
-                base_image = image.split(":")[0]
-            elif image.startswith(LOCAL_REGISTRY):
-                logging.warning("image '%s' hosted locally", image)
-                name = image.split("/")[1].split(":")[0]
-                base_image = f"{IMAGE_BASE}/{name}"
-            else:
-                logging.warning("image '%s' not bumpable", image)
-                continue
+        if image.startswith(IMAGE_PREFIX):
+            base_image = image.split(":")[0]
+        elif image.startswith(LOCAL_REGISTRY):
+            logging.warning("image '%s' hosted locally", image)
+            name = image.split("/")[1].split(":")[0]
+            base_image = f"{IMAGE_BASE}/{name}"
+        else:
+            logging.warning("image '%s' not bumpable", image)
+            continue
 
-            latest = get_latest_main(base_image)
-            latest_images[image] = latest
-            logging.info("got latest: '%s' : '%s'", image, latest)
+        latest = get_latest_main(base_image)
+        latest_images[image] = latest
+        logging.info("got latest: '%s' : '%s'", image, latest)
 
-        with open(CACHE_FILE, "w", encoding="utf-8") as f:
-            yaml.safe_dump(latest_images, f)
+    with open(CACHE_FILE, "w", encoding="utf-8") as f:
+        yaml.safe_dump(latest_images, f)
 
-        return latest_images, False
+    return latest_images, False
 
 
 PULUMI_FILE = "Pulumi.prod.yaml"
 
 
-def main():
-    """main()"""
+def main() -> None:
+    """Main function to bump all homeslice images in Pulumi.prod.yaml to the latest from ghcr.io."""
     with open(PULUMI_FILE, "r", encoding="utf-8") as f:
         config = yaml.safe_load(f)
 

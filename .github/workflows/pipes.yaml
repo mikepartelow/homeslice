@@ -68,6 +68,10 @@ jobs:
         uses: astral-sh/ruff-action@v3
         with:
           args: "--version"
+      - name: Install a pep440-specifier-satisfying version of uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          version: ">=0.4.25,<0.5"
       - name: setup python
         uses: actions/setup-python@v3
         with:

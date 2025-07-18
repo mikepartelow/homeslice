@@ -2,30 +2,36 @@
 
 import pulumi
 import homeslice
+from homeslice_config import ClocktimeConfig
 
-NAME = "clocktime"
 
+class Clocktime(pulumi.ComponentResource):
+    """Clocktime app resources."""
 
-def app(config: pulumi.Config) -> None:
-    """define resources for the homeslice/clocktime app"""
-    image = config["image"]
-    container_port = int(config["container_port"])
-    location = config["location"]
-    ingress_prefix = config.get("ingress_prefix")
+    def __init__(self, name: str, config: ClocktimeConfig, opts: pulumi.ResourceOptions | None = None):
+        super().__init__("homeslice:clocktime:Clocktime", name, {}, opts)
 
-    homeslice.configmap(
-        NAME,
-        {
-            "LOCATION": location,
-        },
-    )
+        image = config.image
+        container_port = config.container_port
+        location = config.location
+        ingress_prefix = config.ingress_prefix
 
-    env_from = [homeslice.env_from_configmap(NAME)]
+        self.configmap = homeslice.configmap(
+            name,
+            {
+                "LOCATION": location,
+            },
+        )
 
-    ports = [homeslice.port(container_port, name="http")]
+        env_from = [homeslice.env_from_configmap(name)]
 
-    homeslice.deployment(NAME, image, env_from=env_from, ports=ports)
+        ports = [homeslice.port(container_port, name="http")]
 
-    homeslice.service(NAME)
+        self.deployment = homeslice.deployment(name, image, env_from=env_from, ports=ports)
 
-    homeslice.ingress(NAME, [ingress_prefix])
+        self.service = homeslice.service(name)
+
+        if ingress_prefix:
+            self.ingress = homeslice.ingress(name, [ingress_prefix])
+
+        self.register_outputs({})
