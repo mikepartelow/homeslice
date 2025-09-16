@@ -93,16 +93,16 @@ config:
       [
         {
           "id": "switch0",
-          "kind": "wemo/v1",
+          "kind": "kasa/v1",
           "name": "Living Room Torch",
-          "address": "a.b.c.d",
+          "address": "{{Living Room Torch}}",
           "port": 49154
         },
         {
           "id": "kbulb0",
           "kind": "kasa/v1",
           "name": "Captain's Quarters",
-          "address": "w.x.y.z"
+          "address": "{{Captain's Quarters}}"
         }
       ]
     switches_json_path: /var/run/switches.json
