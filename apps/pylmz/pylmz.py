@@ -1,7 +1,7 @@
 """web api to turn a la marzocco on and off"""
 
 import asyncio
-import uuid
+import signal
 from pathlib import Path
 
 from aiohttp import ClientSession
@@ -12,6 +12,11 @@ from pylamarzocco.util import InstallationKey
 import logging
 import os
 import sys
+
+from aiohttp import web
+
+PORT = 8000
+
 
 log_level_str = os.getenv("LOG_LEVEL", "INFO").upper()
 log_level = getattr(logging, log_level_str, logging.INFO)
@@ -64,19 +69,75 @@ class Machine(LaMarzoccoMachine):
         raise IndexError("oops")
 
 
+# from __future__ import annotations
+
+
+def create_app(machine: Machine) -> web.Application:
+    async def on_handler(_: web.Request) -> web.Response:
+        try:
+            await machine.set_power(True)
+        except Exception:
+            return web.Response(status=500)
+        return web.Response(status=204)
+
+    async def off_handler(_: web.Request) -> web.Response:
+        try:
+            await machine.set_power(False)
+        except Exception:
+            return web.Response(status=500)
+        return web.Response(status=204)
+
+    async def status_handler(_: web.Request) -> web.Response:
+        try:
+            status = await machine.status()
+        except Exception:
+            return web.Response(status=500)
+
+        if status == "PoweredOn":
+            return web.Response(text="1", status=200)
+        if status == "StandBy":
+            return web.Response(text="0", status=200)
+        return web.Response(status=500)
+
+    app = web.Application()
+    app.router.add_get("/on", on_handler)
+    app.router.add_get("/off", off_handler)
+    app.router.add_get("/status", status_handler)
+
+    return app
+
+
+async def run_app_async(app: web.Application, host: str = "0.0.0.0", port: int = PORT):
+    runner = web.AppRunner(app)
+    await runner.setup()
+
+    site = web.TCPSite(runner, host=host, port=port)
+    await site.start()
+
+    stop = asyncio.Event()
+    loop = asyncio.get_running_loop()
+
+    for sig in (signal.SIGINT, signal.SIGTERM):
+        try:
+            loop.add_signal_handler(sig, stop.set)
+        except NotImplementedError:
+            pass
+
+    try:
+        await stop.wait()
+    finally:
+        await runner.cleanup()
+
+
 async def main():
     creds = Credentials()
 
     async with ClientSession() as session:
         machine = Machine(session, creds)
-        status = await machine.status()
+        app = create_app(machine)
 
-        print("status", status)
-
-        if status == "StandBy":
-            await machine.set_power(True)
-        elif status == "PoweredOn":
-            await machine.set_power(False)
+        await run_app_async(app, host="0.0.0.0", port=PORT)
 
 
-asyncio.run(main())
+if __name__ == "__main__":
+    asyncio.run(main())

@@ -18,6 +18,7 @@ test:
 # FIXME: share with pulumi
 lint:
 	ruff check
+	uvx mypy .
 
 fmt:
 	ruff check --fix
