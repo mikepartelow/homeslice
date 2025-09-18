@@ -1,0 +1,12 @@
+[project]
+name = ""
+version = "0.0.1"
+dependencies = [
+    "pylamarzocco>=2.1.0",
+]
+
+[tool.uv]
+package = false
+
+[tool.mypy]
+ignore_missing_imports = true

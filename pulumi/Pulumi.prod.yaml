@@ -62,10 +62,11 @@ config:
         repo: https://flyteorg.github.io/flyte
         values-resource: onprem-flyte-binary-values.yaml
   homeslice:lmz:
-    image: registry.localdomain:32000/lmz:20250526_162736
+    image: registry.localdomain:32000/pylmz:20250917_213002
     container_port: 8000
     ingress_prefix: /(api/v0/lmz)/(.*)$
-    lmz_yaml_path: /home/nonroot/.config/lmz/config.yaml
+    installation_key_json_path: /home/nonroot/.config/pylmz/installation_key/installation_key.json
+    creds_txt_path: /home/nonroot/.config/pylmz/creds/creds.txt
   # homeslice:observability:
   #   hostname: moe.localdomain
   #   namespace: observability
