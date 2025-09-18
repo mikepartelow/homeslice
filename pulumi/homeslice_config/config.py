@@ -67,7 +67,8 @@ class LmzConfig(BaseModel):
 
     image: str
     container_port: int
-    lmz_yaml_path: str
+    installation_key_json_path: str
+    creds_txt_path: str
     ingress_prefix: Optional[str]
 
 

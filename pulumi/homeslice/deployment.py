@@ -11,6 +11,7 @@ def deployment(
     command: Optional[List[str]] = None,
     args: Optional[List[str]] = None,
     replicas: int = 1,
+    env: Optional[List[kubernetes.core.v1.EnvVarArgs]] = None,
     env_from: Optional[List[kubernetes.core.v1.EnvFromSourceArgs]] = None,
     ports: Optional[List[kubernetes.core.v1.ContainerPortArgs]] = None,
     volumes: Optional[List[kubernetes.core.v1.VolumeArgs]] = None,
@@ -24,7 +25,7 @@ def deployment(
 
     metadata = homeslice.metadata(name)
 
-    for a in ("args", "command", "env_from", "ports", "volume_mounts", "volumes"):
+    for a in ("args", "command", "env", "env_from", "ports", "volume_mounts", "volumes"):
         locals()[a] = locals()[a] or []
 
     tolerations = [
@@ -64,6 +65,7 @@ def deployment(
                             image=image,
                             args=args,
                             command=command,
+                            env=env,
                             env_from=env_from,
                             ports=ports,
                             volume_mounts=volume_mounts,

@@ -36,16 +36,13 @@ class Credentials:
     password: str
     serial: str
 
-    def __init__(self):
-        key_file = Path("installation_key.json")
-        creds_file = Path("creds.txt")
-
+    def __init__(self, installation_key_path: Path, creds_path: Path):
         logger.info("Loading key")
-        with open(key_file, "r", encoding="utf-8") as f:
+        with open(installation_key_path, "r", encoding="utf-8") as f:
             self.installation_key = InstallationKey.from_json(f.read())
 
         logger.info("Loading creds")
-        with open(creds_file, "r", encoding="utf-8") as f:
+        with open(creds_path, "r", encoding="utf-8") as f:
             self.username = f.readline().strip()
             self.password = f.readline().strip()
             self.serial = f.readline().strip()
@@ -67,9 +64,6 @@ class Machine(LaMarzoccoMachine):
             if widget["code"] == "CMMachineStatus":
                 return widget["output"]["status"] # StandBy or PoweredOn
         raise IndexError("oops")
-
-
-# from __future__ import annotations
 
 
 def create_app(machine: Machine) -> web.Application:
@@ -100,9 +94,10 @@ def create_app(machine: Machine) -> web.Application:
         return web.Response(status=500)
 
     app = web.Application()
-    app.router.add_get("/on", on_handler)
-    app.router.add_get("/off", off_handler)
-    app.router.add_get("/status", status_handler)
+    # add_get() is case sensitive
+    app.router.add_get("/ON", on_handler)
+    app.router.add_get("/OFF", off_handler)
+    app.router.add_get("/STATUS", status_handler)
 
     return app
 
@@ -130,7 +125,10 @@ async def run_app_async(app: web.Application, host: str = "0.0.0.0", port: int =
 
 
 async def main():
-    creds = Credentials()
+    creds = Credentials(
+        installation_key_path=Path(os.environ["INSTALLATION_KEY_PATH"]),
+        creds_path=Path(os.environ["CREDS_PATH"])
+    )
 
     async with ClientSession() as session:
         machine = Machine(session, creds)
