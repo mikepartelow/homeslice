@@ -1,5 +1,7 @@
 # go-sonos
 
+Use the following (or modified) [Homebridge HTTP](https://github.com/rudders/homebridge-http) config to wire HomeKit up to `go-sonos`.
+
 ```json
 
 {
