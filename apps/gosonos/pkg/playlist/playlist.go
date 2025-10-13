@@ -72,6 +72,12 @@ func (p *Playlist) Enqueue(player player.Player) error {
 		if err := player.AddShareLink(p.ShareLink); err != nil {
 			return fmt.Errorf("error adding share link %q from playlist %q to player %q: %w", p.ShareLink, p.Name, player.Address().String(), err)
 		}
+
+		var err error
+		p.playingTracks, err = p.ShareLinkTracks()
+		if err != nil {
+			return fmt.Errorf("error fetching share link tracks: %w", err)
+		}
 	} else if len(p.Tracks) > 0 {
 		rand.Shuffle(len(p.Tracks), func(i, j int) {
 			p.Tracks[i], p.Tracks[j] = p.Tracks[j], p.Tracks[i]
@@ -133,6 +139,7 @@ func (p *Playlist) IsPlayingOn(player player.Player) (bool, error) {
 	})
 
 	for i, t := range queueTracks {
+		p.Logger.Debug("IsPlayingOn", "p.playingTracks[i].TrackID()", p.playingTracks[i].TrackID(), "t.TrackID()", t.TrackID())
 		if p.playingTracks[i].TrackID() != t.TrackID() {
 			return p.isPlayingOn.SetValue(false), nil
 		}
@@ -176,6 +183,13 @@ func New(id curation.ID, name string, kind curation.Kind, tracks []track.Track, 
 	p.init()
 
 	return &p, nil
+}
+
+func (p *Playlist) ShareLinkTracks() ([]track.Track, error) {
+	if p.ShareLink == "" {
+		panic("no share link")
+	}
+	return fetchShareLinkTracks(p.ShareLink)
 }
 
 func (p *Playlist) init() {

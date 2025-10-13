@@ -367,10 +367,10 @@ func (p *Player) Queue() ([]track.Track, error) {
 			break
 		}
 
-		fmt.Println(dl.Items)
-
 		for _, item := range dl.Items {
-			// Apple Music: x-sonos-http:librarytrack%3ai.3VBNbzOUpK5q5x.mp4?sid=204&flags=8232&sn=421
+			// Apple Music:
+			//   - x-sonos-http:librarytrack%3ai.3VBNbzOUpK5q5x.mp4?sid=204&flags=8232&sn=421
+			//   - x-sonos-http:song%3a310111228.mp4?sid=204&flags=8232&sn=421
 			// Tidal: x-sonos-http:track%2f2619614.flac?sid=174&flags=8232&sn=34
 			// sid is service id and could be used to identify the track kind, but we're too lazy for that
 
@@ -379,7 +379,7 @@ func (p *Player) Queue() ([]track.Track, error) {
 			var t track.Track
 
 			// FIXME: this belongs in a helper function in track
-			if strings.HasPrefix(uri, "x-sonos-http:librarytrack%3a") {
+			if strings.HasPrefix(uri, "x-sonos-http:librarytrack%3a") || strings.HasPrefix(uri, "x-sonos-http:song%3a") {
 				// Apple Music
 				id := fmt.Sprintf("%s|%s|%s", item.Album, item.Creator, item.Title)
 				t = &playlist.AppleMusicTrack{ID: track.TrackID((id))}
@@ -390,7 +390,7 @@ func (p *Player) Queue() ([]track.Track, error) {
 					ID: track.TrackID(id),
 				}
 			} else {
-				panic("unhandled music service")
+				panic(fmt.Sprintf("unhandled music service: %q", uri))
 			}
 
 			tracks = append(tracks, t)
