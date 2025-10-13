@@ -51,11 +51,12 @@ type config struct {
 }
 
 type cfgplaylist struct {
-	ID       string   `yaml:"id"`
-	Kind     string   `yaml:"kind"`
-	Name     string   `yaml:"name"`
-	TrackIDs []string `yaml:"track_ids"`
-	Volume   *int     `yaml:"volume"`
+	ID        string   `yaml:"id"`
+	Kind      string   `yaml:"kind"`
+	Name      string   `yaml:"name"`
+	TrackIDs  []string `yaml:"track_ids"`
+	ShareLink string   `yaml:"share_link"`
+	Volume    *int     `yaml:"volume"`
 }
 
 type cfgstation struct {
@@ -121,8 +122,8 @@ func (c *Config) Write(w io.Writer) error {
 			}
 
 			playlists = append(playlists, cfgplaylist{
-				Kind:     "tidalplaylist/v1",
 				ID:       pl.ID.String(),
+				Kind:     pl.Kind.String(),
 				Name:     pl.Name,
 				Volume:   (*int)(&pl.Volume),
 				TrackIDs: trackIDs,
@@ -177,7 +178,12 @@ func makePlaylists(cfg config, m map[curation.ID]curation.Curation, logger *slog
 			return fmt.Errorf("error parsing playlist id %q: %w", pl.ID, err)
 		}
 
-		p, err := playlist.New(id, pl.Name, tracks, player.Volume(*pl.Volume), logger)
+		kind, err := curation.ParseKind(pl.Kind)
+		if err != nil {
+			return fmt.Errorf("error parsing playlist kind %q: %w", pl.Kind, err)
+		}
+
+		p, err := playlist.New(id, pl.Name, kind, tracks, pl.ShareLink, player.Volume(*pl.Volume), logger)
 		if err != nil {
 			return fmt.Errorf("error creating Playlist: %w", err)
 		}

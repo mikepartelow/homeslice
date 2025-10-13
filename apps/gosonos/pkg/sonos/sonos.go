@@ -29,6 +29,7 @@ type Player struct {
 	Logger *slog.Logger
 
 	addTracksXmlTemplate         *template.Template
+	addUriToQueueXmlTemplate     *template.Template
 	addTrackDidlLiteXmlTemplate  *template.Template
 	joinXmlTemplate              *template.Template
 	playURIXmlTemplate           *template.Template
@@ -53,6 +54,35 @@ func (p *Player) UID() string {
 
 func (p *Player) GetLogger() *slog.Logger {
 	return p.Logger
+}
+
+func (p *Player) AddShareLink(shareLink string) error {
+	p.init()
+
+	endpoint := "MediaRenderer/AVTransport/Control"
+	action := "urn:schemas-upnp-org:service:AVTransport:1#AddURIToQueue"
+
+	logger := p.Logger.With("method", "AddShareLink", "player", p.Address().String(), "share link", shareLink)
+	logger.Info("", "endpoint", endpoint)
+
+	// Given: https://music.apple.com/us/playlist/lost-due-to-incompetence/pl.u-38oWX9ECvqDrDL
+	// Want: pl.u-38oWX9ECvqDrDL
+	parts := strings.Split(shareLink, "/")
+	shareLinkID := parts[len(parts)-1]
+
+	var addUriToQueueXml bytes.Buffer
+	err := p.addUriToQueueXmlTemplate.Execute(&addUriToQueueXml, struct {
+		ShareLinkID string
+	}{
+		ShareLinkID: shareLinkID,
+	})
+	if err != nil {
+		return fmt.Errorf("error executing addUriToQueue XML template: %w", err)
+	}
+
+	return p.post(endpoint, action, addUriToQueueXml.String(), func(r io.Reader) error {
+		return nil
+	})
 }
 
 func (p *Player) AddTracks(tracks []track.Track) error {
@@ -338,18 +368,40 @@ func (p *Player) Queue() ([]track.Track, error) {
 		}
 
 		for _, item := range dl.Items {
-			// x-sonos-http:track%2f2619614.flac?sid=174&flags=8232&sn=34
-			// FIXME: some if statement to determine this is actually a tidal track
-			uri := item.Res.Value
-			id := strings.Split(strings.Split(uri, "%2f")[1], ".")[0]
-			track := playlist.TidalTrack{
-				ID: track.TrackID(id),
-			}
-			tracks = append(tracks, &track)
+			tracks = append(tracks, makeTrack(&item))
 		}
 	}
 
 	return tracks, nil
+}
+
+func makeTrack(item *soap.Item) track.Track {
+	// Apple Music:
+	//   - x-sonos-http:librarytrack%3ai.3VBNbzOUpK5q5x.mp4?sid=204&flags=8232&sn=421
+	//   - x-sonos-http:song%3a310111228.mp4?sid=204&flags=8232&sn=421
+	// Tidal: x-sonos-http:track%2f2619614.flac?sid=174&flags=8232&sn=34
+	//
+	// sid is service id and could be used to identify the track kind.
+
+	uri := item.Res.Value
+
+	var t track.Track
+
+	if strings.HasPrefix(uri, "x-sonos-http:librarytrack%3a") || strings.HasPrefix(uri, "x-sonos-http:song%3a") {
+		// Apple Music
+		id := track.MakeID(item.Album, item.Creator, item.Title)
+		t = &playlist.AppleMusicTrack{ID: track.TrackID((id))}
+	} else if strings.HasPrefix(uri, "x-sonos-http:track%2f") {
+		// Tidal
+		id := strings.Split(strings.Split(uri, "%2f")[1], ".")[0]
+		t = &playlist.TidalTrack{
+			ID: track.TrackID(id),
+		}
+	} else {
+		panic(fmt.Sprintf("unhandled music service: %q", uri))
+	}
+
+	return t
 }
 
 func (p *Player) Seek(position uint) error {
@@ -480,6 +532,9 @@ var addTrackDidlLiteXmlTemplate string
 //go:embed requests/add_tracks.xml.tmpl
 var addTracksXmlTemplate string
 
+//go:embed requests/add_uri_to_queue.xml.tmpl
+var addUriToQueueXmlTemplate string
+
 //go:embed requests/join.xml.tmpl
 var joinXmlTemplate string
 
@@ -509,6 +564,9 @@ func (p *Player) init() {
 	}
 	if p.addTracksXmlTemplate == nil {
 		p.addTracksXmlTemplate = mustParseTemplate("addTracksXml", addTracksXmlTemplate)
+	}
+	if p.addUriToQueueXmlTemplate == nil {
+		p.addUriToQueueXmlTemplate = mustParseTemplate("addUriToQueueXml", addUriToQueueXmlTemplate)
 	}
 	if p.joinXmlTemplate == nil {
 		p.joinXmlTemplate = mustParseTemplate("joinXml", joinXmlTemplate)

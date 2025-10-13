@@ -22,6 +22,22 @@ Use the following (or modified) [Homebridge HTTP](https://github.com/rudders/hom
 
 {
     "accessory": "Http",
+    "name": "ratatouille",
+    "switchHandling": "yes",
+    "http_method": "POST",
+    "on_url": "http://moe.localdomain/api/v0/sonos/curations/lost-due-to-incompetence/play",
+    "off_url": "http://moe.localdomain/api/v0/sonos/curations/lost-due-to-incompetence/pause",
+    "status_url": "http://moe.localdomain/api/v0/sonos/curations/lost-due-to-incompetence/status",
+    "status_on": "ON",
+    "status_off": "OFF",
+    "service": "Switch",
+    "sendimmediately": "",
+    "username": "",
+    "password": ""
+}
+
+{
+    "accessory": "Http",
     "name": "secret agent",
     "switchHandling": "yes",
     "http_method": "POST",

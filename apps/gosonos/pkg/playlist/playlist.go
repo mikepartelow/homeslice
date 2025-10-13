@@ -16,11 +16,25 @@ import (
 	"github.com/phsym/console-slog"
 )
 
+type AppleMusicTrack struct {
+	ID track.TrackID
+}
+
 type TidalTrack struct {
 	ID track.TrackID
 }
 
+var _ track.Track = &AppleMusicTrack{}
 var _ track.Track = &TidalTrack{}
+
+func (t *AppleMusicTrack) TrackID() track.TrackID {
+	return t.ID
+}
+
+func (t *AppleMusicTrack) URI() track.URI {
+	// x-sonos-http:librarytrack%3ai.3VBNbzOUpK5q5x.mp4?sid=204&flags=8232&sn=421
+	return track.URI("x-sonos-http:librarytrack%3a" + string(t.ID) + ".flac?sid=174&amp;flags=24616&amp;sn=34")
+}
 
 func (t *TidalTrack) TrackID() track.TrackID {
 	return t.ID
@@ -40,8 +54,10 @@ type Playlist struct {
 	ID               curation.ID
 	Logger           *slog.Logger
 	MaxPlayingTracks int
+	Kind             curation.Kind
 	Name             string
 	Tracks           []track.Track
+	ShareLink        string
 	Volume           player.Volume
 
 	playingTracks []track.Track
@@ -52,15 +68,30 @@ var _ curation.Curation = &Playlist{}
 
 // Enqueue enqueues a shuffled subset of maximum length Playlist.MaxPlayingTracks to player.
 func (p *Playlist) Enqueue(player player.Player) error {
-	rand.Shuffle(len(p.Tracks), func(i, j int) {
-		p.Tracks[i], p.Tracks[j] = p.Tracks[j], p.Tracks[i]
-	})
+	if p.ShareLink != "" {
+		if err := player.AddShareLink(p.ShareLink); err != nil {
+			return fmt.Errorf("error adding share link %q from playlist %q to player %q: %w", p.ShareLink, p.Name, player.Address().String(), err)
+		}
 
-	p.playingTracks = p.Tracks[0:min(p.MaxPlayingTracks, len(p.Tracks))]
+		var err error
+		p.playingTracks, err = p.ShareLinkTracks()
+		if err != nil {
+			return fmt.Errorf("error fetching share link tracks: %w", err)
+		}
+	} else if len(p.Tracks) > 0 {
+		rand.Shuffle(len(p.Tracks), func(i, j int) {
+			p.Tracks[i], p.Tracks[j] = p.Tracks[j], p.Tracks[i]
+		})
 
-	if err := player.AddTracks(p.playingTracks); err != nil {
-		return fmt.Errorf("error adding tracks from playlist %q to player %q: %w", p.Name, player.Address().String(), err)
+		p.playingTracks = p.Tracks[0:min(p.MaxPlayingTracks, len(p.Tracks))]
+
+		if err := player.AddTracks(p.playingTracks); err != nil {
+			return fmt.Errorf("error adding tracks from playlist %q to player %q: %w", p.Name, player.Address().String(), err)
+		}
+	} else {
+		panic("invalid playlist")
 	}
+
 	return nil
 }
 
@@ -108,6 +139,7 @@ func (p *Playlist) IsPlayingOn(player player.Player) (bool, error) {
 	})
 
 	for i, t := range queueTracks {
+		p.Logger.Debug("IsPlayingOn", "p.playingTracks[i].TrackID()", p.playingTracks[i].TrackID(), "t.TrackID()", t.TrackID())
 		if p.playingTracks[i].TrackID() != t.TrackID() {
 			return p.isPlayingOn.SetValue(false), nil
 		}
@@ -134,21 +166,30 @@ func (p *Playlist) Play(player player.Player) error {
 	return nil
 }
 
-func New(id curation.ID, name string, tracks []track.Track, volume player.Volume, logger *slog.Logger) (*Playlist, error) {
-	if len(tracks) == 0 {
-		return nil, fmt.Errorf("no tracks")
+func New(id curation.ID, name string, kind curation.Kind, tracks []track.Track, shareLink string, volume player.Volume, logger *slog.Logger) (*Playlist, error) {
+	if len(tracks) == 0 && shareLink == "" {
+		return nil, fmt.Errorf("no tracks, no share link")
 	}
 
 	p := Playlist{
-		ID:     id,
-		Logger: logger,
-		Name:   name,
-		Tracks: tracks,
-		Volume: volume,
+		ID:        id,
+		Kind:      kind,
+		Logger:    logger,
+		Name:      name,
+		Tracks:    tracks,
+		ShareLink: shareLink,
+		Volume:    volume,
 	}
 	p.init()
 
 	return &p, nil
+}
+
+func (p *Playlist) ShareLinkTracks() ([]track.Track, error) {
+	if p.ShareLink == "" {
+		panic("no share link")
+	}
+	return fetchShareLinkTracks(p.ShareLink)
 }
 
 func (p *Playlist) init() {
