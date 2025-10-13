@@ -10,6 +10,8 @@ import (
 	"time"
 )
 
+// NOTE: a lot of this was LLM generated.
+
 func fetch(u string) ([]byte, error) {
 	req, err := http.NewRequest("GET", u, nil)
 	if err != nil {
@@ -21,7 +23,7 @@ func fetch(u string) ([]byte, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error doing HTTP Request: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("HTTP error %d: %s", resp.StatusCode, resp.Status)
@@ -53,22 +55,19 @@ type tEntry struct {
 
 var serDataRe = regexp.MustCompile(`(?is)<script[^>]+id=["']serialized-server-data["'][^>]*>(.*?)</script>`)
 
-func parsePlaylistHTML(html []byte) ([][3]string, error) {
-	// 1) Extract the JSON array inside the script tag.
+func parsePlaylistHTML(html []byte) ([]track.Track, error) {
 	m := serDataRe.FindSubmatch(html)
 	if m == nil {
 		return nil, fmt.Errorf("serialized-server-data script not found")
 	}
 	raw := m[1]
 
-	// 2) Unmarshal the outer array; each element has .data.sections...
 	var pages []docRoot
 	if err := json.Unmarshal(raw, &pages); err != nil {
 		return nil, fmt.Errorf("unmarshal serialized-server-data: %w", err)
 	}
 
-	// 3) Walk sections for itemKind=="trackLockup" and collect rows.
-	var rows [][3]string // (Album, Creator, Title)
+	var tracks []track.Track
 	for _, p := range pages {
 		for _, s := range p.Data.Sections {
 			if s.ItemKind != "trackLockup" {
@@ -84,14 +83,14 @@ func parsePlaylistHTML(html []byte) ([][3]string, error) {
 				if len(it.TertiaryLinks) > 0 {
 					album = it.TertiaryLinks[0].Title
 				}
-				// Only keep well-formed rows
 				if title != "" || artist != "" || album != "" {
-					rows = append(rows, [3]string{album, artist, title})
+					id := track.MakeID(album, artist, title)
+					tracks = append(tracks, &AppleMusicTrack{ID: track.TrackID((id))})
 				}
 			}
 		}
 	}
-	return rows, nil
+	return tracks, nil
 }
 
 func fetchShareLinkTracks(shareLink string) ([]track.Track, error) {
@@ -100,16 +99,5 @@ func fetchShareLinkTracks(shareLink string) ([]track.Track, error) {
 		return nil, fmt.Errorf("error fetching tracks from sharelink %q: %w", shareLink, err)
 	}
 
-	rows, err := parsePlaylistHTML(html)
-	if err != nil {
-		return nil, fmt.Errorf("error parsing tracks from sharelink %q: %w", shareLink, err)
-	}
-
-	var tracks []track.Track
-	for _, r := range rows {
-		id := fmt.Sprintf("%s|%s|%s", r[0], r[1], r[2])
-		tracks = append(tracks, &AppleMusicTrack{ID: track.TrackID((id))})
-	}
-
-	return tracks, nil
+	return parsePlaylistHTML(html)
 }

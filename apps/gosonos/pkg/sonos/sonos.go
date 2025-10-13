@@ -389,7 +389,7 @@ func makeTrack(item *soap.Item) track.Track {
 
 	if strings.HasPrefix(uri, "x-sonos-http:librarytrack%3a") || strings.HasPrefix(uri, "x-sonos-http:song%3a") {
 		// Apple Music
-		id := fmt.Sprintf("%s|%s|%s", item.Album, item.Creator, item.Title)
+		id := track.MakeID(item.Album, item.Creator, item.Title)
 		t = &playlist.AppleMusicTrack{ID: track.TrackID((id))}
 	} else if strings.HasPrefix(uri, "x-sonos-http:track%2f") {
 		// Tidal
