@@ -1,2 +1,4 @@
+*.backup
 *.py
 *.mp3
+*.yaml

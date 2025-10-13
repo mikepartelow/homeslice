@@ -1,25 +1,23 @@
-FROM python:3.12.1@sha256:a3d69b8412f7068fd060ccc7e175825713d5a767e1e14753e75bce6f746c8a7e AS venv
-
-COPY requirements.txt /tmp/requirements.txt
-
-RUN python -m venv --copies /venv && \
-    /venv/bin/pip install --upgrade pip && \
-    /venv/bin/pip install --require-virtualenv --no-deps -r /tmp/requirements.txt
-
-FROM python AS dev
-
-COPY --from=venv /venv /venv
+FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim@sha256:0ddac20e6ed02c16bc5f3881619d4ef959427f2ffbe246db87b375b133523be3 AS dev
 
 WORKDIR /app
-COPY backup_unifi.py backup_unifi.py
-COPY lib lib
 
-ENV PATH=/venv/bin:$PATH
+RUN --mount=type=cache,target=/root/.cache/uv \
+    --mount=type=bind,source=uv.lock,target=uv.lock \
+    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
+    uv sync --frozen --no-install-project
 
-FROM dev AS prod
+ADD . /app
 
-WORKDIR /app
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --frozen
+
+FROM python:3.12@sha256:4e7024df2f2099e87d0a41893c299230d2a974c3474e681b0996f141951f9817 AS prod
+
+COPY --from=dev --chown=app:app /app/.venv /app/.venv
+ADD ./backup_unifi.py /app/backup_unifi.py
+ADD ./lib /app/lib
 
 USER nobody
 
-ENTRYPOINT ["/app/backup_unifi.py"]
+ENTRYPOINT ["/app/.venv/bin/python", "/app/backup_unifi.py"]

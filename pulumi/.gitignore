@@ -1,3 +1,4 @@
+bump-cache.yaml
 .envrc
 *.pyc
 /.venv

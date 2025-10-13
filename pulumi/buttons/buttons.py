@@ -2,30 +2,36 @@
 
 import pulumi
 import homeslice
+from homeslice_config import ButtonsConfig
 
-NAME = "buttons"
 
+class Buttons(pulumi.ComponentResource):
+    """Buttons app resources."""
 
-def app(config: pulumi.Config) -> None:
-    """define resources for the homeslice/buttons app"""
-    image = config["image"]
-    container_port = int(config["container_port"])
-    clocktime_url = config["clocktime_url"]
-    ingress_prefixes = config.get("ingress_prefixes")
+    def __init__(self, name: str, config: ButtonsConfig, opts: pulumi.ResourceOptions | None = None):
+        super().__init__("homeslice:buttons:Buttons", name, {}, opts)
 
-    homeslice.configmap(
-        NAME,
-        {
-            "CLOCKTIME_URL": clocktime_url,
-        },
-    )
+        image = config.image
+        container_port = config.container_port
+        clocktime_url = config.clocktime_url
+        ingress_prefixes = config.ingress_prefixes
 
-    env_from = [homeslice.env_from_configmap(NAME)]
+        self.configmap = homeslice.configmap(
+            name,
+            {
+                "CLOCKTIME_URL": clocktime_url,
+            },
+        )
 
-    ports = [homeslice.port(container_port, name="http")]
+        env_from = [homeslice.env_from_configmap(name)]
 
-    homeslice.deployment(NAME, image, env_from=env_from, ports=ports)
+        ports = [homeslice.port(container_port, name="http")]
 
-    homeslice.service(NAME)
+        self.deployment = homeslice.deployment(name, image, env_from=env_from, ports=ports)
 
-    homeslice.ingress(NAME, ingress_prefixes)
+        self.service = homeslice.service(name)
+
+        if ingress_prefixes:
+            self.ingress = homeslice.ingress(name, ingress_prefixes)
+
+        self.register_outputs({})

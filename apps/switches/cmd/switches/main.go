@@ -21,6 +21,7 @@ type switchConfig struct {
 	Kind    string `json:"kind"`
 	Name    string `json:"name"`
 	Address string `json:"address"`
+	Port    int    `json:"port"`
 }
 
 func main() {
@@ -41,6 +42,7 @@ func main() {
 				Id:      cfg.Id,
 				Name:    cfg.Name,
 				Address: net.ParseIP(cfg.Address),
+				Port:    cfg.Port,
 				Logger:  logger,
 			})
 		} else if cfg.Kind == "kasa/v1" {

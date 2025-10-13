@@ -2,5 +2,6 @@ name: homeslice
 runtime:
   name: python
   options:
+    toolchain: uv
     virtualenv: .venv
 description: homeslice home automation

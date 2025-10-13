@@ -16,17 +16,11 @@ test:
 	echo FIXME
 
 # FIXME: share with pulumi
-VENV_LINT := ./.venv.lint
-venv-lint:
-	python3 -m venv $(VENV_LINT)
-	$(VENV_LINT)/bin/pip install --no-deps -r requirements-lint.txt -r requirements.txt
+lint:
+	ruff check
 
-lint: venv-lint
-	$(VENV_LINT)/bin/black --exclude '.venv.*' --check .
-	$(VENV_LINT)/bin/pylint --ignore-paths=.venv,.venv.lint "**/*.py"
-
-fmt: venv-lint
-	$(VENV_LINT)/bin/black --exclude '.venv.*' .
+fmt:
+	ruff check --fix
 
 VENV := ./.venv
 venv:
@@ -37,7 +31,7 @@ login: dev
 	docker run --rm --entrypoint '' -ti ${--shell-args} $(PROJECT)-dev ./login_tidal.py
 
 backup: dev
-	docker run --rm --entrypoint '' -ti ${--shell-args} $(PROJECT)-dev ./backup_tidal.py
+	docker run --rm --entrypoint '' -v`pwd`/tmp:/tmp -ti ${--shell-args} $(PROJECT)-dev ./backup_tidal.py
 
 lint: copy-libs
 
@@ -46,3 +40,10 @@ build: copy-libs
 copy-libs:
 	cp -v ../pylib/git.py lib/git.py
 	cp -v ../pylib/github_backup.py lib/github_backup.py
+
+UNAVAILABLE_JSON_PATH := tmp/unavailable.json
+find-unavailable:
+	jq '[.[] | select(.available == false)]' tmp/mega_playlist.json > $(UNAVAILABLE_JSON_PATH)
+
+remedy-unavailables: dev
+	docker run --rm --entrypoint '' -v`pwd`/tmp:/tmp -ti ${--shell-args} $(PROJECT)-dev ./remedy_unavailables.py /$(UNAVAILABLE_JSON_PATH) "remedied jamboree"

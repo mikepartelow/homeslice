@@ -39,7 +39,7 @@ def main():
         snap = snapshot.Snapshot(member)
         try:
             snap.snapshot()
-        except:  # pylint: disable=bare-except
+        except:  # noqa: E722
             print(f"  exception: snap {member.player_name}")
             continue
         snapshots.append(snap)
@@ -50,7 +50,7 @@ def main():
         ):
             try:
                 member.pause()
-            except:  # pylint: disable=bare-except
+            except:  # noqa: E722
                 print(f"  exception: pause {member.player_name}")
                 continue
     for member in zone.group.members:
@@ -67,7 +67,7 @@ def main():
     for snap in snapshots:
         try:
             snap.restore(fade=False)
-        except:  # pylint: disable=bare-except
+        except:  # noqa: E722
             print(f"  exception: restore {member.player_name}")
             continue
 

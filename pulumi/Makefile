@@ -1,20 +1,15 @@
-.PHONY: venv venv-lint lint fmt
+.PHONY: lint fmt
 all: lint
 
-VENV := .venv
-venv:
-	python3 -m venv $(VENV)
-	$(VENV)/bin/pip install -r requirements.txt
+bump:
+	rm -f bump-cache.yaml
+	uv run --no-project ./bump.py
 
-# FIXME: share with chime
-VENV_LINT := ./.venv.lint
-venv-lint:
-	python3 -m venv $(VENV_LINT)
-	$(VENV_LINT)/bin/pip install --no-deps -r requirements-lint.txt -r requirements.txt
+# FIXME: refactor to a common Python lint/fmt
+make fmt:
+	@ruff check --fix
+	@ruff format
 
-lint: venv-lint
-	$(VENV_LINT)/bin/black --exclude '.venv.*' --check .
-	$(VENV_LINT)/bin/pylint --ignore-paths=.venv,.venv.lint "**/*.py"
-
-fmt: venv-lint
-	$(VENV_LINT)/bin/black --exclude '.venv.*' .
+lint:
+	@ruff check
+	@uv run mypy .

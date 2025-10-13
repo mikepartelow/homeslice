@@ -1,0 +1,6 @@
+[project]
+name = ""
+version = "0.0.1"
+
+[tool.uv]
+package = false
