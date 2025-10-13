@@ -39,12 +39,12 @@ type Item struct {
 
 	ParentID    string `xml:"parentID,attr"`
 	Restricted  bool   `xml:"restricted,attr"`
-	Title       string `xml:"dc:title"`
-	Class       string `xml:"upnp:class"`
-	Album       string `xml:"upnp:album"`
-	Creator     string `xml:"dc:creator"`
-	AlbumArtURI string `xml:"upnp:albumArtURI"`
-	AlbumArtist string `xml:"r:albumArtist"`
+	Title       string `xml:"title"`
+	Class       string `xml:"class"`
+	Album       string `xml:"album"`
+	Creator     string `xml:"creator"`
+	AlbumArtURI string `xml:"albumArtURI"`
+	AlbumArtist string `xml:"albumArtist"`
 }
 
 type Desc struct {

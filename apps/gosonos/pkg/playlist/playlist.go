@@ -16,11 +16,25 @@ import (
 	"github.com/phsym/console-slog"
 )
 
+type AppleMusicTrack struct {
+	ID track.TrackID
+}
+
 type TidalTrack struct {
 	ID track.TrackID
 }
 
+var _ track.Track = &AppleMusicTrack{}
 var _ track.Track = &TidalTrack{}
+
+func (t *AppleMusicTrack) TrackID() track.TrackID {
+	return t.ID
+}
+
+func (t *AppleMusicTrack) URI() track.URI {
+	// x-sonos-http:librarytrack%3ai.3VBNbzOUpK5q5x.mp4?sid=204&flags=8232&sn=421
+	return track.URI("x-sonos-http:librarytrack%3a" + string(t.ID) + ".flac?sid=174&amp;flags=24616&amp;sn=34")
+}
 
 func (t *TidalTrack) TrackID() track.TrackID {
 	return t.ID
@@ -40,8 +54,10 @@ type Playlist struct {
 	ID               curation.ID
 	Logger           *slog.Logger
 	MaxPlayingTracks int
+	Kind             curation.Kind
 	Name             string
 	Tracks           []track.Track
+	ShareLink        string
 	Volume           player.Volume
 
 	playingTracks []track.Track
@@ -134,17 +150,19 @@ func (p *Playlist) Play(player player.Player) error {
 	return nil
 }
 
-func New(id curation.ID, name string, tracks []track.Track, volume player.Volume, logger *slog.Logger) (*Playlist, error) {
-	if len(tracks) == 0 {
-		return nil, fmt.Errorf("no tracks")
+func New(id curation.ID, name string, kind curation.Kind, tracks []track.Track, shareLink string, volume player.Volume, logger *slog.Logger) (*Playlist, error) {
+	if len(tracks) == 0 && shareLink == "" {
+		return nil, fmt.Errorf("no tracks, no share link")
 	}
 
 	p := Playlist{
-		ID:     id,
-		Logger: logger,
-		Name:   name,
-		Tracks: tracks,
-		Volume: volume,
+		ID:        id,
+		Kind:      kind,
+		Logger:    logger,
+		Name:      name,
+		Tracks:    tracks,
+		ShareLink: shareLink,
+		Volume:    volume,
 	}
 	p.init()
 

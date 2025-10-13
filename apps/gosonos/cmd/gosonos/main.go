@@ -54,6 +54,13 @@ func serve() *cli.Command {
 				Port:   int(cmd.Int("port")),
 			}
 
+			p := server.Players[0]
+			qq, err := p.Queue()
+			if err != nil {
+				panic(err)
+			}
+			fmt.Println(qq)
+
 			if err := server.Serve(); err != nil {
 				return cli.Exit(err.Error(), 1)
 			}
