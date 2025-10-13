@@ -29,6 +29,7 @@ type Player struct {
 	Logger *slog.Logger
 
 	addTracksXmlTemplate         *template.Template
+	addUriToQueueXmlTemplate     *template.Template
 	addTrackDidlLiteXmlTemplate  *template.Template
 	joinXmlTemplate              *template.Template
 	playURIXmlTemplate           *template.Template
@@ -53,6 +54,35 @@ func (p *Player) UID() string {
 
 func (p *Player) GetLogger() *slog.Logger {
 	return p.Logger
+}
+
+func (p *Player) AddShareLink(shareLink string) error {
+	p.init()
+
+	endpoint := "MediaRenderer/AVTransport/Control"
+	action := "urn:schemas-upnp-org:service:AVTransport:1#AddURIToQueue"
+
+	logger := p.Logger.With("method", "AddShareLink", "player", p.Address().String(), "share link", shareLink)
+	logger.Info("", "endpoint", endpoint)
+
+	// Given: https://music.apple.com/us/playlist/lost-due-to-incompetence/pl.u-38oWX9ECvqDrDL
+	// Want: pl.u-38oWX9ECvqDrDL
+	parts := strings.Split(shareLink, "/")
+	shareLinkID := parts[len(parts)-1]
+
+	var addUriToQueueXml bytes.Buffer
+	err := p.addUriToQueueXmlTemplate.Execute(&addUriToQueueXml, struct {
+		ShareLinkID string
+	}{
+		ShareLinkID: shareLinkID,
+	})
+	if err != nil {
+		return fmt.Errorf("error executing addUriToQueue XML template: %w", err)
+	}
+
+	return p.post(endpoint, action, addUriToQueueXml.String(), func(r io.Reader) error {
+		return nil
+	})
 }
 
 func (p *Player) AddTracks(tracks []track.Track) error {
@@ -498,6 +528,9 @@ var addTrackDidlLiteXmlTemplate string
 //go:embed requests/add_tracks.xml.tmpl
 var addTracksXmlTemplate string
 
+//go:embed requests/add_uri_to_queue.xml.tmpl
+var addUriToQueueXmlTemplate string
+
 //go:embed requests/join.xml.tmpl
 var joinXmlTemplate string
 
@@ -527,6 +560,9 @@ func (p *Player) init() {
 	}
 	if p.addTracksXmlTemplate == nil {
 		p.addTracksXmlTemplate = mustParseTemplate("addTracksXml", addTracksXmlTemplate)
+	}
+	if p.addUriToQueueXmlTemplate == nil {
+		p.addUriToQueueXmlTemplate = mustParseTemplate("addUriToQueueXml", addUriToQueueXmlTemplate)
 	}
 	if p.joinXmlTemplate == nil {
 		p.joinXmlTemplate = mustParseTemplate("joinXml", joinXmlTemplate)

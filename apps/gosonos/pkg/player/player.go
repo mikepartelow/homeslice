@@ -14,6 +14,7 @@ const (
 
 type Player interface {
 	Address() net.Addr
+	AddShareLink(string) error
 	AddTracks([]track.Track) error
 	Channel() (string, error)
 	ClearQueue() error

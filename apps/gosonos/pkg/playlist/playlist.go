@@ -68,15 +68,24 @@ var _ curation.Curation = &Playlist{}
 
 // Enqueue enqueues a shuffled subset of maximum length Playlist.MaxPlayingTracks to player.
 func (p *Playlist) Enqueue(player player.Player) error {
-	rand.Shuffle(len(p.Tracks), func(i, j int) {
-		p.Tracks[i], p.Tracks[j] = p.Tracks[j], p.Tracks[i]
-	})
+	if p.ShareLink != "" {
+		if err := player.AddShareLink(p.ShareLink); err != nil {
+			return fmt.Errorf("error adding share link %q from playlist %q to player %q: %w", p.ShareLink, p.Name, player.Address().String(), err)
+		}
+	} else if len(p.Tracks) > 0 {
+		rand.Shuffle(len(p.Tracks), func(i, j int) {
+			p.Tracks[i], p.Tracks[j] = p.Tracks[j], p.Tracks[i]
+		})
 
-	p.playingTracks = p.Tracks[0:min(p.MaxPlayingTracks, len(p.Tracks))]
+		p.playingTracks = p.Tracks[0:min(p.MaxPlayingTracks, len(p.Tracks))]
 
-	if err := player.AddTracks(p.playingTracks); err != nil {
-		return fmt.Errorf("error adding tracks from playlist %q to player %q: %w", p.Name, player.Address().String(), err)
+		if err := player.AddTracks(p.playingTracks); err != nil {
+			return fmt.Errorf("error adding tracks from playlist %q to player %q: %w", p.Name, player.Address().String(), err)
+		}
+	} else {
+		panic("invalid playlist")
 	}
+
 	return nil
 }
 
