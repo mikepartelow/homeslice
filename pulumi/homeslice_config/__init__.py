@@ -1,6 +1,5 @@
 """Homeslice Config"""
 
-from .config import BackupTidalConfig as BackupTidalConfig
 from .config import BackupTodoistConfig as BackupTodoistConfig
 from .config import ButtonsConfig as ButtonsConfig
 from .config import ChimeConfig as ChimeConfig

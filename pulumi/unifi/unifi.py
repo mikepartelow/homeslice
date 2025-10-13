@@ -6,7 +6,6 @@ import homeslice
 import homeslice_config
 from homeslice_secrets import (  # pylint: disable=no-name-in-module
     unifi as UNIFI_SECRETS,
-    backup_tidal as TIDAL_SECRETS,
 )
 
 
@@ -36,7 +35,7 @@ class Unifi(pulumi.ComponentResource):
         )
 
         config.git_clone_url = UNIFI_SECRETS.GIT_CLONE_URL
-        config.ssh_private_key = TIDAL_SECRETS.SSH_PRIVATE_KEY.encode() if TIDAL_SECRETS.SSH_PRIVATE_KEY else None
+        config.ssh_private_key = UNIFI_SECRETS.SSH_PRIVATE_KEY.encode() if UNIFI_SECRETS.SSH_PRIVATE_KEY else None
         btg = homeslice.BackupToGithub(name, config)
 
         self.configmap = homeslice.configmap(name, btg.configmap_items)
