@@ -368,36 +368,40 @@ func (p *Player) Queue() ([]track.Track, error) {
 		}
 
 		for _, item := range dl.Items {
-			// Apple Music:
-			//   - x-sonos-http:librarytrack%3ai.3VBNbzOUpK5q5x.mp4?sid=204&flags=8232&sn=421
-			//   - x-sonos-http:song%3a310111228.mp4?sid=204&flags=8232&sn=421
-			// Tidal: x-sonos-http:track%2f2619614.flac?sid=174&flags=8232&sn=34
-			// sid is service id and could be used to identify the track kind, but we're too lazy for that
-
-			uri := item.Res.Value
-
-			var t track.Track
-
-			// FIXME: this belongs in a helper function in track
-			if strings.HasPrefix(uri, "x-sonos-http:librarytrack%3a") || strings.HasPrefix(uri, "x-sonos-http:song%3a") {
-				// Apple Music
-				id := fmt.Sprintf("%s|%s|%s", item.Album, item.Creator, item.Title)
-				t = &playlist.AppleMusicTrack{ID: track.TrackID((id))}
-			} else if strings.HasPrefix(uri, "x-sonos-http:track%2f") {
-				// Tidal
-				id := strings.Split(strings.Split(uri, "%2f")[1], ".")[0]
-				t = &playlist.TidalTrack{
-					ID: track.TrackID(id),
-				}
-			} else {
-				panic(fmt.Sprintf("unhandled music service: %q", uri))
-			}
-
-			tracks = append(tracks, t)
+			tracks = append(tracks, makeTrack(&item))
 		}
 	}
 
 	return tracks, nil
+}
+
+func makeTrack(item *soap.Item) track.Track {
+	// Apple Music:
+	//   - x-sonos-http:librarytrack%3ai.3VBNbzOUpK5q5x.mp4?sid=204&flags=8232&sn=421
+	//   - x-sonos-http:song%3a310111228.mp4?sid=204&flags=8232&sn=421
+	// Tidal: x-sonos-http:track%2f2619614.flac?sid=174&flags=8232&sn=34
+	//
+	// sid is service id and could be used to identify the track kind.
+
+	uri := item.Res.Value
+
+	var t track.Track
+
+	if strings.HasPrefix(uri, "x-sonos-http:librarytrack%3a") || strings.HasPrefix(uri, "x-sonos-http:song%3a") {
+		// Apple Music
+		id := fmt.Sprintf("%s|%s|%s", item.Album, item.Creator, item.Title)
+		t = &playlist.AppleMusicTrack{ID: track.TrackID((id))}
+	} else if strings.HasPrefix(uri, "x-sonos-http:track%2f") {
+		// Tidal
+		id := strings.Split(strings.Split(uri, "%2f")[1], ".")[0]
+		t = &playlist.TidalTrack{
+			ID: track.TrackID(id),
+		}
+	} else {
+		panic(fmt.Sprintf("unhandled music service: %q", uri))
+	}
+
+	return t
 }
 
 func (p *Player) Seek(position uint) error {
