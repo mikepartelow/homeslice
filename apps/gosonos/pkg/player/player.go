@@ -15,7 +15,6 @@ const (
 type Player interface {
 	Address() net.Addr
 	AddShareLink(string) error
-	AddTracks([]track.Track) error
 	Channel() (string, error)
 	ClearQueue() error
 	GetLogger() *slog.Logger
@@ -27,6 +26,7 @@ type Player interface {
 	Queue() ([]track.Track, error)
 	Seek(uint) error
 	SetVolume(volume Volume) error
+	Shuffle() error
 	UID() string
 	Unjoin() error
 }
