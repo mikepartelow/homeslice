@@ -448,7 +448,7 @@ func (p *Player) post(endpoint, action, body string, callback func(io.Reader) er
 	if err != nil {
 		return fmt.Errorf("error doing HTTP Request: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("HTTP error %d: %s", resp.StatusCode, resp.Status)
@@ -515,7 +515,7 @@ func (p *Player) init() {
 		if err != nil {
 			panic(fmt.Errorf("error fetching device info for %s: %w", p.Address().String(), err))
 		}
-		defer resp.Body.Close()
+		defer func() { _ = resp.Body.Close() }()
 		body, err := io.ReadAll(resp.Body)
 		if err != nil {
 			panic(fmt.Errorf("error fetching device info for %s: %w", p.Address().String(), err))

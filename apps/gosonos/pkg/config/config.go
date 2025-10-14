@@ -32,7 +32,7 @@ func (c *Config) Load(configPath string) (*slog.Logger, error) {
 	if err != nil {
 		return nil, fmt.Errorf("couldn't open config file at %q: %w", configPath, err)
 	}
-	defer file.Close()
+	defer func() { _ = file.Close() }()
 
 	err = c.parse(file, logger)
 	if err != nil {

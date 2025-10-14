@@ -2,11 +2,8 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"mp/gosonos/pkg/config"
-	"mp/gosonos/pkg/curation"
-	"mp/gosonos/pkg/playlist"
 	"mp/gosonos/pkg/server"
 	"os"
 
@@ -71,25 +68,4 @@ func serve() *cli.Command {
 			},
 		},
 	}
-}
-
-func getPlaylist(configPath, playlistID string) (*playlist.Playlist, *config.Config, error) {
-	var cfg config.Config
-
-	_, err := cfg.Load(configPath)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	cid, err := curation.ParseID(playlistID)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	pl, ok := cfg.Curations[cid].(*playlist.Playlist)
-	if !ok {
-		return nil, nil, fmt.Errorf("curation %q is not a Playlist", pl.GetID())
-	}
-
-	return pl, &cfg, nil
 }
