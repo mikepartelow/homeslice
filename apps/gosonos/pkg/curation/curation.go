@@ -12,6 +12,7 @@ import (
 
 type Curation interface {
 	Enqueue(player.Player) error
+	Shuffle(player.Player) error
 	IsPlayingOn(player.Player) (bool, error)
 	Play(player.Player) error
 
@@ -90,6 +91,11 @@ func Play(c Curation, coordinator player.Player, players []player.Player, wg *sy
 		logger.Debug("Enqueue")
 		if err := c.Enqueue(coordinator); err != nil {
 			logger.Error("error enqueuing", "error", fmt.Errorf("couldn't enqueue curation on coordinator %q: %w", coordinator.Address().String(), err))
+		}
+
+		logger.Debug("Shuffle")
+		if err := c.Shuffle(coordinator); err != nil {
+			logger.Error("error shuffling", "error", fmt.Errorf("couldn't shuffle curation on coordinator %q: %w", coordinator.Address().String(), err))
 		}
 
 		logger.Debug("Play")
