@@ -1,10 +1,5 @@
 encryptionsalt: v1:VKuGdX6V+cI=:v1:NjPNhDyrBhgOUzh7:ZORqZH2ALQT0/D+qYIhNJOAoCraRjw==
 config:
-  homeslice:backup_tidal:
-    git_author_email: github@mikepartelow.com
-    git_author_name: Mike Partelow
-    image: ghcr.io/mikepartelow/homeslice/backup-tidal:main.20250918-043612.3ac39b9@sha256:410075268a86be4c08f0357daddc029c17298ab30db255e5cba9a9d7320be7e1
-    schedule: 0 1 * * *
   homeslice:backup_todoist:
     git_author_email: github@mikepartelow.com
     git_author_name: Mike Partelow
@@ -81,7 +76,7 @@ config:
   #   promtail_chart_version: "6.16.3"
   homeslice:namespace: homeslice
   homeslice:sonos:
-    image: registry.localdomain:32000/gosonos:20251012_215549
+    image: registry.localdomain:32000/gosonos:20251013_075008
     container_port: 8000
     config_path: /etc/sonos/config.yaml
     ingress_prefix: /(api/v0/sonos/)(.*)$
