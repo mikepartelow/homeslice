@@ -12,18 +12,18 @@ dependencies = [
     "grpcio==1.60.2",
     "idna==3.7",
     "parver==0.5",
-    "protobuf==4.25.4",
+    "protobuf==4.25.8",
     "pulumi==3.128.0",
     "pulumi-command==1.0.1",
     "pulumi-kubernetes==4.16.0",
     "pydantic==2.8.2",
     "pydantic-core==2.20.1",
     "pyyaml==6.0.2",
-    "requests==2.32.3",
+    "requests==2.32.4",
     "semver==2.13.0",
     "six==1.16.0",
     "typing-extensions==4.12.2",
-    "urllib3==2.2.2",
+    "urllib3==2.5.0",
 ]
 
 [tool.uv]

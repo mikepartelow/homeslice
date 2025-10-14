@@ -8,10 +8,10 @@ dependencies = [
     "idna==3.7",
     "ifaddr==0.2.0",
     "lxml==4.9.3",
-    "requests==2.32.2",
-    "setuptools==70.0.0",
+    "requests==2.32.4",
+    "setuptools==78.1.1",
     "soco==0.29.1",
-    "urllib3==2.2.2",
+    "urllib3==2.5.0",
     "wheel==0.41.2",
     "xmltodict==0.13.0",
 ]
