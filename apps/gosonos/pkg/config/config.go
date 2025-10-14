@@ -168,11 +168,6 @@ func makePlaylists(cfg config, m map[curation.ID]curation.Curation, logger *slog
 			pl.Volume = &n
 		}
 
-		var tracks []track.Track
-		for _, t := range pl.TrackIDs {
-			tracks = append(tracks, &playlist.TidalTrack{ID: track.TrackID(t)})
-		}
-
 		id, err := curation.ParseID(pl.ID)
 		if err != nil {
 			return fmt.Errorf("error parsing playlist id %q: %w", pl.ID, err)
@@ -183,7 +178,7 @@ func makePlaylists(cfg config, m map[curation.ID]curation.Curation, logger *slog
 			return fmt.Errorf("error parsing playlist kind %q: %w", pl.Kind, err)
 		}
 
-		p, err := playlist.New(id, pl.Name, kind, tracks, pl.ShareLink, player.Volume(*pl.Volume), logger)
+		p, err := playlist.New(id, pl.Name, kind, pl.ShareLink, player.Volume(*pl.Volume), logger)
 		if err != nil {
 			return fmt.Errorf("error creating Playlist: %w", err)
 		}

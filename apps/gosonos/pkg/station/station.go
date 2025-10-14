@@ -31,6 +31,10 @@ func (s *Station) Enqueue(player player.Player) error {
 	return player.PlayURI(s.URI, s.Name)
 }
 
+func (s *Station) Shuffle(player player.Player) error {
+	return nil
+}
+
 var _ curation.Curation = &Station{}
 
 func (s *Station) GetID() curation.ID {

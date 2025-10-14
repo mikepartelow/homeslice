@@ -2,16 +2,13 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"log"
 	"mp/gosonos/pkg/config"
 	"mp/gosonos/pkg/curation"
 	"mp/gosonos/pkg/playlist"
 	"mp/gosonos/pkg/server"
-	"mp/gosonos/pkg/track"
 	"os"
-	"strconv"
 
 	"github.com/urfave/cli/v3"
 )
@@ -22,7 +19,6 @@ func main() {
 		Usage: "sonos ops server and cli",
 		Commands: []*cli.Command{
 			serve(),
-			updateConfig(),
 		},
 	}
 
@@ -75,90 +71,6 @@ func serve() *cli.Command {
 			},
 		},
 	}
-}
-
-func updateConfig() *cli.Command {
-	return &cli.Command{
-		Name:    "update-config",
-		Aliases: []string{"uc"},
-		Usage:   "update config from a tidal backup",
-		Action: func(ctx context.Context, cmd *cli.Command) error {
-			pl, cfg, err := getPlaylist(cmd.String("config"), cmd.String("playlist-id"))
-			if err != nil {
-				_ = cli.Exit(err.Error(), 1)
-			}
-
-			tracks, err := chooseBackupTracks(cmd.String("tidal-backup"))
-			if err != nil {
-				_ = cli.Exit(err.Error(), 1)
-			}
-
-			pl.Tracks = tracks
-
-			ofile, err := os.Create(cmd.String("output"))
-			if err != nil {
-				_ = cli.Exit(err.Error(), 1)
-			}
-			defer ofile.Close()
-
-			err = cfg.Write(ofile)
-			if err != nil {
-				_ = cli.Exit(err.Error(), 1)
-			}
-
-			return nil
-		},
-		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:     "config",
-				Usage:    "load configuration from `FILE`",
-				Sources:  cli.EnvVars("CONFIG_PATH"),
-				Required: true,
-			},
-			&cli.StringFlag{
-				Name:     "playlist-id",
-				Usage:    "update playlist `PLAYLIST_ID`",
-				Sources:  cli.EnvVars("PLAYLIST_ID"),
-				Required: true,
-			},
-			&cli.StringFlag{
-				Name:     "output",
-				Usage:    "output to `FILE`",
-				Required: true,
-			},
-			&cli.StringFlag{
-				Name:     "tidal-backup",
-				Usage:    "load track ids from Tidal Backup `FILE`",
-				Sources:  cli.EnvVars("TIDAL_BACKUP_PATH"),
-				Required: true,
-			},
-		},
-	}
-}
-
-func chooseBackupTracks(backupFilename string) ([]track.Track, error) {
-	type BackupTidalTrack struct {
-		ID int `json:"id"`
-	}
-
-	file, err := os.Open(backupFilename)
-	if err != nil {
-		return nil, err
-	}
-	defer file.Close()
-
-	var backup []BackupTidalTrack
-	err = json.NewDecoder(file).Decode(&backup)
-	if err != nil {
-		return nil, err
-	}
-
-	var tracks []track.Track
-	for _, btt := range backup {
-		tracks = append(tracks, &playlist.TidalTrack{ID: track.TrackID(strconv.Itoa(btt.ID))})
-	}
-
-	return tracks, nil
 }
 
 func getPlaylist(configPath, playlistID string) (*playlist.Playlist, *config.Config, error) {

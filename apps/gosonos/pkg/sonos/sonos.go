@@ -28,9 +28,7 @@ type Player struct {
 	Addr   net.Addr
 	Logger *slog.Logger
 
-	addTracksXmlTemplate         *template.Template
 	addUriToQueueXmlTemplate     *template.Template
-	addTrackDidlLiteXmlTemplate  *template.Template
 	joinXmlTemplate              *template.Template
 	playURIXmlTemplate           *template.Template
 	queueXmlTemplate             *template.Template
@@ -83,80 +81,6 @@ func (p *Player) AddShareLink(shareLink string) error {
 	return p.post(endpoint, action, addUriToQueueXml.String(), func(r io.Reader) error {
 		return nil
 	})
-}
-
-func (p *Player) AddTracks(tracks []track.Track) error {
-	p.init()
-
-	// implementation detail: the maximum number of tracks we can send in a single SOAP call.
-	// more than this and Sonos returns HTTP 500. experimentally determined to be 16
-	// however, if Sonos "doesn't like" any of the track ids, it will 500 the whole request
-	// so we don't add the max to slightly limit the blast radius
-	const AddTracksMax = 8
-
-	endpoint := "MediaRenderer/AVTransport/Control"
-	action := "urn:schemas-upnp-org:service:AVTransport:1#AddMultipleURIsToQueue"
-
-	logger := p.Logger.With("method", "AddTracks", "player", p.Address().String())
-	logger.Info("", "endpoint", endpoint)
-
-	var uris, didls string
-	var count int
-
-	for i, t := range tracks {
-		tid := t.TrackID()
-		// tid := "140695808" // always fails
-		// tid := "21078302" // should work
-		uris = uris + string(t.URI()) + " " // the " " is required!
-
-		// in this template, whitespace is extremely significant. make sure there isn't any!
-		var addTrackDidlLiteXML bytes.Buffer
-		err := p.addTrackDidlLiteXmlTemplate.Execute(&addTrackDidlLiteXML, struct {
-			TrackId string
-		}{
-			TrackId: string(tid),
-		})
-		if err != nil {
-			return fmt.Errorf("error executing addTracks XML template: %w", err)
-		}
-
-		didls += addTrackDidlLiteXML.String()
-		count++
-
-		if (count > 0 && count == AddTracksMax) || i == len(tracks)-1 {
-			didls = strings.TrimSpace(didls)
-
-			var addTracksXML bytes.Buffer
-			err := p.addTracksXmlTemplate.Execute(&addTracksXML, struct {
-				Count    int
-				URIs     string
-				Metadata string
-			}{
-				Count:    count,
-				URIs:     uris,
-				Metadata: didls,
-			})
-			if err != nil {
-				return fmt.Errorf("error executing addTracks XML template: %w", err)
-			}
-
-			logger.Debug("posting", "count", count, "len(uris)", strings.Count(uris, " "))
-
-			err = p.post(endpoint, action, addTracksXML.String(), func(r io.Reader) error {
-				return nil
-			})
-			// some tracks, like 140695808, give us a HTTP 500 every time we try to add them
-			// so we can't take errors here too seriously.
-			if err != nil {
-				logger.Error("error enqueing tracks", "uris", uris, "error", err)
-			}
-
-			didls, uris = "", ""
-			count = 0
-		}
-	}
-	logger.Debug("bye")
-	return nil
 }
 
 //	if zone.get_current_media_info()["channel"] != self.title:
@@ -375,11 +299,27 @@ func (p *Player) Queue() ([]track.Track, error) {
 	return tracks, nil
 }
 
+// Shuffle operation has no variables, and so is not a template
+//
+//go:embed requests/shuffle.xml
+var shuffleXml string
+
+func (p *Player) Shuffle() error {
+	p.init()
+
+	endpoint := "MediaRenderer/AVTransport/Control"
+	action := "urn:schemas-upnp-org:service:AVTransport:1#SetPlayMode"
+
+	logger := p.Logger.With("method", "Play", "player", p.Address().String())
+	logger.Info("", "endpoint", endpoint)
+
+	return p.post(endpoint, action, shuffleXml, nil)
+}
+
 func makeTrack(item *soap.Item) track.Track {
 	// Apple Music:
 	//   - x-sonos-http:librarytrack%3ai.3VBNbzOUpK5q5x.mp4?sid=204&flags=8232&sn=421
 	//   - x-sonos-http:song%3a310111228.mp4?sid=204&flags=8232&sn=421
-	// Tidal: x-sonos-http:track%2f2619614.flac?sid=174&flags=8232&sn=34
 	//
 	// sid is service id and could be used to identify the track kind.
 
@@ -391,12 +331,6 @@ func makeTrack(item *soap.Item) track.Track {
 		// Apple Music
 		id := track.MakeID(item.Album, item.Creator, item.Title)
 		t = &playlist.AppleMusicTrack{ID: track.TrackID((id))}
-	} else if strings.HasPrefix(uri, "x-sonos-http:track%2f") {
-		// Tidal
-		id := strings.Split(strings.Split(uri, "%2f")[1], ".")[0]
-		t = &playlist.TidalTrack{
-			ID: track.TrackID(id),
-		}
 	} else {
 		panic(fmt.Sprintf("unhandled music service: %q", uri))
 	}
@@ -526,12 +460,6 @@ func (p *Player) post(endpoint, action, body string, callback func(io.Reader) er
 	return nil
 }
 
-//go:embed requests/add_track_didl_lite.xml.tmpl
-var addTrackDidlLiteXmlTemplate string
-
-//go:embed requests/add_tracks.xml.tmpl
-var addTracksXmlTemplate string
-
 //go:embed requests/add_uri_to_queue.xml.tmpl
 var addUriToQueueXmlTemplate string
 
@@ -558,12 +486,6 @@ func (p *Player) init() {
 		p.Logger = slog.New(
 			console.NewHandler(os.Stderr, &console.HandlerOptions{Level: slog.LevelError}),
 		)
-	}
-	if p.addTrackDidlLiteXmlTemplate == nil {
-		p.addTrackDidlLiteXmlTemplate = mustParseTemplate("addTrackDidlLiteXml", addTrackDidlLiteXmlTemplate)
-	}
-	if p.addTracksXmlTemplate == nil {
-		p.addTracksXmlTemplate = mustParseTemplate("addTracksXml", addTracksXmlTemplate)
 	}
 	if p.addUriToQueueXmlTemplate == nil {
 		p.addUriToQueueXmlTemplate = mustParseTemplate("addUriToQueueXml", addUriToQueueXmlTemplate)
