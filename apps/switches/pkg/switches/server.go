@@ -67,5 +67,5 @@ func (s Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	s.logger.Debug("op result", "err", err, "op", op, "id", id)
 
-	fmt.Fprintf(w, "OK")
+	_, _ = fmt.Fprintf(w, "OK")
 }
