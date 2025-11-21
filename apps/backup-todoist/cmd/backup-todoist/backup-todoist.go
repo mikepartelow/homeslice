@@ -97,13 +97,13 @@ func (b *BackerUpper) pushBackup(publicKeys *ssh.PublicKeys, writer func(io.Writ
 	if err != nil {
 		return fmt.Errorf("couldn't open file %q: %w", repoFilename, err)
 	}
-	defer file.Close()
+	defer func() { _ = file.Close() }()
 
 	err = writer(file)
 	if err != nil {
 		return fmt.Errorf("couldn't write file %q: %w", repoFilename, err)
 	}
-	file.Close()
+	defer func() { _ = file.Close() }()
 
 	_, err = worktree.Add(b.Filename)
 	if err != nil {

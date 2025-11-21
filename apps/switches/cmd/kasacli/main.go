@@ -38,7 +38,7 @@ func main() {
 
 	file, err := os.Open(configPath)
 	check(err, fmt.Sprintf("Error: couldn't open config file at %q", configPath))
-	defer file.Close()
+	defer func() { _ = file.Close() }()
 
 	var cfg config
 	err = yaml.NewDecoder(file).Decode(&cfg)
