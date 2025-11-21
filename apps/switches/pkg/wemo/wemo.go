@@ -103,7 +103,7 @@ func (w *Wemo) do(op Operation, state State) (State, error) {
 	if err != nil {
 		return None, fmt.Errorf("error POSTing op %s: %w", op, err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	body, _ := io.ReadAll(resp.Body)
 	logger.Debug("wemo response (raw)", "status", resp.StatusCode, "body", body)

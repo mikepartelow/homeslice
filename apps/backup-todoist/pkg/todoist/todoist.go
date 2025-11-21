@@ -100,7 +100,7 @@ func (c *Client) do(resource string, things interface{}) error {
 	if err != nil {
 		return fmt.Errorf("http error: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("http status error: %d", resp.StatusCode)

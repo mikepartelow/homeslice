@@ -28,7 +28,7 @@ func main() {
 	logger := mustMakeLogger()
 	if len(os.Args) != 2 {
 		logger.Error("missing path to switches.json")
-		_, _ = os.Stderr.Write([]byte(fmt.Sprintf("Usage: %s /path/to/switches.json", os.Args[0])))
+		_, _ = fmt.Fprintf(os.Stderr, "Usage: %s /path/to/switches.json", os.Args[0])
 		os.Exit(1)
 	}
 	configPath := os.Args[1]
@@ -37,7 +37,8 @@ func main() {
 	for _, cfg := range mustParseConfigs(configPath, logger) {
 		logger.Debug("got switch cfg", "cfg", cfg)
 
-		if cfg.Kind == "wemo/v1" {
+		switch cfg.Kind {
+		case "wemo/v1":
 			devices = append(devices, &wemo.Wemo{
 				Id:      cfg.Id,
 				Name:    cfg.Name,
@@ -45,13 +46,13 @@ func main() {
 				Port:    cfg.Port,
 				Logger:  logger,
 			})
-		} else if cfg.Kind == "kasa/v1" {
+		case "kasa/v1":
 			devices = append(devices, kasa.New(
 				cfg.Id,
 				net.ParseIP(cfg.Address),
 				logger,
 			))
-		} else {
+		default:
 			panic(fmt.Sprintf("unknown kind: %s", cfg.Kind))
 		}
 	}
@@ -90,7 +91,7 @@ func mustParseConfigs(configPath string, logger *slog.Logger) (cfgs []switchConf
 	if err != nil {
 		panic(err)
 	}
-	defer file.Close()
+	defer func() { _ = file.Close() }()
 
 	if err := json.NewDecoder(file).Decode(&cfgs); err != nil {
 		panic(err)

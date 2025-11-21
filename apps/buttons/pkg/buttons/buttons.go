@@ -79,7 +79,7 @@ func (s Server) post(w http.ResponseWriter, r *http.Request, parts []string) {
 		return
 	}
 
-	fmt.Fprintf(w, "OK")
+	_, _ = fmt.Fprintf(w, "OK")
 }
 
 func (s Server) get(w http.ResponseWriter, r *http.Request, parts []string) {
@@ -112,7 +112,7 @@ func (s Server) get(w http.ResponseWriter, r *http.Request, parts []string) {
 		body += ":" + clocktime
 	}
 
-	fmt.Fprintln(w, body)
+	_, _ = fmt.Fprintln(w, body)
 }
 
 func (s Server) getClocktime() (string, error) {
@@ -120,7 +120,7 @@ func (s Server) getClocktime() (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("couldn't get clocktime from %s: %w", s.clocktimeUrl, err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		return "", fmt.Errorf("clocktime not OK. status: %d", resp.StatusCode)
