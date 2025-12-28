@@ -28,52 +28,12 @@ config:
     image: ghcr.io/mikepartelow/homeslice/clocktime:main.20251014-051024.185c95c@sha256:b60420c747ea2d56090ab834048e45c944d51a1dc7c11941af75e0bfa8cf9a23
     ingress_prefix: /api/v0/clocktime/
     location: America/Los_Angeles
-  homeslice:flyte:
-    namespace: flyte
-    # based off https://github.com/davidmirror-ops/flyte-the-hard-way/blob/main/docs/on-premises/single-node/002-single-node-onprem-install.md
-    secret-name: flyte-binary-inline-config-secret
-    charts:
-      - name: postgres
-        version: 16.6.6
-        chart: oci://registry-1.docker.io/bitnamicharts/postgresql
-        values:
-          fullnameOverride: postgres
-          auth:
-            postgresPassword: "%DB_PASSWORD%"
-            username: flyte
-            password: "%DB_PASSWORD%"
-            database: flyte
-      - name: minio
-        version: 16.0.8
-        chart: oci://registry-1.docker.io/bitnamicharts/minio
-        values:
-          auth:
-            rootUser: minio
-            rootPassword: "%MINIO_PASSWORD%"
-          defaultBuckets: flyte
-      - name: flyte
-        chart: flyte-binary
-        version: v1.15.3
-        repo: https://flyteorg.github.io/flyte
-        values-resource: onprem-flyte-binary-values.yaml
   homeslice:lmz:
-    image: ghcr.io/mikepartelow/homeslice/pylmz:main.20251014-051003.185c95c@sha256:c75f3b01ba6774de0668b2a1dc8c9b095d8b2a8ab3c095f3100038f8d34d1774
+    image: registry.localdomain:32000/pylmz:20251228_085620
     container_port: 8000
     ingress_prefix: /(api/v0/lmz)/(.*)$
     installation_key_json_path: /home/nonroot/.config/pylmz/installation_key/installation_key.json
     creds_txt_path: /home/nonroot/.config/pylmz/creds/creds.txt
-  # homeslice:observability:
-  #   hostname: moe.localdomain
-  #   namespace: observability
-  #   grafana_chart_version: "8.3.2"
-  #   grafana_ingress_prefix: /grafana
-  #   loki_chart_version: "6.6.5"
-  #   loki_datasource: http://loki-gateway.observability.svc.cluster.local/
-  #   loki_push_url: http://loki-gateway.observability.svc.cluster.local/loki/api/v1/push
-  #   prometheus_chart_version: "25.22.0"
-  #   prometheus_ingress_prefix: /prometheus
-  #   prometheus_datasource: http://prometheus-server.observability.svc.cluster.local
-  #   promtail_chart_version: "6.16.3"
   homeslice:namespace: homeslice
   homeslice:sonos:
     image: ghcr.io/mikepartelow/homeslice/gosonos:main.20251014-051025.185c95c@sha256:64240f04e470ffe7b3fcdb38af9e4d0c182d14e80afcd4f9c3d3c6f47ee0e4c6
