@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 	"mp/switches/pkg/kasa"
+	"mp/switches/pkg/lutron"
 	"mp/switches/pkg/switches"
 	"mp/switches/pkg/wemo"
 	"net"
@@ -17,11 +18,12 @@ import (
 const Port = 8000
 
 type switchConfig struct {
-	Id      string `json:"id"`
-	Kind    string `json:"kind"`
-	Name    string `json:"name"`
-	Address string `json:"address"`
-	Port    int    `json:"port"`
+	Id            string `json:"id"`
+	Kind          string `json:"kind"`
+	Name          string `json:"name"`
+	Address       string `json:"address"`
+	Port          int    `json:"port"`
+	IntegrationId int    `json:"integration_id"`
 }
 
 func main() {
@@ -50,6 +52,17 @@ func main() {
 			devices = append(devices, kasa.New(
 				cfg.Id,
 				net.ParseIP(cfg.Address),
+				logger,
+			))
+		case "lutron/telnet/v1":
+			if cfg.IntegrationId == 0 {
+				panic("missing integration_id for lutron device")
+			}
+			devices = append(devices, lutron.New(
+				cfg.Id,
+				net.ParseIP(cfg.Address),
+				cfg.Port,
+				cfg.IntegrationId,
 				logger,
 			))
 		default:
