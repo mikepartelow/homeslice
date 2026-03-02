@@ -1,3 +1,5 @@
 /kasacli
 /switches
 switches.json
+lutron.json
+.envrc
