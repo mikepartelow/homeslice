@@ -21,6 +21,9 @@ Build and push the containers to your registry.
 % make push
 ```
 
+`make push` now publishes multi-arch images (`linux/amd64,linux/arm64`) by default.
+Override platforms when needed, e.g. `DOCKER_PLATFORMS=linux/arm64 make push`.
+
 Edit [pulumi/Pulumi.prod.yaml] and [pulumi/subst_address.json].
 
 Deploy with [pulumi](https://www.pulumi.com).

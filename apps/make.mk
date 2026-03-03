@@ -4,6 +4,8 @@ PROJECT := $(notdir $(patsubst %/,%,$(dir $(abspath $(firstword $(MAKEFILE_LIST)
 REGISTRY := $(if $(REGISTRY),$(REGISTRY),$(DEFAULT_REGISTRY))
 VERSION := $(if $(VERSION),$(VERSION),$(shell date +'%Y%m%d_%H%M%S'))
 IMAGE = $(REGISTRY)/$(PROJECT)
+DOCKER_PLATFORMS ?= linux/amd64,linux/arm64
+DOCKER_BUILDX_BUILDER ?= homeslice-multiarch
 
 --docker-run-env :=
 --docker-build-platform := --platform=linux/amd64
@@ -16,7 +18,7 @@ IMAGE = $(REGISTRY)/$(PROJECT)
 --local-args :=
 --shell-args := ${--docker-run-ports} ${--docker-run-mounts} ${--docker-run-env}
 
-.PHONY: fmt lint info dev shell build run push local
+.PHONY: fmt lint info dev shell build run push local buildx-ensure
 all: build
 
 info:
@@ -41,14 +43,19 @@ shell: dev
 test:
 	go test -race -cover ./...
 
+buildx-ensure:
+	docker buildx inspect $(DOCKER_BUILDX_BUILDER) >/dev/null 2>&1 || docker buildx create --name $(DOCKER_BUILDX_BUILDER) --use
+	docker buildx use $(DOCKER_BUILDX_BUILDER)
+	docker buildx inspect --bootstrap >/dev/null
+
 build: test
 	docker build ${--build-args} -t $(IMAGE):$(VERSION) --target prod .
 
 run: build
 	docker run --rm -t ${--run-args} $(IMAGE):$(VERSION)
 
-push: build
-	docker push $(IMAGE):$(VERSION)
+push: test buildx-ensure
+	docker buildx build --platform $(DOCKER_PLATFORMS) -t $(IMAGE):$(VERSION) --target prod --push .
 
 local:
 	CGO_ENABLED=0 go build ${--local-args} -o . ./cmd/...
