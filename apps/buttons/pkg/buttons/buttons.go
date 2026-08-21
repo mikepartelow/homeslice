@@ -18,6 +18,8 @@ const (
 	On
 )
 
+const alwaysOnButton = "brclock"
+
 func (s Status) String() string {
 	if s == On {
 		return "ON"
@@ -93,11 +95,15 @@ func (s Server) get(w http.ResponseWriter, r *http.Request, parts []string) {
 	id := parts[4]
 	s.logger.Info("buttons", "id", id)
 
-	status, ok := s.buttons.Get(id)
-	if !ok {
-		s.logger.Error("unknown button", "id", id)
-		w.WriteHeader(http.StatusBadRequest)
-		return
+	status := On
+	if id != alwaysOnButton {
+		var ok bool
+		status, ok = s.buttons.Get(id)
+		if !ok {
+			s.logger.Error("unknown button", "id", id)
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
 	}
 
 	body := status.String()

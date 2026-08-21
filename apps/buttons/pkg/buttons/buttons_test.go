@@ -100,6 +100,22 @@ func TestButtonTimes(t *testing.T) {
 	}
 }
 
+func TestBrclockIsAlwaysOn(t *testing.T) {
+	clocktimeServer := makeClocktimeServer(t, "1420")
+	defer clocktimeServer.Close()
+
+	s := buttons.NewServer(slog.Default(), clocktimeServer.URL)
+	request, _ := http.NewRequest(http.MethodPost, ButtonsPath+"brclock/off/", nil)
+	s.ServeHTTP(httptest.NewRecorder(), request)
+
+	request, _ = http.NewRequest(http.MethodGet, ButtonTimesPath+"brclock/", nil)
+	response := httptest.NewRecorder()
+	s.ServeHTTP(response, request)
+
+	assert.Equal(t, http.StatusOK, response.Code)
+	assert.Equal(t, "ON:1420", strings.TrimSpace(response.Body.String()))
+}
+
 func play(t *testing.T, s *buttons.Server, buttonPath string, operations []buttons.Status) (*http.Request, *httptest.ResponseRecorder) {
 	t.Helper()
 
