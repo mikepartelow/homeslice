@@ -1,7 +1,7 @@
 """The center of the homeslice deployment multiverse."""
 
-import pulumi
 import homeslice
+from backup_tidal.backup_tidal import BackupTidal
 from backup_todoist.backup_todoist import BackupTodoist
 from buttons.buttons import Buttons
 from chime.chime import Chime
@@ -9,6 +9,7 @@ from clocktime.clocktime import Clocktime
 from flyte.flyte import Flyte
 from homebridge.homebridge import Homebridge
 from homeslice_config import (
+    BackupTidalConfig,
     BackupTodoistConfig,
     ButtonsConfig,
     ChimeConfig,
@@ -16,8 +17,8 @@ from homeslice_config import (
     FlyteConfig,
     GrafanaConfig,
     HomeBridgeConfig,
-    LokiConfig,
     LmzConfig,
+    LokiConfig,
     PrometheusConfig,
     PromtailConfig,
     SonosConfig,
@@ -33,10 +34,15 @@ from sonos.sonos import Sonos
 from switches.switches import Switches
 from unifi.unifi import Unifi
 
+import pulumi
+
 config = pulumi.Config("homeslice")
 name = config.require("namespace")
 
 namespace = homeslice.namespace(name)
+
+if cfg := config.get_object("backup_tidal"):
+    BackupTidal("backup-tidal", BackupTidalConfig(**dict(cfg)))
 
 if cfg := config.get_object("backup_todoist"):
     BackupTodoist("backup-todoist", BackupTodoistConfig(**dict(cfg)))

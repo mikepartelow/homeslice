@@ -1,12 +1,13 @@
 """Resources for the homeslice/backup-todoist app."""
 
-import pulumi
-import pulumi_kubernetes as kubernetes
 import homeslice
 import homeslice_config
+import pulumi_kubernetes as kubernetes
 from homeslice_secrets import (  # pylint: disable=no-name-in-module
     backup_todoist as BACKUP_TODOIST_SECRETS,
 )
+
+import pulumi
 
 
 class BackupTodoist(pulumi.ComponentResource):
