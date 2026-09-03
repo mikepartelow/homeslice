@@ -21,7 +21,6 @@ from homeslice_config import (
     LokiConfig,
     PrometheusConfig,
     PromtailConfig,
-    SonosConfig,
     SwitchesConfig,
     UnifiConfig,
 )
@@ -30,7 +29,6 @@ from observability.grafana import Grafana
 from observability.loki import Loki
 from observability.prometheus import Prometheus
 from observability.promtail import Promtail
-from sonos.sonos import Sonos
 from switches.switches import Switches
 from unifi.unifi import Unifi
 
@@ -77,9 +75,6 @@ if cfg := config.get_object("observability"):
     Loki("loki", LokiConfig(**dict(cfg)))
     Prometheus("prometheus", PrometheusConfig(**dict(cfg)))
     Promtail("promtail", PromtailConfig(**dict(cfg)))
-
-if cfg := config.get_object("sonos"):
-    Sonos("sonos", SonosConfig(**dict(cfg)))
 
 if cfg := config.get_object("switches"):
     Switches("switches", SwitchesConfig(**dict(cfg)))
