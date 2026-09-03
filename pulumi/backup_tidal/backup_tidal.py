@@ -1,13 +1,15 @@
 """Resources for the homeslice/backup-tidal app."""
 
 from pathlib import Path
-import pulumi
-import pulumi_kubernetes as kubernetes
+
 import homeslice
 import homeslice_config
+import pulumi_kubernetes as kubernetes
 from homeslice_secrets import (  # pylint: disable=no-name-in-module
     backup_tidal as BACKUP_TIDAL_SECRETS,
 )
+
+import pulumi
 
 CONFIG_PATH = "/var/run/secrets/backup-tidal.json"
 TIDAL_CREDS_PATH = "/var/run/secrets/tidal-creds.json"

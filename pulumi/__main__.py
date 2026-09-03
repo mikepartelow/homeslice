@@ -1,6 +1,5 @@
 """The center of the homeslice deployment multiverse."""
 
-import pulumi
 import homeslice
 from backup_tidal.backup_tidal import BackupTidal
 from backup_todoist.backup_todoist import BackupTodoist
@@ -18,8 +17,8 @@ from homeslice_config import (
     FlyteConfig,
     GrafanaConfig,
     HomeBridgeConfig,
-    LokiConfig,
     LmzConfig,
+    LokiConfig,
     PrometheusConfig,
     PromtailConfig,
     SonosConfig,
@@ -34,6 +33,8 @@ from observability.promtail import Promtail
 from sonos.sonos import Sonos
 from switches.switches import Switches
 from unifi.unifi import Unifi
+
+import pulumi
 
 config = pulumi.Config("homeslice")
 name = config.require("namespace")

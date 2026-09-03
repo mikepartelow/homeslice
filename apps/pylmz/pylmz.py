@@ -1,19 +1,15 @@
 """web api to turn a la marzocco on and off"""
 
 import asyncio
-import signal
-from pathlib import Path
-
-from aiohttp import ClientSession
-
-from pylamarzocco import LaMarzoccoCloudClient, LaMarzoccoMachine
-from pylamarzocco.util import InstallationKey
-
 import logging
 import os
+import signal
 import sys
+from pathlib import Path
 
-from aiohttp import web
+from aiohttp import ClientSession, web
+from pylamarzocco import LaMarzoccoCloudClient, LaMarzoccoMachine
+from pylamarzocco.util import InstallationKey
 
 PORT = 8000
 
@@ -70,21 +66,21 @@ def create_app(machine: Machine) -> web.Application:
     async def on_handler(_: web.Request) -> web.Response:
         try:
             await machine.set_power(True)
-        except Exception:
+        except Exception:  # noqa: BLE001
             return web.Response(status=500)
         return web.Response(status=204)
 
     async def off_handler(_: web.Request) -> web.Response:
         try:
             await machine.set_power(False)
-        except Exception:
+        except Exception:  # noqa: BLE001
             return web.Response(status=500)
         return web.Response(status=204)
 
     async def status_handler(_: web.Request) -> web.Response:
         try:
             status = await machine.status()
-        except Exception:
+        except Exception:  # noqa: BLE001
             return web.Response(status=500)
 
         if status == "PoweredOn":
