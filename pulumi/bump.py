@@ -16,8 +16,8 @@ from pathlib import Path
 from typing import Any
 
 import yaml
-from coregio.registry_api import (
-    ContainerRegistry,  # type: ignore  # pylint: disable=import-error
+from coregio.registry_api import (  # type: ignore[import-not-found]
+    ContainerRegistry,  # pylint: disable=import-error
 )
 
 CACHE_FILE = "./bump-cache.yaml"
