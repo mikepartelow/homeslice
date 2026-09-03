@@ -1,0 +1,17 @@
+[project]
+name = ""
+version = "0.0.1"
+dependencies = [
+    "certifi==2024.7.4",
+    "charset-normalizer==3.3.2",
+    "idna==3.7",
+    "python-dateutil==2.9.0",
+    "requests==2.32.2",
+    "six==1.16.0",
+    "tidalapi==0.7.4",
+    "typing-extensions==4.10.0",
+    "urllib3==2.2.2",
+]
+
+[tool.uv]
+package = false
