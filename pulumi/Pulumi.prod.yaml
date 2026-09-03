@@ -3,7 +3,7 @@ config:
   homeslice:backup_tidal:
     git_author_email: github@mikepartelow.com
     git_author_name: Mike Partelow
-    image: ghcr.io/mikepartelow/homeslice/backup-tidal:main.20250918-043612.3ac39b9@sha256:410075268a86be4c08f0357daddc029c17298ab30db255e5cba9a9d7320be7e1
+    image: ghcr.io/mikepartelow/homeslice/backup-tidal:main.20260903-053021.e739b2e@sha256:ab57b4425deecc0f4921f716a264cfe34248b64cb4c25177d74bc601786504f5
     schedule: 0 1 * * *
   homeslice:backup_todoist:
     git_author_email: github@mikepartelow.com
