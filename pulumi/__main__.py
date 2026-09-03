@@ -4,7 +4,6 @@ import homeslice
 from backup_tidal.backup_tidal import BackupTidal
 from backup_todoist.backup_todoist import BackupTodoist
 from buttons.buttons import Buttons
-from chime.chime import Chime
 from clocktime.clocktime import Clocktime
 from flyte.flyte import Flyte
 from homebridge.homebridge import Homebridge
@@ -12,7 +11,6 @@ from homeslice_config import (
     BackupTidalConfig,
     BackupTodoistConfig,
     ButtonsConfig,
-    ChimeConfig,
     ClocktimeConfig,
     FlyteConfig,
     GrafanaConfig,
@@ -47,15 +45,6 @@ if cfg := config.get_object("backup_todoist"):
 
 if cfg := config.get_object("buttons"):
     Buttons("buttons", ButtonsConfig(**dict(cfg)))
-
-if cfg := config.get_object("chime"):
-    k8s_context = pulumi.Config("kubernetes").require("context")
-    Chime(
-        "chime",
-        ChimeConfig(**dict(cfg)),
-        k8s_context,
-        config.require("namespace"),
-    )
 
 if cfg := config.get_object("clocktime"):
     Clocktime("clocktime", ClocktimeConfig(**dict(cfg)))

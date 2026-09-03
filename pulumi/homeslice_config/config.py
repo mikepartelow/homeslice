@@ -1,6 +1,6 @@
 """Homeslice Config"""
 
-from typing import Mapping, Optional, Sequence
+from typing import Optional
 from pydantic import BaseModel, Field
 
 
@@ -42,17 +42,6 @@ class BackupTodoistConfig(GithubBackupConfig):
     schedule: str
 
 
-class ChimeConfig(BaseModel):
-    """Chime Config"""
-
-    image: str
-    chimes: Sequence[Mapping[str, str]]
-    nginx: str
-    pvc_mount_path: str
-    container_port: int
-    ingress_prefix: str
-
-
 class HomeBridgeConfig(BaseModel):
     """HomeBridge Config"""
 
@@ -70,16 +59,6 @@ class LmzConfig(BaseModel):
     installation_key_json_path: str
     creds_txt_path: str
     ingress_prefix: Optional[str]
-
-
-class SonosConfig(BaseModel):
-    """Sonos Config"""
-
-    config_path: str
-    container_port: int
-    image: str
-    ingress_prefix: Optional[str]
-    volume: int
 
 
 class UnifiConfig(GithubBackupConfig):

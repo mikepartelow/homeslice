@@ -10,23 +10,6 @@ TODOIST_BACKUP_TODOIST_TOKEN="Todoist auth token",
 SSH_PRIVATE_KEY="""an SSH private key with write permissions to $TODOIST_BACKUP_GIT_CLONE"
 ```
 
-## chime.py
-
-```python
-ZONES = [
-    {
-        "ip_address": "1.2.3.4",
-        "name": "Vault 13",
-    },
-    {
-        "ip_address": "6.5.4.3",
-        "name": "Rooftop Pool",
-    },
-]
-
-INGRESS = "ip address of your ingress, so sonos can play the mp3 hosted on your persistent volume"
-```
-
 ## switches
 
 ```python
