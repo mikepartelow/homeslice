@@ -6,10 +6,10 @@ dependencies = [
     "charset-normalizer==3.3.2",
     "idna==3.7",
     "python-dateutil==2.9.0",
-    "requests==2.32.2",
+    "requests==2.32.3",
     "six==1.16.0",
-    "tidalapi==0.7.4",
-    "typing-extensions==4.10.0",
+    "tidalapi==0.8.11",
+    "typing-extensions==4.12.2",
     "urllib3==2.2.2",
 ]
 

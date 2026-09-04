@@ -37,7 +37,11 @@ def main():
         config = json.load(config_f)
 
     session = tidalapi.Session()
-    auth.login(session, PATH_TO_CREDS)
+    try:
+        auth.login(session, PATH_TO_CREDS)
+    except auth.TidalAuthError as exc:
+        print(f"Tidal authentication failed: {exc}")
+        sys.exit(1)
 
     playlist_filename = f"{config['playlist_name']}.json"
     playlist_path = Path(PLAYLIST_PATH) / Path(playlist_filename)
