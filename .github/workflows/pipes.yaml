@@ -14,7 +14,7 @@ jobs:
       packages: write
     strategy:
       matrix:
-        app: [backup-tidal, backup-todoist, backup-unifi, buttons, chime, clocktime, gosonos, pylmz, switches]
+        app: [backup-tidal, backup-todoist, backup-unifi, buttons, clocktime, pylmz, switches]
     steps:
       - uses: actions/checkout@v4
       - name: Install ruff without running check or format
@@ -83,3 +83,12 @@ jobs:
           python-version: '3.12'
       - name: lint
         run: cd pulumi && make lint
+
+  # Keep the legacy required check green until repository branch protection
+  # is updated to remove the retired chime check.
+  apps_chime:
+    name: apps (chime)
+    if: ${{ false }}
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "chime retired"

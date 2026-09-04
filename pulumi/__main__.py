@@ -4,7 +4,6 @@ import homeslice
 from backup_tidal.backup_tidal import BackupTidal
 from backup_todoist.backup_todoist import BackupTodoist
 from buttons.buttons import Buttons
-from chime.chime import Chime
 from clocktime.clocktime import Clocktime
 from flyte.flyte import Flyte
 from homebridge.homebridge import Homebridge
@@ -12,7 +11,6 @@ from homeslice_config import (
     BackupTidalConfig,
     BackupTodoistConfig,
     ButtonsConfig,
-    ChimeConfig,
     ClocktimeConfig,
     FlyteConfig,
     GrafanaConfig,
@@ -21,7 +19,6 @@ from homeslice_config import (
     LokiConfig,
     PrometheusConfig,
     PromtailConfig,
-    SonosConfig,
     SwitchesConfig,
     UnifiConfig,
 )
@@ -30,7 +27,6 @@ from observability.grafana import Grafana
 from observability.loki import Loki
 from observability.prometheus import Prometheus
 from observability.promtail import Promtail
-from sonos.sonos import Sonos
 from switches.switches import Switches
 from unifi.unifi import Unifi
 
@@ -50,15 +46,6 @@ if cfg := config.get_object("backup_todoist"):
 if cfg := config.get_object("buttons"):
     Buttons("buttons", ButtonsConfig(**dict(cfg)))
 
-if cfg := config.get_object("chime"):
-    k8s_context = pulumi.Config("kubernetes").require("context")
-    Chime(
-        "chime",
-        ChimeConfig(**dict(cfg)),
-        k8s_context,
-        config.require("namespace"),
-    )
-
 if cfg := config.get_object("clocktime"):
     Clocktime("clocktime", ClocktimeConfig(**dict(cfg)))
 
@@ -77,9 +64,6 @@ if cfg := config.get_object("observability"):
     Loki("loki", LokiConfig(**dict(cfg)))
     Prometheus("prometheus", PrometheusConfig(**dict(cfg)))
     Promtail("promtail", PromtailConfig(**dict(cfg)))
-
-if cfg := config.get_object("sonos"):
-    Sonos("sonos", SonosConfig(**dict(cfg)))
 
 if cfg := config.get_object("switches"):
     Switches("switches", SwitchesConfig(**dict(cfg)))

@@ -3,7 +3,7 @@ config:
   homeslice:backup_tidal:
     git_author_email: github@mikepartelow.com
     git_author_name: Mike Partelow
-    image: ghcr.io/mikepartelow/homeslice/backup-tidal:main.20250918-043612.3ac39b9@sha256:410075268a86be4c08f0357daddc029c17298ab30db255e5cba9a9d7320be7e1
+    image: ghcr.io/mikepartelow/homeslice/backup-tidal:main.20260903-053021.e739b2e@sha256:ab57b4425deecc0f4921f716a264cfe34248b64cb4c25177d74bc601786504f5
     schedule: 0 1 * * *
   homeslice:backup_todoist:
     git_author_email: github@mikepartelow.com
@@ -18,16 +18,6 @@ config:
     ingress_prefixes:
       - /api/v0/buttons/
       - /api/v0/buttontimes/
-  homeslice:chime:
-    chimes:
-      - media_title: every day
-        media_uri: http://{{ingress}}/api/v0/chime/swed.mp3
-        schedule: 20 16 * * *
-    container_port: 80
-    image: ghcr.io/mikepartelow/homeslice/chime:main.20251014-050954.185c95c@sha256:96d8bc194792bdc6fccc370f01d5e5696ecdd51573f46ae9418dcbc75a3f634b
-    ingress_prefix: /(api/v0/chime/)(.*)$
-    nginx: nginx:1.25
-    pvc_mount_path: /usr/share/nginx/html
   homeslice:clocktime:
     container_port: 8000
     image: ghcr.io/mikepartelow/homeslice/clocktime:main.20251014-051024.185c95c@sha256:b60420c747ea2d56090ab834048e45c944d51a1dc7c11941af75e0bfa8cf9a23
@@ -40,12 +30,6 @@ config:
     installation_key_json_path: /home/nonroot/.config/pylmz/installation_key/installation_key.json
     creds_txt_path: /home/nonroot/.config/pylmz/creds/creds.txt
   homeslice:namespace: homeslice
-  homeslice:sonos:
-    image: ghcr.io/mikepartelow/homeslice/gosonos:main.20251014-051025.185c95c@sha256:64240f04e470ffe7b3fcdb38af9e4d0c182d14e80afcd4f9c3d3c6f47ee0e4c6
-    container_port: 8000
-    config_path: /etc/sonos/config.yaml
-    ingress_prefix: /(api/v0/sonos/)(.*)$
-    volume: 20
   homeslice:switches:
     container_port: 8000
     image: ghcr.io/mikepartelow/homeslice/switches:main.20251014-051032.185c95c@sha256:b3f010cc9bb92b48994fe11592bd9cbb3a86b627e069adbae3b3b91b6f4480d4
@@ -67,7 +51,7 @@ config:
         }
       ]
     switches_json_path: /var/run/switches.json
-  kubernetes:context: moe
+  kubernetes:context: kate
   homeslice:homebridge:
     image: ghcr.io/homebridge/homebridge:2024-05-02@sha256:c13910618a3dbe6ed1afd01def54f800a10228ca1a6e540bb302ab56762fbd66
     redirect_host: moe.localdomain

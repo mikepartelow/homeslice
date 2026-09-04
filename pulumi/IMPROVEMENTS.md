@@ -16,7 +16,6 @@
 - [ ] create a common base class for all ComponentResources to reduce duplication
 - [ ] add proper error handling and validation to config loading
 - [ ] implement proper secret management strategy
-- [ ] fix FIXME items in chime/chime.py (populate command and local.Command issues)
 - [ ] implement proper logging throughout the codebase
 - [ ] add integration tests for ComponentResources
 - [ ] create a proper CI/CD pipeline configuration
@@ -29,4 +28,4 @@
 - [x] fix all mypy errors
 - [x] convert all pulumi config usage to pydantic model usage
 - [x] alphabetize all imports
-- [x] remove app() functions and instantiate ComponentResources directly 
+- [x] remove app() functions and instantiate ComponentResources directly
