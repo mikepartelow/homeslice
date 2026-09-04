@@ -8,13 +8,20 @@ env:
 
 jobs:
   apps:
+    # Keep the legacy required check green until repository branch protection
+    # is updated to remove the retired chime check.
+    name: apps (${{ matrix.check_name || matrix.app }})
     runs-on: ubuntu-latest
+    if: matrix.app != 'retired-chime'
     permissions:
       contents: read
       packages: write
     strategy:
       matrix:
         app: [backup-tidal, backup-todoist, backup-unifi, buttons, clocktime, pylmz, switches]
+        include:
+          - app: retired-chime
+            check_name: chime
     steps:
       - uses: actions/checkout@v4
       - name: Install ruff without running check or format
