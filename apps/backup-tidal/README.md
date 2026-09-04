@@ -10,6 +10,10 @@ Download a playlist from Tidal, store it in a local JSON file, push the JSON fil
 % make login
 ```
 
+If a scheduled backup reports that the refresh token has expired, run
+`make login` again and update the deployment secret with the resulting
+`tidal-creds.json` before the next scheduled run.
+
 2. Create config file `./backup-tidal.json`.
 
 ```json

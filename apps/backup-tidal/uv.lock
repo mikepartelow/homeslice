@@ -24,10 +24,10 @@ requires-dist = [
     { name = "charset-normalizer", specifier = "==3.3.2" },
     { name = "idna", specifier = "==3.7" },
     { name = "python-dateutil", specifier = "==2.9.0" },
-    { name = "requests", specifier = "==2.32.2" },
+    { name = "requests", specifier = "==2.32.3" },
     { name = "six", specifier = "==1.16.0" },
-    { name = "tidalapi", specifier = "==0.7.4" },
-    { name = "typing-extensions", specifier = "==4.10.0" },
+    { name = "tidalapi", specifier = "==0.8.11" },
+    { name = "typing-extensions", specifier = "==4.12.2" },
     { name = "urllib3", specifier = "==2.2.2" },
 ]
 
@@ -74,6 +74,30 @@ wheels = [
 ]
 
 [[package]]
+name = "isodate"
+version = "0.7.2"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/54/4d/e940025e2ce31a8ce1202635910747e5a87cc3a6a6bb2d00973375014749/isodate-0.7.2.tar.gz", hash = "sha256:4cd1aa0f43ca76f4a6c6c0292a85f40b35ec2e43e315b59f06e6d32171a953e6", size = 29705 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/15/aa/0aca39a37d3c7eb941ba736ede56d689e7be91cab5d9ca846bde3999eba6/isodate-0.7.2-py3-none-any.whl", hash = "sha256:28009937d8031054830160fce6d409ed342816b543597cece116d966c6d99e15", size = 22320 },
+]
+
+[[package]]
+name = "mpegdash"
+version = "0.4.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/48/10/fc39d56bce11d703617435a47843c7c33fa0f84635c6136279c9f73ecd5b/mpegdash-0.4.1.tar.gz", hash = "sha256:e31d81e1f0184cc456553ef2a4a1de1c662972b8ce04b687c1854180912759e6", size = 12665 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ca/a0/7a2734a7d734d81b6627ac1c470ce388f5a80e5669d9803a5c3c179ca84f/mpegdash-0.4.1-py3-none-any.whl", hash = "sha256:788e559b73acbf9175422548c58a4c441486c0ce0633fa10f77097bfffeaad4d", size = 11009 },
+]
+
+[[package]]
+name = "pyaes"
+version = "1.6.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/44/66/2c17bae31c906613795711fc78045c285048168919ace2220daa372c7d72/pyaes-1.6.1.tar.gz", hash = "sha256:02c1b1405c38d3c370b085fb952dd8bea3fadcee6411ad99f312cc129c536d8f", size = 28536 }
+
+[[package]]
 name = "python-dateutil"
 version = "2.9.0"
 source = { registry = "https://pypi.org/simple" }
@@ -86,8 +110,14 @@ wheels = [
 ]
 
 [[package]]
+name = "ratelimit"
+version = "2.2.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/ab/38/ff60c8fc9e002d50d48822cc5095deb8ebbc5f91a6b8fdd9731c87a147c9/ratelimit-2.2.1.tar.gz", hash = "sha256:af8a9b64b821529aca09ebaf6d8d279100d766f19e90b5059ac6a718ca6dee42", size = 5251 }
+
+[[package]]
 name = "requests"
-version = "2.32.2"
+version = "2.32.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "certifi" },
@@ -95,9 +125,9 @@ dependencies = [
     { name = "idna" },
     { name = "urllib3" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/86/ec/535bf6f9bd280de6a4637526602a146a68fde757100ecf8c9333173392db/requests-2.32.2.tar.gz", hash = "sha256:dd951ff5ecf3e3b3aa26b40703ba77495dab41da839ae72ef3c8e5d8e2433289", size = 130327 }
+sdist = { url = "https://files.pythonhosted.org/packages/63/70/2bf7780ad2d390a8d301ad0b550f1581eadbd9a20f896afe06353c2a2913/requests-2.32.3.tar.gz", hash = "sha256:55365417734eb18255590a9ff9eb97e9e1da868d4ccd6402399eaf68af20a760", size = 131218 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/c3/20/748e38b466e0819491f0ce6e90ebe4184966ee304fe483e2c414b0f4ef07/requests-2.32.2-py3-none-any.whl", hash = "sha256:fc06670dd0ed212426dfeb94fc1b983d917c4f9847c863f313c9dfaaffb7c23c", size = 63902 },
+    { url = "https://files.pythonhosted.org/packages/f9/9b/335f9764261e915ed497fcdeb11df5dfd6f7bf257d4a6a2a686d80da4d54/requests-2.32.3-py3-none-any.whl", hash = "sha256:70761cfe03c773ceb22aa2f671b4757976145175cdfca038c02654d061d6dcc6", size = 64928 },
 ]
 
 [[package]]
@@ -111,25 +141,29 @@ wheels = [
 
 [[package]]
 name = "tidalapi"
-version = "0.7.4"
+version = "0.8.11"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
+    { name = "isodate" },
+    { name = "mpegdash" },
+    { name = "pyaes" },
     { name = "python-dateutil" },
+    { name = "ratelimit" },
     { name = "requests" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/ec/08/1c1aabf6eceb98b2cd9e0bc2e0f99f7084507bf89510bc60fe7bfed965e4/tidalapi-0.7.4.tar.gz", hash = "sha256:cb100daf557ceff6d23da734de354debd5a23b879cfb2179a19a464df2de249e", size = 35988 }
+sdist = { url = "https://files.pythonhosted.org/packages/80/ab/5552d1ba6e4abb627a018cd14e3253fdf3dbfd28bba59f430401368f455a/tidalapi-0.8.11.tar.gz", hash = "sha256:c8dea8c382be37be12413665c8b81a516ecd6e97c0997a565f2ae1b21a2ed165", size = 58372 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/f0/29/8e60c08f12e95c5b542a5308768e7299a45e0d38d9c5683389e666d95c03/tidalapi-0.7.4-py3-none-any.whl", hash = "sha256:442482fd5fc877f37d04e643e2b83b42d949cbaba403aeb90f791d51df6c7e61", size = 43742 },
+    { url = "https://files.pythonhosted.org/packages/a0/dc/11ae1f4150754e82234a56ed4d94d5c326022502ce3f1e6e214f569c5c3e/tidalapi-0.8.11-py3-none-any.whl", hash = "sha256:1ed2485bb4634907afc434163fba22dc8a323d90cc92306973ab68bcdfef5c54", size = 64279 },
 ]
 
 [[package]]
 name = "typing-extensions"
-version = "4.10.0"
+version = "4.12.2"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/16/3a/0d26ce356c7465a19c9ea8814b960f8a36c3b0d07c323176620b7b483e44/typing_extensions-4.10.0.tar.gz", hash = "sha256:b0abd7c89e8fb96f98db18d86106ff1d90ab692004eb746cf6eda2682f91b3cb", size = 77558 }
+sdist = { url = "https://files.pythonhosted.org/packages/df/db/f35a00659bc03fec321ba8bce9420de607a1d37f8342eee1863174c69557/typing_extensions-4.12.2.tar.gz", hash = "sha256:1a7ead55c7e559dd4dee8856e3a88b41225abfe1ce8df57b7c13915fe121ffb8", size = 85321 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/f9/de/dc04a3ea60b22624b51c703a84bbe0184abcd1d0b9bc8074b5d6b7ab90bb/typing_extensions-4.10.0-py3-none-any.whl", hash = "sha256:69b1a937c3a517342112fb4c6df7e72fc39a38e7891a5730ed4985b5214b5475", size = 33926 },
+    { url = "https://files.pythonhosted.org/packages/26/9f/ad63fc0248c5379346306f8668cda6e2e2e9c95e01216d2b8ffd9ff037d0/typing_extensions-4.12.2-py3-none-any.whl", hash = "sha256:04e5ca0351e0f3f85c6853954072df659d0d13fac324d0072316b67d7794700d", size = 37438 },
 ]
 
 [[package]]
